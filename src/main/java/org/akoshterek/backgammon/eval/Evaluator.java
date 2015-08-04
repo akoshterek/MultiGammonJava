@@ -192,7 +192,7 @@ public class Evaluator {
         return basePath;
     }
 
-    public void load(String basePath) {
-        this.basePath = Paths.get(basePath).getParent();
+    public void load(Path basePath) {
+        this.basePath = basePath;
     }
 }

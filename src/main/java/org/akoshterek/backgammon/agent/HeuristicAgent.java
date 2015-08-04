@@ -46,7 +46,7 @@ public class HeuristicAgent extends AbsAgent {
             int dist = 25 - i;
 
             // value based on closeness to home
-            value += (12.5f - dist) * (float) points[i] / 225.0f;
+            value += (12.5 - dist) * (double) points[i] / 225.0;
         }
 
         reward.data[Constants.OUTPUT_WIN] = value;

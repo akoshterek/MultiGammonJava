@@ -20,8 +20,8 @@ public abstract class AbsAgent implements IAgent {
     private boolean learnMode = false;
     private boolean supportsSanityCheck = false;
     private int playedGames = 0;
-    private boolean fixed = true;
-    private boolean needsInvertedEval = false;
+    protected boolean fixed = true;
+    protected boolean needsInvertedEval = false;
 
     public AbsAgent(Path path) {
         this.path = Paths.get(path.toString(), AGENTS_SUBFOLDER);
@@ -74,5 +74,14 @@ public abstract class AbsAgent implements IAgent {
 
     public void setSanityCheck(boolean sc) {
         this.supportsSanityCheck = sc;
+    }
+
+    @Override
+    public AbsAgent clone() {
+        try {
+            return (AbsAgent)super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
