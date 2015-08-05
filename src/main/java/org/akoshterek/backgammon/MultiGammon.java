@@ -7,7 +7,7 @@ import org.akoshterek.backgammon.dispatch.Dispatcher;
  *         date 18.07.2015.
  */
 public class MultiGammon {
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         Dispatcher dispatcher = new Dispatcher();
         if(dispatcher.init(args)) {
             dispatcher.run();

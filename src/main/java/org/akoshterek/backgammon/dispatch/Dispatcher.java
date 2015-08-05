@@ -7,7 +7,6 @@ import org.akoshterek.backgammon.agent.IAgent;
 import org.akoshterek.backgammon.eval.Evaluator;
 import org.akoshterek.backgammon.util.OptionsBean;
 import org.akoshterek.backgammon.util.OptionsBuilder;
-import org.apache.commons.cli.*;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 
 import java.nio.file.Path;
@@ -25,7 +24,7 @@ public class Dispatcher {
         OptionsBuilder.build();
     }
 
-    public boolean init(String[] args) throws ParseException {
+    public boolean init(String[] args) {
         License.printBanner();
         options = OptionsBuilder.parse(args);
 
@@ -53,13 +52,13 @@ public class Dispatcher {
         String benchAgenName = options.getBenchmarkAgentName();
 
         long start = System.currentTimeMillis();
-        Arrays.stream(agentNames).parallel().forEach(agentName -> {
-            runAgentIteration(agentName,
+        Arrays.stream(agentNames).parallel().forEach(agentName ->
+                runAgentIteration(agentName,
                     benchAgenName,
                     options.getTrainingGames(),
                     options.getBenchmarkGames(),
-                    options.getBenchmarkPeriod());
-        });
+                    options.getBenchmarkPeriod())
+        );
         long end = System.currentTimeMillis();
         System.out.println("Elapsed time " + formatTime(end - start));
     }
@@ -83,23 +82,31 @@ public class Dispatcher {
 
     private void runIteration(IAgent agent1, IAgent benchAgent, IAgent agent2,
                                     int trainGames, int benchmarkGames, int benchmarkPeriod) {
-        GameDispatcher gameDispatcher(agent1, agent2);
-        gameDispatcher.setShowLog(options.isVerbose());
+        GameDispatcher gameDispatcher = new GameDispatcher(agent1, agent2);
+        gameDispatcher.setIsShowLog(options.isVerbose());
+
+        if (trainGames > 0) {
+            for (int game = 0; game < trainGames; game += benchmarkPeriod) {
+                //training
+                gameDispatcher.playGames(benchmarkPeriod, true);
+                agent1.save();
+
+                //benchmark
+                GameDispatcher benchDispatcher = new GameDispatcher(agent1, benchAgent);
+                benchDispatcher.setIsShowLog(false);
+                benchDispatcher.playGames(benchmarkGames, false);
+                benchDispatcher.printStatistics();
+            }
+        } else {
+            //benchmark
+            GameDispatcher benchDispatcher = new GameDispatcher(agent1, benchAgent);
+            benchDispatcher.setIsShowLog(false);
+            benchDispatcher.playGames(benchmarkGames, false);
+            benchDispatcher.printStatistics();
+        }
     }
 
     private static String formatTime(long millis) {
         return DurationFormatUtils.formatDuration(millis, "HH:mm:ss.S");
     }
-
-    //private:
-    //int m_argc;
-    //char **m_argv;
-
-    /*
-    po::options_description m_desc;
-    po::variables_map m_vm;
-    void runAgentIteration(const char *agentName, const char *benchAgentName);
-    void runIteration(BgAgent *agent1, BgAgent *benchAgent, BgAgent *agent2,
-                      int trainGames, int benchmarkGames, int benchmarkPeriod);
-    */
 }
