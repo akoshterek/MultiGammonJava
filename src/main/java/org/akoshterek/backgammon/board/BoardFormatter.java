@@ -5,15 +5,13 @@ package org.akoshterek.backgammon.board;
  *         date 26.07.2015.
  */
 public class BoardFormatter {
-    public static String drawBoard(Board board, int fRoll, String[] asz, String szMatchID)
+    public static String drawBoard(Board board, int fRoll, String[] asz)
     {
-        return drawBoardStd(board, fRoll, asz, szMatchID);
+        return drawBoardStd(board, fRoll, asz);
     }
-
 
     /*
      *  GNU Backgammon  Position ID: 0123456789ABCD
-     *                  Match ID   : 0123456789ABCD
      *  +13-14-15-16-17-18------19-20-21-22-23-24-+     O: gnubg (Cube: 2)
      *  |                  |   | O  O  O  O     O | OO  0 points
      *  |                  |   | O     O          | OO  Cube offered at 2
@@ -29,7 +27,7 @@ public class BoardFormatter {
      *  +12-11-10--9--8--7-------6--5--4--3--2--1-+     X: Gary (Cube: 2)
      *
      */
-    private static String drawBoardStd(Board board, int fRoll, String[] asz, String szMatchID) {
+    private static String drawBoardStd(Board board, int fRoll, String[] asz) {
         String pch = "";
         int x, y;
         int cOffO = Board.TOTAL_MEN, cOffX = Board.TOTAL_MEN;
@@ -54,8 +52,6 @@ public class BoardFormatter {
         }
         pch += "              \n";
 
-        // match id
-        pch += String.format("                 %s   : %s\n", ("Match ID"), szMatchID);
         pch += fRoll != 0 ? " +13-14-15-16-17-18------19-20-21-22-23-24-+     " :
                 " +12-11-10--9--8--7-------6--5--4--3--2--1-+     ";
         pch += "                                                 ";
@@ -231,17 +227,17 @@ public class BoardFormatter {
         int[] anOff = new int[] {0, 0};
         byte[][] anBoard = board.anBoard;
 
-        /* Opponent on bar */
+        // Opponent on bar
         pch += String.format("%d:", -(int)anBoard[ 0 ][ 24 ] );
 
-        /* Board */
+        // Board
         for(int i = 0; i < 24; i++ )
         {
             int point = (int)anBoard[ 0 ][ 23 - i ];
             pch += String.format("%d:", (point > 0) ?  -point : (int)anBoard[ 1 ][ i ] );
         }
 
-        /* Player on bar */
+        // Player on bar
         pch += String.format("%d:", anBoard[ 1 ][ 24 ] );
 
         anOff[ 0 ] = anOff[ 1 ] = Board.TOTAL_MEN;

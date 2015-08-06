@@ -25,7 +25,7 @@ public class Board {
 
     public byte[][] anBoard = new byte[2][25];
 
-    private static final String aszBase64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+    public static final String aszBase64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
     public Board() {
         clearBoard();
