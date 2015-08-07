@@ -4,6 +4,7 @@ import org.akoshterek.backgammon.board.Board;
 import org.akoshterek.backgammon.board.BoardFormatter;
 import org.akoshterek.backgammon.match.MatchMove;
 import org.akoshterek.backgammon.match.MatchState;
+import org.akoshterek.backgammon.move.ChequerMove;
 import org.akoshterek.backgammon.move.MoveRecord;
 
 import java.io.IOException;
@@ -95,6 +96,23 @@ public class GameInfoPrinter {
                 agents[0].agent.getFullName(), match.anScore[0],
                 agents[1].agent.getFullName(), match.anScore[1]);
         System.out.println(str);
+    }
+
+    public static void showAutoMove(ChequerMove anMove, GameDispatcher.AgentEntry[] agents, MatchState match) {
+        char symbol = match.fTurn != 0? 'X' : 'O';
+        if( anMove.move[ 0 ] == -1 ) {
+            System.out.println(String.format("%c:%s cannot move.", symbol, agents[match.fTurn].agent.getFullName()));
+        } else {
+            System.out.println(String.format("%c:%s moves %s.", symbol, agents[match.fTurn].agent.getFullName(),
+                    BoardFormatter.formatMovePlain(anMove, match.board)));
+        }
+    }
+
+    public static void printGameOver(GameDispatcher.AgentEntry[] agents, int fWinner, int nPoints, int result) {
+        System.out.println(String.format("\nEnd Game done.\n%c:%s wins a %s and %d point(s)\n",
+                fWinner != 0 ? 'X' : 'O',
+                agents[fWinner].agent.getFullName(),
+                gameResult[ result - 1 ], nPoints));
     }
 
     private static String getLogFileName(GameDispatcher.AgentEntry[] agents) {

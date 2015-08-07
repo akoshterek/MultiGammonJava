@@ -157,8 +157,121 @@ public class GameDispatcher {
         //perform other elision (e.g. consecutive "set" records)
         fixMatchState(pmr);
         lMatch.getLast().moveRecords.addLast(pmr);
-        ApplyMoveRecord( pmr );
+        applyMoveRecord(pmr);
     }
+
+    private void applyMoveRecord(MoveRecord pmr) {
+        Deque<MoveRecord> lGame = lMatch.getLast().moveRecords;
+
+        int n;
+        MoveRecord pmrx = lGame.getFirst();
+        XMoveGameInfo pmgi;
+        //this is wrong -- plGame is not necessarily the right game
+
+        assert (pmr.mt == MoveType.MOVE_GAMEINFO || pmrx.mt == MoveType.MOVE_GAMEINFO);
+        pmgi = pmrx.g;
+
+        currentMatch.gs = GameState.GAME_PLAYING;
+
+        switch (pmr.mt) {
+            case MOVE_GAMEINFO:
+                currentMatch.board.initBoard();
+
+                currentMatch.anScore[0] = pmr.g.anScore[0];
+                currentMatch.anScore[1] = pmr.g.anScore[1];
+
+                currentMatch.gs = GameState.GAME_NONE;
+                currentMatch.fMove = currentMatch.fTurn = -1;
+                currentMatch.anDice[0] = currentMatch.anDice[1] = 0;
+                break;
+
+            case MOVE_NORMAL:
+                playMove(pmr.n.anMove, pmr.fPlayer);
+                currentMatch.anDice[0] = currentMatch.anDice[1] = 0;
+
+                if ((n = currentMatch.board.gameStatus()) != 0) {
+                    currentMatch.gs = GameState.GAME_OVER;
+                    pmgi.nPoints = n;
+                    pmgi.fWinner = pmr.fPlayer;
+                    applyGameOver();
+                }
+                break;
+
+            case MOVE_SETBOARD:
+                currentMatch.board = Board.positionFromKey(pmr.sb.auchKey);
+
+                if (currentMatch.fMove < 0) {
+                    currentMatch.fTurn = currentMatch.fMove = 0;
+                }
+
+                if (currentMatch.fMove != 0) {
+                    currentMatch.board.swapSides();
+                }
+                break;
+
+            case MOVE_SETDICE:
+                currentMatch.anDice[0] = pmr.anDice[0];
+                currentMatch.anDice[1] = pmr.anDice[1];
+                if (currentMatch.fMove != pmr.fPlayer)
+                    currentMatch.board.swapSides();
+                currentMatch.fTurn = currentMatch.fMove = pmr.fPlayer;
+                break;
+        }
+    }
+
+    private void playMove(ChequerMove anMove, int fPlayer) {
+        if (currentMatch.fMove != -1 && fPlayer != currentMatch.fMove) {
+            currentMatch.board.swapSides();
+        }
+
+        for (int i = 0; i < 8; i += 2) {
+            int nSrc = anMove.move[i];
+            int nDest = anMove.move[i + 1];
+
+            if (nSrc < 0) {
+                // move is finished
+                break;
+            }
+
+            if (currentMatch.board.anBoard[1][nSrc] == 0) {
+                // source point is empty; ignore
+                continue;
+            }
+
+            currentMatch.board.anBoard[1][nSrc]--;
+            if (nDest >= 0) {
+                currentMatch.board.anBoard[1][nDest]++;
+            }
+
+            if (nDest >= 0 && nDest <= 23) {
+                currentMatch.board.anBoard[0][24] += currentMatch.board.anBoard[0][23 - nDest];
+                currentMatch.board.anBoard[0][23 - nDest] = 0;
+            }
+        }
+
+        currentMatch.fMove = currentMatch.fTurn = fPlayer != 0 ? 0 : 1;
+        currentMatch.board.swapSides();
+    }
+
+    private void applyGameOver()
+    {
+        MoveRecord pmr = lMatch.getLast().moveRecords.getFirst();
+        XMoveGameInfo pmgi = pmr.g;
+
+        assert( pmr.mt == MoveType.MOVE_GAMEINFO );
+
+        if( pmgi.fWinner < 0 ) {
+            return;
+        }
+
+        int n = currentMatch.board.gameStatus();
+        currentMatch.anScore[ pmgi.fWinner ] += pmgi.nPoints;
+        playedGames++;
+        if (isShowLog()) {
+            GameInfoPrinter.printGameOver(agents, pmgi.fWinner, pmgi.nPoints, n);
+        }
+    }
+
 
     private void addMoverecordSanityCheck(MoveRecord pmr) {
         assert(pmr.fPlayer >= 0 && pmr.fPlayer <= 1);
@@ -174,6 +287,7 @@ public class GameDispatcher {
                 break;
 
             case MOVE_SETDICE:
+            case MOVE_SETBOARD:
                 break;
 
             default:
@@ -265,13 +379,8 @@ public class GameDispatcher {
             MoveRecord pmr = lMatch.getLast().moveRecords.getLast();
             XMoveGameInfo pmgi = pmr.g;
 
-            int n = ms.board.gameStatus();
-
             if (showLog) {
                 GameInfoPrinter.printWin(agents, currentMatch, pmgi.fWinner, pmgi.nPoints);
-            }
-
-            if (showLog) {
                 GameInfoPrinter.printScore(agents, ms, playedGames);
             }
         }
@@ -286,7 +395,6 @@ public class GameDispatcher {
             return;
 
         FindData fd = new FindData();
-        final char[] achResign = new char[] { 'n', 'g', 'b' };
 
 		//Don't use the global board for this call, to avoid
 		//race conditions with updating the board and aborting the
@@ -335,9 +443,9 @@ public class GameDispatcher {
 
 		// write move to status bar or stdout
         if(isShowLog()) {
-            ShowAutoMove( pmr.n.anMove );
+            GameInfoPrinter.showAutoMove( pmr.n.anMove, agents, currentMatch);
         }
-        AddMoveRecord(pmr);
+        addMoveRecord(pmr);
     }
 
     class AgentEntry {

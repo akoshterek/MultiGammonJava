@@ -1,5 +1,7 @@
 package org.akoshterek.backgammon.board;
 
+import org.akoshterek.backgammon.move.ChequerMove;
+
 /**
  * @author Alex
  *         date 26.07.2015.
@@ -250,4 +252,42 @@ public class BoardFormatter {
         pch += String.format("%d:%d", anOff[ 1 ], -anOff[ 0 ]);
         return pch;
     }
+
+    public static String formatMovePlain(ChequerMove anMove, Board anBoard)  {
+        String pch = "";
+        int i, j;
+
+        for( i = 0; i < 8 && anMove.move[ i ] >= 0; i += 2 ) {
+            pch += formatPointPlain(anMove.move[ i ] + 1 );
+            pch += '/';
+            pch += formatPointPlain(anMove.move[i + 1] + 1);
+
+            if(anMove.move[ i + 1 ] >= 0 &&
+                    anBoard.anBoard[ 0 ][ 23 - anMove.move[ i + 1 ] ] != 0)       {
+                for( j = 1; ; j += 2 )       {
+                    if( j > i )               {
+                        pch += '*';
+                        break;
+                    }
+                    else
+                    if( anMove.move[ i + 1 ] == anMove.move[ j ] ) {
+                        break;
+                    }
+                }
+            }
+
+            if( i < 6 ) {
+                pch += ' ';
+            }
+        }
+
+        return pch;
+    }
+
+    private static String formatPointPlain(int n) {
+        assert( n >= 0 );
+        return String.format("%d", n);
+    }
+
+
 }

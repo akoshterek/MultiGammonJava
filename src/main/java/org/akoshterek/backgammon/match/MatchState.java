@@ -10,9 +10,8 @@ import org.akoshterek.backgammon.eval.Evaluator;
 public class MatchState {
     public Board board;
     public int[] anDice = new int[]{0, 0};    // (0,0) for unrolled anDice
-    public int fTurn = 0;        // who makes the next decision
-    public int fDoubled = 0;
-    public int fMove = 0;        // player on roll
+    public int fTurn = -1;        // who makes the next decision
+    public int fMove = -1;        // player on roll
     public int[] anScore = new int[]{0, 0};
     public GameState gs = GameState.GAME_NONE;
 
