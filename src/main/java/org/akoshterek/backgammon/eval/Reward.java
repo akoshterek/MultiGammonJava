@@ -9,7 +9,6 @@ import static org.akoshterek.backgammon.Constants.*;
  *         date 19.07.2015.
  *
  * backgammon reward
- * immutable
  */
 public final class Reward {
     public final double[] data = new double[NUM_ROLLOUT_OUTPUTS];

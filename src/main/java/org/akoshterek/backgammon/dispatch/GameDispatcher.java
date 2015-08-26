@@ -5,6 +5,7 @@ import org.akoshterek.backgammon.board.Board;
 import org.akoshterek.backgammon.board.PositionClass;
 import org.akoshterek.backgammon.eval.Evaluator;
 import org.akoshterek.backgammon.eval.Reward;
+import org.akoshterek.backgammon.eval.Sanitizer;
 import org.akoshterek.backgammon.match.GameState;
 import org.akoshterek.backgammon.match.MatchMove;
 import org.akoshterek.backgammon.match.MatchState;
@@ -548,7 +549,7 @@ public class GameDispatcher {
 
         if (!PositionClass.isExact(pc) && agent.supportsSanityCheck() && !agent.isLearnMode()) {
 		    // no sanity check needed for exact evaluations
-            Evaluator.getInstance().SanityCheck( anBoard, arOutput );
+            Sanitizer.sanityCheck(anBoard, arOutput);
         }
     }
 

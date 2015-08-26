@@ -7,7 +7,6 @@ import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.commons.math3.random.Well19937c;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import static org.akoshterek.backgammon.Constants.*;
 
@@ -45,7 +44,7 @@ public class Evaluator {
     }
 
     public PositionClass classifyPosition(Board anBoard) {
-        int nOppBack = -1, nBack = -1;
+        int nOppBack, nBack;
 
         for (nOppBack = 24; nOppBack >= 0; --nOppBack) {
             if (anBoard.anBoard[0][nOppBack] != 0) {
