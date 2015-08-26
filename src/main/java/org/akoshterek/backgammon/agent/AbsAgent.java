@@ -22,6 +22,7 @@ public abstract class AbsAgent implements IAgent {
     private int playedGames = 0;
     protected boolean fixed = true;
     protected boolean needsInvertedEval = false;
+    protected Board curBoard = null;
 
     public AbsAgent(Path path) {
         this.path = Paths.get(path.toString(), AGENTS_SUBFOLDER);
@@ -74,6 +75,10 @@ public abstract class AbsAgent implements IAgent {
 
     public void setSanityCheck(boolean sc) {
         this.supportsSanityCheck = sc;
+    }
+
+    public void setCurrentBoard(Board board) {
+        curBoard = new Board(board);
     }
 
     @Override

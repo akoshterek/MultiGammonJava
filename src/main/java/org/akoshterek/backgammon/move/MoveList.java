@@ -20,7 +20,7 @@ public class MoveList {
     public int cMoves = 0; /* and current move when building list */
     public int cMaxMoves, cMaxPips;
     public int iMoveBest;
-    public float rBestScore;
+    public double rBestScore;
     public Move[] amMoves = null;
 
     public MoveList() {}

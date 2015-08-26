@@ -3,13 +3,18 @@ package org.akoshterek.backgammon.dispatch;
 import org.akoshterek.backgammon.agent.IAgent;
 import org.akoshterek.backgammon.board.Board;
 import org.akoshterek.backgammon.board.PositionClass;
+import org.akoshterek.backgammon.eval.Evaluator;
+import org.akoshterek.backgammon.eval.Reward;
 import org.akoshterek.backgammon.match.GameState;
 import org.akoshterek.backgammon.match.MatchMove;
 import org.akoshterek.backgammon.match.MatchState;
 import org.akoshterek.backgammon.move.*;
 
+import java.util.Arrays;
 import java.util.Deque;
 import java.util.LinkedList;
+
+import static org.akoshterek.backgammon.Constants.OUTPUT_EQUITY;
 
 /**
  * @author Alex
@@ -17,7 +22,6 @@ import java.util.LinkedList;
  */
 public class GameDispatcher {
     private AgentEntry[] agents = new AgentEntry[2];
-    private boolean isLearningMode = false;
     private boolean showLog = false;
     private int numGames = 0;
     private int playedGames = 0;
@@ -44,8 +48,6 @@ public class GameDispatcher {
 
     public void playGames(int games, boolean learn)
     {
-        isLearningMode = learn;
-
         agents[0].agent.setLearnMode(learn);
         agents[1].agent.setLearnMode(learn);
 
@@ -416,8 +418,7 @@ public class GameDispatcher {
         fd.ml = pmr.ml;
         fd.board = anBoardMove;
         fd.auchMove = null;
-        fd.rThr = 0.0;
-        if (FindMove(fd) != 0) {
+        if (findMove(fd) != 0) {
             return;
         }
 		/* resorts the moves according to cubeful (if applicable),
@@ -447,6 +448,110 @@ public class GameDispatcher {
         }
         addMoveRecord(pmr);
     }
+
+    private int findMove(FindData pfd) {
+        return findAndSaveBestMoves(pfd.ml, currentMatch.anDice[0], currentMatch.anDice[1], pfd.board);
+    }
+
+    private int findAndSaveBestMoves(MoveList pml, int nDice0, int nDice1,Board anBoard) {
+        // Find best moves.
+	    /* Find all moves -- note that pml contains internal pointers to static
+		data, so we can't call GenerateMoves again (or anything that calls
+		it, such as ScoreMoves at more than 0 plies) until we have saved
+		the moves we want to keep in amCandidates. */
+        //it doesn't now
+        MoveGenerator.generateMoves(anBoard, pml, amMoves, nDice0, nDice1, false);
+        agents[currentMatch.fMove].agent.setCurrentBoard(currentMatch.board);
+        if (pml.cMoves == 0) {
+            // no legal moves
+            pml.amMoves = null;
+            return 0;
+        }
+
+	    // Save moves
+        Move[] pm = new Move[pml.cMoves];
+        System.arraycopy(pml.amMoves, 0, pm, 0, pml.cMoves);
+        pml.amMoves = pm;
+        int nMoves = pml.cMoves;
+
+	    // evaluate moves on top ply
+        if( scoreMoves(pml) < 0 ) {
+            pml.deleteMoves();
+            return -1;
+        }
+
+	    // Resort the moves, in case the new evaluation reordered them.
+        //std::vector<move>::iterator it(pml->amMoves);
+        Arrays.sort(pml.amMoves, 0, pml.cMoves, Move.moveComparator);
+        //qsort( pml->amMoves, pml->cMoves, sizeof( move ), (cfunc) move::CompareMovesGeneral );
+        pml.iMoveBest = 0;
+	    // set the proper size of the movelist
+        pml.cMoves = nMoves;
+        return 0;
+    }
+
+    private int scoreMoves(MoveList pml) {
+        int r = 0;    // return value
+        pml.rBestScore = -99999.9;
+
+        for (int i = 0; i < pml.cMoves; i++) {
+            if (scoreMove(pml.amMoves[i]) < 0) {
+                r = -1;
+                break;
+            }
+
+            if (pml.amMoves[i].rScore > pml.rBestScore) {
+                pml.iMoveBest = i;
+                pml.rBestScore = pml.amMoves[i].rScore;
+            }
+        }
+
+        return r;
+    }
+
+    private int scoreMove(Move pm) {
+        Board anBoardTemp = Board.positionFromKey(pm.auch);
+        anBoardTemp.swapSides();
+
+        Reward arEval = new Reward();
+        pm.pc = Evaluator.getInstance().classifyPosition(anBoardTemp);
+        if (generalEvaluationEPlied(arEval, anBoardTemp, pm.pc) != 0){
+            return -1;
+        }
+
+        IAgent agent = agents[currentMatch.fMove].agent;
+
+        if(agent.needsInvertedEval())
+            arEval.invert();
+        else
+        if(PositionClass.isExact(pm.pc)) {
+            //TODO why?
+            arEval.invert();
+        }
+
+        // Save evaluations
+        pm.arEvalMove = arEval;
+        pm.rScore = arEval.data[OUTPUT_EQUITY];
+        return 0;
+    }
+
+    private int generalEvaluationEPlied(Reward arOutput, Board anBoard, PositionClass pc) {
+        evaluatePositionFull(anBoard, arOutput, pc);
+        arOutput.data[OUTPUT_EQUITY] = arOutput.utility();
+        return 0;
+    }
+
+    private void evaluatePositionFull(Board anBoard, Reward arOutput, PositionClass pc ) {
+	    // at leaf node; use static evaluation
+        IAgent agent = agents[currentMatch.fMove].agent;
+        arOutput.assign(agent.evaluatePosition(anBoard, pc));
+
+        if (!PositionClass.isExact(pc) && agent.supportsSanityCheck() && !agent.isLearnMode()) {
+		    // no sanity check needed for exact evaluations
+            Evaluator.getInstance().SanityCheck( anBoard, arOutput );
+        }
+    }
+
 
     class AgentEntry {
         public IAgent agent;

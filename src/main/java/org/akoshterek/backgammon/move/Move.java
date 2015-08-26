@@ -14,7 +14,7 @@ public class Move {
     public AuchKey auch = new AuchKey();
     public int cMoves, cPips;
     /* scores for this move */
-    public float rScore;
+    public double rScore;
     /* evaluation for this move */
     public Reward arEvalMove;
     public PositionClass pc;
@@ -36,7 +36,7 @@ public class Move {
             if (p.rScore != q.rScore)
                 return compareMoves(p, q);
 
-            if(p.backChequer ==  q.backChequer) {
+            if(p.backChequer == q.backChequer) {
                 return 0;
             } else {
                 return (p.backChequer > q.backChequer) ? 1 : -1;

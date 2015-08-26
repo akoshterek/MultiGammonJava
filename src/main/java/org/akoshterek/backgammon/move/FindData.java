@@ -10,5 +10,4 @@ public class FindData {
     public MoveList ml;
     public Board board;
     public AuchKey auchMove;
-    public double rThr;
 }

@@ -22,4 +22,9 @@ public enum PositionClass {
     public int getValue() {
         return value;
     }
+
+    public static boolean isExact(PositionClass pc) {
+        return pc != CLASS_CONTACT && pc != CLASS_CRASHED && pc != CLASS_RACE;
+    }
+
 }

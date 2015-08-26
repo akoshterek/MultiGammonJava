@@ -7,7 +7,7 @@ import org.akoshterek.backgammon.board.Board;
  *         date 29.07.2015.
  */
 public class MoveGenerator {
-    public static int GenerateMoves(Board board, MoveList pml, Move[] amMoves, int n0, int n1, boolean fPartial) {
+    public static int generateMoves(Board board, MoveList pml, Move[] amMoves, int n0, int n1, boolean fPartial) {
         int[] anRoll = new int[4];
         ChequerMove anMoves = new ChequerMove();
 
@@ -17,20 +17,20 @@ public class MoveGenerator {
 
         pml.cMoves = pml.cMaxMoves = pml.cMaxPips = pml.iMoveBest = 0;
         pml.amMoves = amMoves;
-        GenerateMovesSub(board, pml, anRoll, 0, 23, 0, anMoves, fPartial);
+        generateMovesSub(board, pml, anRoll, 0, 23, 0, anMoves, fPartial);
 
         if (anRoll[0] != anRoll[1]) {
             int tmp = anRoll[1];
             anRoll[1] = anRoll[0];
             anRoll[1] = tmp;
 
-            GenerateMovesSub(board, pml, anRoll, 0, 23, 0, anMoves, fPartial);
+            generateMovesSub(board, pml, anRoll, 0, 23, 0, anMoves, fPartial);
         }
 
         return pml.cMoves;
     }
 
-    public static boolean GenerateMovesSub(Board board, MoveList pml, int[] anRoll, int nMoveDepth,
+    public static boolean generateMovesSub(Board board, MoveList pml, int[] anRoll, int nMoveDepth,
                                            int iPip, int cPip, ChequerMove anMoves, boolean fPartial) {
         boolean fUsed = false;
         byte[][] anBoard = board.anBoard;
@@ -49,7 +49,7 @@ public class MoveGenerator {
             Board anBoardNew = new Board(board);
             anBoardNew.applySubMove(24, anRoll[nMoveDepth], true);
 
-            if (GenerateMovesSub(anBoardNew, pml, anRoll, nMoveDepth + 1, 23, cPip +
+            if (generateMovesSub(anBoardNew, pml, anRoll, nMoveDepth + 1, 23, cPip +
                     anRoll[nMoveDepth], anMoves, fPartial)) {
                 anBoardNew.saveMoves(pml, nMoveDepth + 1, cPip + anRoll[nMoveDepth],
                         anMoves, fPartial);
@@ -65,7 +65,7 @@ public class MoveGenerator {
                     Board anBoardNew = new Board(board);
                     anBoardNew.applySubMove(i, anRoll[nMoveDepth], true);
 
-                    if (GenerateMovesSub(anBoardNew, pml, anRoll, nMoveDepth + 1,
+                    if (generateMovesSub(anBoardNew, pml, anRoll, nMoveDepth + 1,
                             anRoll[0] == anRoll[1] ? i : 23,
                             cPip + anRoll[nMoveDepth], anMoves, fPartial)) {
                         anBoardNew.saveMoves(pml, nMoveDepth + 1, cPip +

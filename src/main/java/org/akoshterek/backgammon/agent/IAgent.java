@@ -53,6 +53,7 @@ public interface IAgent {
     boolean needsInvertedEval();
     boolean supportsSanityCheck();
     void setSanityCheck(boolean sc);
+    void setCurrentBoard(Board board);
 
     default void load() {};
     default void save() {};
