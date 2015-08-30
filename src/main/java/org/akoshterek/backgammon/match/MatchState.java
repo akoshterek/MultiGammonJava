@@ -8,7 +8,7 @@ import org.akoshterek.backgammon.eval.Evaluator;
  *         date 05.08.2015.
  */
 public class MatchState {
-    public Board board;
+    public Board board = new Board();
     public int[] anDice = new int[]{0, 0};    // (0,0) for unrolled anDice
     public int fTurn = -1;        // who makes the next decision
     public int fMove = -1;        // player on roll

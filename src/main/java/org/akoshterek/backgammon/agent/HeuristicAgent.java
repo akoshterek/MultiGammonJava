@@ -17,28 +17,40 @@ public class HeuristicAgent extends AbsAgent {
     }
 
     @Override
+    public Reward evalRace(Board board) {
+        return evalContact(board);
+    }
+
+    @Override
+    public Reward evalCrashed(Board board) {
+        return evalContact(board);
+    }
+
+    @Override
     public Reward evalContact(Board board) {
         Reward reward = new Reward();
         double value = 0;
-        byte[] points = board.anBoard[Board.SELF];
+        Board tmpBoard = new Board(board);
+        tmpBoard.swapSides();
+        byte[] points = tmpBoard.anBoard[Board.SELF];
 
-        byte total = 0;
+        int total = 0;
         for (int i = 0; i < 25; i++) {
             total += points[i];
         }
-        byte atHome = (byte) (15 - total);
+        int atHome = 15 - total;
 
         // 1/15th of a point per man home
         value += atHome / 15.0;
 
         // -1/5th of a point per man on the bar
-        value -= points[Board.BAR] / 5.0f;
+        value -= points[Board.BAR] / 5.0;
 
         for (int i = 0; i < 24; i++) {
             // -1/10th of a point for each blot
             // +1/20th for contiguous points
             if (points[i] == 1) {
-                value -= 0.10f;
+                value -= 0.10;
             } else if (i > 0 && points[i] >= 2 && points[i - 1] >= 2) {
                 value += 0.05;
             }

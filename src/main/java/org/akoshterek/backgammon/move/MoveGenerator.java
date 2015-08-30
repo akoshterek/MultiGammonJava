@@ -35,7 +35,7 @@ public class MoveGenerator {
         boolean fUsed = false;
         byte[][] anBoard = board.anBoard;
 
-        if (nMoveDepth > 3 || anRoll[nMoveDepth] != 0)
+        if (nMoveDepth > 3 || anRoll[nMoveDepth] == 0)
             return true;
 
         if (anBoard[Board.SELF][Board.BAR] != 0) // on bar

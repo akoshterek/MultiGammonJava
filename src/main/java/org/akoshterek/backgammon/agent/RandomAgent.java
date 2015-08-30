@@ -24,4 +24,14 @@ public class RandomAgent extends AbsAgent {
         reward.data[Constants.OUTPUT_WIN] = random.nextDouble();
         return reward;
     }
+
+    @Override
+    public Reward evalRace(Board board) {
+        return evalContact(board);
+    }
+
+    @Override
+    public Reward evalCrashed(Board board) {
+        return evalContact(board);
+    }
 }

@@ -93,14 +93,14 @@ public class Dispatcher {
 
                 //benchmark
                 GameDispatcher benchDispatcher = new GameDispatcher(agent1, benchAgent);
-                benchDispatcher.setIsShowLog(false);
+                benchDispatcher.setIsShowLog(options.isVerbose());
                 benchDispatcher.playGames(benchmarkGames, false);
                 benchDispatcher.printStatistics();
             }
         } else {
             //benchmark
             GameDispatcher benchDispatcher = new GameDispatcher(agent1, benchAgent);
-            benchDispatcher.setIsShowLog(false);
+            benchDispatcher.setIsShowLog(options.isVerbose());
             benchDispatcher.playGames(benchmarkGames, false);
             benchDispatcher.printStatistics();
         }

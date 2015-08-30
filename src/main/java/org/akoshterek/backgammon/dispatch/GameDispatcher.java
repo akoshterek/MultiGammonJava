@@ -22,7 +22,7 @@ import static org.akoshterek.backgammon.Constants.OUTPUT_EQUITY;
  *         date 04.08.2015.
  */
 public class GameDispatcher {
-    private AgentEntry[] agents = new AgentEntry[2];
+    private AgentEntry[] agents = new AgentEntry[] {new AgentEntry(), new AgentEntry()};
     private boolean showLog = false;
     private int numGames = 0;
     private int playedGames = 0;
@@ -31,12 +31,16 @@ public class GameDispatcher {
     private Deque<MatchMove> lMatch = new LinkedList<>();
     //std::list<std::list<moverecord> > m_lMatch;
     private MoveRecord pmrHint;
-    private Move[] amMoves = new Move[MoveList.MAX_INCOMPLETE_MOVES];
+    private Move[] amMoves;
 
     public GameDispatcher(IAgent agent1, IAgent agent2) {
         agents[0].agent = agent1;
         agents[1].agent = agent2;
 
+        amMoves = new Move[MoveList.MAX_INCOMPLETE_MOVES];
+        for(int i = 0; i < MoveList.MAX_INCOMPLETE_MOVES; i++) {
+            amMoves[i] = new Move();
+        }
     }
 
     public boolean isShowLog() {

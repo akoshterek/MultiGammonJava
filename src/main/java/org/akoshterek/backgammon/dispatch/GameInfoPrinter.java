@@ -75,7 +75,7 @@ public class GameInfoPrinter {
 
         if (!matchMoves.isEmpty() && !matchMoves.getLast().moveRecords.isEmpty()) {
             MoveRecord pmr = matchMoves.getLast().moveRecords.getLast();
-            if (!pmr.sz.isEmpty()) {
+            if (pmr.sz != null && !pmr.sz.isEmpty()) {
                 System.out.println(pmr.sz);
             }
         }

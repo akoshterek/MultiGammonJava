@@ -43,16 +43,21 @@ public final class Reward {
      * @return money equity
      */
     public double utility() {
-        return data[ OUTPUT_WIN ] * 2.0 - 1.0 +
-                ( data[ OUTPUT_WINGAMMON ] - data[ OUTPUT_LOSEGAMMON ] ) +
-                ( data[ OUTPUT_WINBACKGAMMON ] - data[ OUTPUT_LOSEBACKGAMMON ] );
+        if (data[OUTPUT_WINGAMMON] == 0 && data[OUTPUT_LOSEGAMMON] == 0 &&
+                data[OUTPUT_WINBACKGAMMON] == 0 && data[OUTPUT_LOSEBACKGAMMON] == 0) {
+            return data[OUTPUT_WIN];
+        } else {
+            return data[OUTPUT_WIN] * 2.0 - 1.0 +
+                    (data[OUTPUT_WINGAMMON] - data[OUTPUT_LOSEGAMMON]) +
+                    (data[OUTPUT_WINBACKGAMMON] - data[OUTPUT_LOSEBACKGAMMON]);
+        }
     }
 
     public Reward invert() {
         Reward reward = new Reward(this);
         double r;
 
-        reward.data[ OUTPUT_WIN ] = 1.0f - reward.data[ OUTPUT_WIN ];
+        reward.data[ OUTPUT_WIN ] = 1.0 - reward.data[ OUTPUT_WIN ];
 
         r = reward.data[ OUTPUT_WINGAMMON ];
         reward.data[ OUTPUT_WINGAMMON ] = reward.data[ OUTPUT_LOSEGAMMON ];

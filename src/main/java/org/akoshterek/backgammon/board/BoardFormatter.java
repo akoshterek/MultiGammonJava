@@ -286,8 +286,13 @@ public class BoardFormatter {
 
     private static String formatPointPlain(int n) {
         assert( n >= 0 );
-        return String.format("%d", n);
+        switch (n){
+            case 25:
+                return "bar";
+            case 0:
+                return "off";
+            default:
+                return String.format("%d", n);
+        }
     }
-
-
 }

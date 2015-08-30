@@ -34,6 +34,9 @@ public class MoveList {
             if (src.cMoves > cMoves) {
                 deleteMoves();
                 amMoves = new Move[src.cMoves];
+                for(int i = 0; i < src.cMoves; i++) {
+                    amMoves[i] = new Move();
+                }
             }
             System.arraycopy(src.amMoves, 0, amMoves, 0, src.cMoves);
         } else {

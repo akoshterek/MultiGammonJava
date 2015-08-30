@@ -16,7 +16,7 @@ public class Move {
     /* scores for this move */
     public double rScore;
     /* evaluation for this move */
-    public Reward arEvalMove;
+    public Reward arEvalMove = new Reward();
     public PositionClass pc;
     public int backChequer;
 
