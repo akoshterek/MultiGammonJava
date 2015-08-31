@@ -31,10 +31,6 @@ public final class Reward {
         System.arraycopy(reward.data, 0, this.data, 0, this.data.length);
     }
 
-    public void set(float value) {
-        Arrays.fill(data, value);
-    }
-
     /**
      * Move evaluation
      * let's keep things simple as I don't want to go into cube handling
@@ -43,14 +39,9 @@ public final class Reward {
      * @return money equity
      */
     public double utility() {
-        if (data[OUTPUT_WINGAMMON] == 0 && data[OUTPUT_LOSEGAMMON] == 0 &&
-                data[OUTPUT_WINBACKGAMMON] == 0 && data[OUTPUT_LOSEBACKGAMMON] == 0) {
-            return data[OUTPUT_WIN];
-        } else {
-            return data[OUTPUT_WIN] * 2.0 - 1.0 +
-                    (data[OUTPUT_WINGAMMON] - data[OUTPUT_LOSEGAMMON]) +
-                    (data[OUTPUT_WINBACKGAMMON] - data[OUTPUT_LOSEBACKGAMMON]);
-        }
+        return data[OUTPUT_WIN] * 2.0 - 1.0 +
+                (data[OUTPUT_WINGAMMON] - data[OUTPUT_LOSEGAMMON]) +
+                (data[OUTPUT_WINBACKGAMMON] - data[OUTPUT_LOSEBACKGAMMON]);
     }
 
     public Reward invert() {

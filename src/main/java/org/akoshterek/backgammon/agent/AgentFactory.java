@@ -19,6 +19,9 @@ public class AgentFactory {
             case "heuristic":
                 agent = new HeuristicAgent(Evaluator.getInstance().getBasePath());
                 break;
+            case "pubeval":
+                agent = new PubEvalAgent(Evaluator.getInstance().getBasePath());
+                break;
             default:
                 throw new IllegalArgumentException("Unknown agent name " + fullName);
         }

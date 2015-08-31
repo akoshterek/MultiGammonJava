@@ -1,6 +1,7 @@
 package org.akoshterek.backgammon.agent;
 
 import org.akoshterek.backgammon.board.Board;
+import org.akoshterek.backgammon.board.PositionClass;
 import org.akoshterek.backgammon.eval.Evaluator;
 import org.akoshterek.backgammon.eval.Reward;
 import org.akoshterek.backgammon.move.Move;
@@ -23,6 +24,7 @@ public abstract class AbsAgent implements IAgent {
     protected boolean fixed = true;
     protected boolean needsInvertedEval = false;
     protected Board curBoard = null;
+    protected PositionClass curPC = PositionClass.CLASS_OVER;
 
     public AbsAgent(Path path) {
         this.path = Paths.get(path.toString(), AGENTS_SUBFOLDER);
@@ -79,6 +81,7 @@ public abstract class AbsAgent implements IAgent {
 
     public void setCurrentBoard(Board board) {
         curBoard = new Board(board);
+        curPC = Evaluator.getInstance().classifyPosition(curBoard);
     }
 
     @Override

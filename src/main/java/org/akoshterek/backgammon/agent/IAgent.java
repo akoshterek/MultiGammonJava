@@ -21,8 +21,7 @@ public interface IAgent {
     void doMove(Move move);
 
     default Reward evaluatePosition(Board board, PositionClass pc) {
-        switch(pc)
-        {
+        switch (pc) {
             case CLASS_OVER:
                 return evalOver(board);
             case CLASS_RACE:
@@ -55,6 +54,6 @@ public interface IAgent {
     void setSanityCheck(boolean sc);
     void setCurrentBoard(Board board);
 
-    default void load() {};
-    default void save() {};
+    default void load() {}
+    default void save() {}
 }

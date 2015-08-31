@@ -80,7 +80,7 @@ public class Board {
         }
     }
 
-    public void ChequersCount(int[] anChequers) {
+    public void chequersCount(int[] anChequers) {
         anChequers[OPPONENT] = 0;
         anChequers[SELF] = 0;
 
