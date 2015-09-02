@@ -1,5 +1,7 @@
 package org.akoshterek.backgammon.eval;
 
+import org.akoshterek.backgammon.bearoff.Bearoff;
+import org.akoshterek.backgammon.bearoff.BearoffContext;
 import org.akoshterek.backgammon.board.Board;
 import org.akoshterek.backgammon.board.PositionClass;
 import org.apache.commons.math3.distribution.UniformIntegerDistribution;
@@ -22,6 +24,11 @@ public class Evaluator {
     private final UniformIntegerDistribution distribution;
     private Path basePath;
 
+    //private BearoffContext pbcOS;
+    //private BearoffContext pbcTS;
+    private BearoffContext pbc1;
+    private BearoffContext pbc2;
+
     public static Evaluator getInstance() {
         if (instance == null) {
             instance = new Evaluator();
@@ -33,6 +40,8 @@ public class Evaluator {
     private Evaluator() {
         rng = new Well19937c();
         distribution = new UniformIntegerDistribution(rng, 1, 6);
+
+        loadBearoff();
     }
 
     public int nextDice() {
@@ -92,17 +101,17 @@ public class Evaluator {
 
             return PositionClass.CLASS_CONTACT;
         } else {
-//            if ( isBearoff ( pbc2, anBoard ) )
-//                return PositionClass.CLASS_BEAROFF2;
-//
-//            if ( isBearoff ( pbcTS, anBoard ) )
-//                return PositionClass.CLASS_BEAROFF_TS;
-//
-//            if ( isBearoff ( pbc1, anBoard ) )
-//                return PositionClass.CLASS_BEAROFF1;
-//
-//            if ( isBearoff ( pbcOS, anBoard ) )
-//                return PositionClass.CLASS_BEAROFF_OS;
+            if (Bearoff.isBearoff(pbc2, anBoard))
+                return PositionClass.CLASS_BEAROFF2;
+
+            //if (Bearoff.isBearoff(pbcTS, anBoard))
+            //    return PositionClass.CLASS_BEAROFF_TS;
+
+            if (Bearoff.isBearoff(pbc1, anBoard))
+                return PositionClass.CLASS_BEAROFF1;
+
+            //if (Bearoff.isBearoff(pbcOS, anBoard))
+            //    return PositionClass.CLASS_BEAROFF_OS;
 
             return PositionClass.CLASS_RACE;
         }
@@ -187,11 +196,35 @@ public class Evaluator {
         return reward;
     }
 
+    public Reward evalBearoff2(Board anBoard) {
+        return Bearoff.bearoffEval(pbc2, anBoard);
+    }
+
+    public Reward evalBearoff1(Board anBoard) {
+        return Bearoff.bearoffEval(pbc1, anBoard);
+    }
+
+//    public Reward evalBearoffTS(Board anBoard) {
+//        return Bearoff.bearoffEval(pbcTS, anBoard);
+//    }
+//
+//    public Reward evalBearoffOS(Board anBoard) {
+//        return Bearoff.bearoffEval(pbcOS, anBoard);
+//    }
+
+
     public Path getBasePath() {
         return basePath;
     }
 
     public void load(Path basePath) {
         this.basePath = basePath;
+    }
+
+    private void loadBearoff() {
+        pbc1 = BearoffContext.bearoffInit("/org/akoshterek/backgammon/gnu/gnubg_os0.bd");
+        pbc2 = BearoffContext.bearoffInit("/org/akoshterek/backgammon/gnu/gnubg_ts0.bd");
+        //pbcOS = BearoffContext.bearoffInit("/org/akoshterek/backgammon/gnu/gnubg_os0.bd");
+        //pbcTS = BearoffContext.bearoffInit("/org/akoshterek/backgammon/gnu/gnubg_ts0.bd");
     }
 }

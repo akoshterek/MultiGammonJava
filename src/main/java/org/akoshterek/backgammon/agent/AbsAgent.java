@@ -23,6 +23,7 @@ public abstract class AbsAgent implements IAgent {
     private int playedGames = 0;
     protected boolean fixed = true;
     protected boolean needsInvertedEval = false;
+    protected boolean supportsBearoff = false;
     protected Board curBoard = null;
     protected PositionClass curPC = PositionClass.CLASS_OVER;
 
@@ -51,10 +52,6 @@ public abstract class AbsAgent implements IAgent {
 
     public void doMove(Move move) {}
 
-    public Reward evalOver(Board board) {
-        return Evaluator.getInstance().evalOver(board);
-    }
-
     public boolean isLearnMode() {
         return learnMode;
     }
@@ -77,6 +74,10 @@ public abstract class AbsAgent implements IAgent {
 
     public void setSanityCheck(boolean sc) {
         this.supportsSanityCheck = sc;
+    }
+
+    public boolean supportsBearoff() {
+        return this.supportsBearoff;
     }
 
     public void setCurrentBoard(Board board) {

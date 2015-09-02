@@ -31,17 +31,17 @@ public class PositionId {
         return (short) PositionF(fBits, 15, g);
     }
 
-    public static int Combination(int n, int r) {
+    public static int combination(int n, int r) {
         assert (n <= MAX_N && r <= MAX_R);
 
         if (!calculated) {
-            InitCombination();
+            initCombination();
         }
 
         return anCombination[n - 1][r - 1];
     }
 
-    public static int PositionBearoff(byte[] anBoard, int nPoints, int nChequers) {
+    public static int positionBearoff(byte[] anBoard, int nPoints, int nChequers) {
         int i, fBits, j;
 
         for (j = nPoints - 1, i = 0; i < nPoints; i++)
@@ -101,7 +101,7 @@ public class PositionId {
             return 0;
         }
 
-        return ((fBits & (1 << (n - 1))) != 0) ? Combination(n - 1, r) +
+        return ((fBits & (1 << (n - 1))) != 0) ? combination(n - 1, r) +
                 PositionF(fBits, n - 1, r - 1) : PositionF(fBits, n - 1, r);
     }
 
@@ -114,13 +114,13 @@ public class PositionId {
             return (1 << n) - 1;
         }
 
-        nC = Combination(n - 1, r);
+        nC = combination(n - 1, r);
 
         return (nID >= nC) ? (1 << (n - 1)) | PositionInv(nID - nC, n - 1, r - 1)
                 : PositionInv(nID, n - 1, r);
     }
 
-    private static void InitCombination() {
+    private static void initCombination() {
         if (calculated) {
             return;
         }

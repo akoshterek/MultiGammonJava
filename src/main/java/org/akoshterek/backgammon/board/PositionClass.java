@@ -6,12 +6,14 @@ package org.akoshterek.backgammon.board;
  */
 public enum PositionClass {
     CLASS_OVER(0),         /* Game already finished */
-    CLASS_RACE(1),         /* Race neural network */
-    CLASS_CRASHED(2),      /* Contact, one side has less than 7 active checkers */
-    CLASS_CONTACT(3);      /* Contact neural network */
+    CLASS_BEAROFF2(1),     /* Two-sided bearoff database (in memory) */
+    //CLASS_BEAROFF_TS(2),   /* Two-sided bearoff database (on disk) */
+    CLASS_BEAROFF1(2),     /* One-sided bearoff database (in memory) */
+    //CLASS_BEAROFF_OS(4),   /* One-sided bearoff database (on disk) */
 
-    //public static final int CLASS_PERFECT = CLASS_BEAROFF_TS.getValue();
-    public static final int N_CLASSES = (CLASS_CONTACT.getValue() + 1);
+    CLASS_RACE(3),         /* Race neural network */
+    CLASS_CRASHED(4),      /* Contact, one side has less than 7 active checkers */
+    CLASS_CONTACT(5);      /* Contact neural network */
 
     private final int value;
 
@@ -27,4 +29,15 @@ public enum PositionClass {
         return pc != CLASS_CONTACT && pc != CLASS_CRASHED && pc != CLASS_RACE;
     }
 
+    public static boolean isBearoff(PositionClass pc) {
+        switch (pc) {
+            case CLASS_BEAROFF2:
+            //case CLASS_BEAROFF_TS:
+            case CLASS_BEAROFF1:
+            //case CLASS_BEAROFF_OS:
+                return true;
+            default:
+                return false;
+        }
+    }
 }

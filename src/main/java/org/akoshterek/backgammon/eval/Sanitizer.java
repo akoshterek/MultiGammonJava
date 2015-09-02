@@ -11,7 +11,7 @@ import static org.akoshterek.backgammon.Constants.*;
  */
 public class Sanitizer {
     public static void sanityCheck(Board board, Reward reward) {
-        //do nothing for now
+        //TODO implement this
 //        int i, j, nciq;
 //        int  ac[ 2 ], anBack[ 2 ], anCross[ 2 ], anGammonCross[ 2 ],
 //                anBackgammonCross[ 2 ], anMaxTurns[ 2 ];
@@ -86,7 +86,7 @@ public class Sanitizer {
 //                if( anBack[ i ] < 6 && pbc1 )
 //                {
 //                    anMaxTurns[ i ] =
-//                            MaxTurns( PositionId.PositionBearoff(board.anBoard[i], pbc1 -> nPoints, pbc1 -> nChequers) );
+//                            MaxTurns( PositionId.positionBearoff(board.anBoard[i], pbc1 -> nPoints, pbc1 -> nChequers) );
 //                }
 //                else
 //                {

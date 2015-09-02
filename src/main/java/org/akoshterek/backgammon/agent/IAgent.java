@@ -2,6 +2,7 @@ package org.akoshterek.backgammon.agent;
 
 import org.akoshterek.backgammon.board.Board;
 import org.akoshterek.backgammon.board.PositionClass;
+import org.akoshterek.backgammon.eval.Evaluator;
 import org.akoshterek.backgammon.eval.Reward;
 import org.akoshterek.backgammon.move.Move;
 
@@ -21,6 +22,10 @@ public interface IAgent {
     void doMove(Move move);
 
     default Reward evaluatePosition(Board board, PositionClass pc) {
+        if(PositionClass.isBearoff(pc) && !supportsBearoff()) {
+            pc = PositionClass.CLASS_RACE;
+        }
+
         switch (pc) {
             case CLASS_OVER:
                 return evalOver(board);
@@ -30,12 +35,19 @@ public interface IAgent {
                 return evalCrashed(board);
             case CLASS_CONTACT:
                 return evalContact(board);
+            case CLASS_BEAROFF1:
+                return Evaluator.getInstance().evalBearoff1(board);
+            case CLASS_BEAROFF2:
+                return Evaluator.getInstance().evalBearoff2(board);
             default:
                 throw new RuntimeException("Unknown class. How did we get here?");
         }
     }
 
-    Reward evalOver(Board board);
+    default Reward evalOver(Board board) {
+        return Evaluator.getInstance().evalOver(board);
+    }
+
     default Reward evalRace(Board board) {
         return evalContact(board);
     }
@@ -51,6 +63,7 @@ public interface IAgent {
     boolean isFixed();
     boolean needsInvertedEval();
     boolean supportsSanityCheck();
+    boolean supportsBearoff();
     void setSanityCheck(boolean sc);
     void setCurrentBoard(Board board);
 
