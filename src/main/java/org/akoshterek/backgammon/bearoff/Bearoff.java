@@ -101,7 +101,7 @@ public class Bearoff {
 
         for (i = 0; i < 2; ++i) {
             an[i] = PositionId.positionBearoff(anBoard.anBoard[i], pbc.getnPoints(), pbc.getnChequers());
-            bearoffDist(pbc, an[i], aarProb[i], aarGammonProb[i], ar[i]);
+            bearoffDist(pbc, an[i], aarProb[i], aarGammonProb[i], ar[i], null, null);
         }
 
         // calculate winning chance
@@ -164,17 +164,18 @@ public class Bearoff {
         return arOutput;
     }
 
-    private static void bearoffDist(BearoffContext pbc, int nPosID,
+    public static void bearoffDist(BearoffContext pbc, int nPosID,
                              float[] arProb, float[] arGammonProb,
-                             float[] ar) {
+                             float[] ar,
+                             short[] ausProb, short[] ausGammonProb) {
         if (pbc.isTwoSided()) {
             throw new IllegalArgumentException("Invalid bearoff database");
         }
 
         if (pbc.isfND()) {
-            readBearoffOneSidedND(pbc, nPosID, arProb, arGammonProb, ar);
+            readBearoffOneSidedND(pbc, nPosID, arProb, arGammonProb, ar, ausProb, ausGammonProb);
         } else {
-            readBearoffOneSidedExact(pbc, nPosID, arProb, arGammonProb, ar);
+            readBearoffOneSidedExact(pbc, nPosID, arProb, arGammonProb, ar, ausProb, ausGammonProb);
         }
     }
 
@@ -189,10 +190,12 @@ public class Bearoff {
         }
     }
 
-    private static void readBearoffOneSidedND (BearoffContext pbc,
-                            int nPosID,
-                            float[] arProb, float[] arGammonProb,
-                            float[] ar) {
+    private static void readBearoffOneSidedND(BearoffContext pbc,
+                                              int nPosID,
+                                              float[] arProb, float[] arGammonProb,
+                                              float[] ar,
+                                              short[] ausProb,
+                                              short[] ausGammonProb) {
 
         byte[] ac = new byte[16];
         int i;
@@ -203,17 +206,27 @@ public class Bearoff {
         bb.order(ByteOrder.LITTLE_ENDIAN);
         float[] arx = bb.asFloatBuffer().array();
 
-        if ( arProb != null) {
+        if ( arProb != null || ausProb != null) {
             for (i = 0; i < 32; ++i) {
                 r = fnd(1.0f * i, arx[0], arx[1]);
-                arProb[i] = r;
+                if(arProb != null) {
+                    arProb[i] = r;
+                }
+                if(ausProb != null) {
+                    ausProb[i] = (short)((int)(r * 65535.0f) & 0xffff);
+                }
             }
         }
 
-        if ( arGammonProb != null) {
+        if ( arGammonProb != null || ausGammonProb != null) {
             for (i = 0; i < 32; ++i) {
                 r = fnd(1.0f * i, arx[2], arx[3]);
-                arGammonProb[i] = r;
+                if(arGammonProb != null) {
+                    arGammonProb[i] = r;
+                }
+                if(ausGammonProb != null) {
+                    ausGammonProb[i] = (short)((int)(r * 65535.0f) & 0xffff);
+                }
             }
         }
 
@@ -225,7 +238,9 @@ public class Bearoff {
     private static void readBearoffOneSidedExact(BearoffContext pbc,
                                                  int nPosID,
                                                  float[] arProb, float[] arGammonProb,
-                                                 float[] ar) {
+                                                 float[] ar,
+                                                 short[] ausProb,
+                                                 short[] ausGammonProb) {
         short[] aus = new short[64];
     	// get distribution
         if (pbc.isfCompressed()) {
@@ -234,15 +249,23 @@ public class Bearoff {
             getDistUncompressed(aus, pbc, nPosID);
         }
 
-        AssignOneSided(arProb, arGammonProb, ar, aus, 32);
+        assignOneSided(arProb, arGammonProb, ar, ausProb, ausGammonProb, aus, 32);
     }
 
-    private static void AssignOneSided(float[] arProb, float[] arGammonProb,
+    private static void assignOneSided(float[] arProb, float[] arGammonProb,
                                        float[] ar,
+                                       short[] ausProb,
+                                       short[] ausGammonProb,
                                        short[] ausProbx,
                                        int ausGammonProbxOffset) {
 
         float[] arx = new float[64];
+
+        if ( ausProb != null)
+            System.arraycopy(ausProbx, 0, ausProb, 0, 32);
+
+        if ( ausGammonProb != null)
+            System.arraycopy(ausProbx, ausGammonProbxOffset, ausGammonProb, 0, 32);
 
         if (ar != null || arProb != null || arGammonProb != null) {
             for (int i = 0; i < 32; ++i)
@@ -330,7 +353,7 @@ public class Bearoff {
         int iOffset;
 
         // read from file
-        iOffset = 40 + 64 * nPosID * ( pbc.isfGammon() ? 2 : 1 );
+        iOffset = 40 + 64 * nPosID * (pbc.isfGammon() ? 2 : 1);
 
         pbc.readBearoffData(iOffset, ac, pbc.isfGammon() ? 128 : 64);
         copyBytes ( aus, ac, 32, 0, 32, 0 );
