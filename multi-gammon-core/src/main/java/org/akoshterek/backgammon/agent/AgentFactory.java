@@ -1,5 +1,6 @@
 package org.akoshterek.backgammon.agent;
 
+import org.akoshterek.backgammon.agent.gnubg.GnubgAgent;
 import org.akoshterek.backgammon.eval.Evaluator;
 
 /**
@@ -21,6 +22,9 @@ public class AgentFactory {
                 break;
             case "pubeval":
                 agent = new PubEvalAgent(Evaluator.getInstance().getBasePath());
+                break;
+            case "gnubg":
+                agent = new GnubgAgent(Evaluator.getInstance().getBasePath());
                 break;
             default:
                 throw new IllegalArgumentException("Unknown agent name " + fullName);

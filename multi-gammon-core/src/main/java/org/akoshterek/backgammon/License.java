@@ -23,8 +23,7 @@ public class License {
     }
 
     private static void printResourse(String resourceName) {
-        InputStream inputStream = License.class.getResourceAsStream(resourceName);
-        try {
+        try (InputStream inputStream = License.class.getResourceAsStream(resourceName)){
             IOUtils.copy(inputStream, System.out);
         } catch (IOException e) {
             throw new RuntimeException(e);

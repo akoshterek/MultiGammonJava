@@ -22,7 +22,7 @@ public abstract class AbsAgent implements IAgent {
     private boolean supportsSanityCheck = false;
     private int playedGames = 0;
     protected boolean fixed = true;
-    protected boolean needsInvertedEval = false;
+    private boolean needsInvertedEval = false;
     protected boolean supportsBearoff = false;
     protected Board curBoard = null;
     protected PositionClass curPC = PositionClass.CLASS_OVER;
@@ -68,6 +68,10 @@ public abstract class AbsAgent implements IAgent {
         return this.needsInvertedEval;
     }
 
+    public void setNeedsInvertedEval(boolean needsInvertedEval) {
+        this.needsInvertedEval = needsInvertedEval;
+    }
+
     public boolean supportsSanityCheck() {
         return this.supportsSanityCheck;
     }
@@ -93,4 +97,5 @@ public abstract class AbsAgent implements IAgent {
             throw new RuntimeException(e);
         }
     }
+
 }
