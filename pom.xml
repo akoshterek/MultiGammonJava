@@ -6,7 +6,11 @@
 
     <groupId>multi-gammon</groupId>
     <artifactId>multi-gammon</artifactId>
+    <packaging>pom</packaging>
     <version>0.1</version>
+    <modules>
+        <module>multi-gammon-core</module>
+    </modules>
 
     <properties>
         <skipTests>true</skipTests>
@@ -76,7 +80,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>org.akoshterek.backgammon.MultiGammon</mainClass>
+                            <mainClass>backgammon.MultiGammon</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
@@ -91,7 +95,7 @@
                     </descriptorRefs>
                     <archive>
                         <manifest>
-                            <mainClass>org.akoshterek.backgammon.MultiGammon</mainClass>
+                            <mainClass>backgammon.MultiGammon</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
