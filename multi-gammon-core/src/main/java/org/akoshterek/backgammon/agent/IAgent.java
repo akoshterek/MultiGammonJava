@@ -62,9 +62,10 @@ public interface IAgent {
     //fixed means it's unable to learn
     boolean isFixed();
     boolean needsInvertedEval();
+    void setNeedsInvertedEval(boolean needsInvertedEval);
     boolean supportsSanityCheck();
-    boolean supportsBearoff();
     void setSanityCheck(boolean sc);
+    boolean supportsBearoff();
     void setCurrentBoard(Board board);
 
     default void load() {}
