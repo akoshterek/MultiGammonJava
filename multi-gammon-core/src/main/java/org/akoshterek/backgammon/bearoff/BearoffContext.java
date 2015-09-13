@@ -1,8 +1,8 @@
 package org.akoshterek.backgammon.bearoff;
 
+import com.google.common.io.LittleEndianDataInputStream;
 import org.apache.commons.io.IOUtils;
 
-import java.io.DataInputStream;
 import java.io.IOException;
 
 /**
@@ -29,7 +29,7 @@ public class BearoffContext {
 
         pbc.szFilename = szFilename;
 
-        try (DataInputStream inputStream = new DataInputStream(BearoffContext.class.getResourceAsStream(szFilename))) {
+        try (LittleEndianDataInputStream inputStream = new LittleEndianDataInputStream(BearoffContext.class.getResourceAsStream(szFilename))) {
 	        // read header
             inputStream.readFully(sz);
             // detect bearoff program
