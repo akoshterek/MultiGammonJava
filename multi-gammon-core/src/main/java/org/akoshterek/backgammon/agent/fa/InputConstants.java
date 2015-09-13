@@ -146,5 +146,4 @@ public interface InputConstants {
     int MINPPERPOINT = 4;
     int NUM_INPUTS = ((25 * MINPPERPOINT + ContactInputs.MORE_INPUTS) * 2);
     int NUM_RACE_INPUTS = RaceInputs.HALF_RACE_INPUTS * 2;
-
 }
