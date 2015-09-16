@@ -12,7 +12,7 @@ public class PositionId {
     private static boolean calculated = false;
     private static int[][] anCombination = new int[MAX_N][MAX_R];
 
-    public static short PositionIndex(int g, int anBoard[]) {
+    public static int positionIndex(int g, int[] anBoard) {
         int fBits;
         int j = g - 1;
 
@@ -28,7 +28,7 @@ public class PositionId {
 
         // FIXME: 15 should be replaced by nChequers, but the function is
         //   only called from bearoffgammon, so this should be fine.
-        return (short) PositionF(fBits, 15, g);
+        return positionF(fBits, 15, g);
     }
 
     public static int combination(int n, int r) {
@@ -55,7 +55,7 @@ public class PositionId {
 
         }
 
-        return PositionF(fBits, nChequers + nPoints, nPoints);
+        return positionF(fBits, nChequers + nPoints, nPoints);
     }
 
     public static void PositionFromBearoff(byte[] anBoard, int usID,
@@ -96,13 +96,13 @@ public class PositionId {
         return (byte) 255;
     }
 
-    private static int PositionF(int fBits, int n, int r) {
+    private static int positionF(int fBits, int n, int r) {
         if (n == r) {
             return 0;
         }
 
         return ((fBits & (1 << (n - 1))) != 0) ? combination(n - 1, r) +
-                PositionF(fBits, n - 1, r - 1) : PositionF(fBits, n - 1, r);
+                positionF(fBits, n - 1, r - 1) : positionF(fBits, n - 1, r);
     }
 
     private static int PositionInv(int nID, int n, int r) {

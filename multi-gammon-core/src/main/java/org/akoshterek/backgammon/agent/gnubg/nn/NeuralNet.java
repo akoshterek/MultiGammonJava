@@ -58,7 +58,7 @@ public class NeuralNet {
         }
     }
 
-    public void evaluate(float[] arInput, float[] arOutput) {
+    public void evaluate(double[] arInput, double[] arOutput) {
         float[] ar = new float[cHidden];
 
         // Calculate activity at hidden nodes
@@ -67,7 +67,7 @@ public class NeuralNet {
         int prWeight = 0;
         //arHiddenWeight
         for (int i = 0; i < cInput; i++) {
-            float ari = arInput[i];
+            float ari = (float)arInput[i];
 
             if (ari != 0) {
                 int prIndex = 0;

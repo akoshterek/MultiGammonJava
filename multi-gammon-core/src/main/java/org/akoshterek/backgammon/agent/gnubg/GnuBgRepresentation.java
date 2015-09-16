@@ -205,7 +205,7 @@ public class GnuBgRepresentation implements InputRepresentation {
     }
 
     @Override
-    public  double[] calculateCrashedInputs(Board anBoard) {
+    public double[] calculateCrashedInputs(Board anBoard) {
         double[] inputs = new double[NUM_INPUTS];
         baseInputs(anBoard, inputs);
 
