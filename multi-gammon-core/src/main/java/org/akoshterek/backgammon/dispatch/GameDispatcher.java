@@ -525,10 +525,9 @@ public class GameDispatcher {
 
         IAgent agent = agents[currentMatch.fMove].agent;
 
-        if(agent.needsInvertedEval())
+        if(agent.needsInvertedEval()) {
             arEval.invert();
-        else
-        if(PositionClass.isExact(pm.pc)) {
+        } else if(PositionClass.isExact(pm.pc)) {
             //TODO why?
             arEval.invert();
         }

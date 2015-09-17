@@ -44,23 +44,19 @@ public final class Reward {
                 (data[OUTPUT_WINBACKGAMMON] - data[OUTPUT_LOSEBACKGAMMON]);
     }
 
-    public Reward invert() {
-        Reward reward = new Reward(this);
+    public void invert() {
         double r;
+        data[ OUTPUT_WIN ] = 1.0 - data[ OUTPUT_WIN ];
 
-        reward.data[ OUTPUT_WIN ] = 1.0 - reward.data[ OUTPUT_WIN ];
+        r = data[ OUTPUT_WINGAMMON ];
+        data[ OUTPUT_WINGAMMON ] = data[ OUTPUT_LOSEGAMMON ];
+        data[ OUTPUT_LOSEGAMMON ] = r;
 
-        r = reward.data[ OUTPUT_WINGAMMON ];
-        reward.data[ OUTPUT_WINGAMMON ] = reward.data[ OUTPUT_LOSEGAMMON ];
-        reward.data[ OUTPUT_LOSEGAMMON ] = r;
+        r = data[ OUTPUT_WINBACKGAMMON ];
+        data[ OUTPUT_WINBACKGAMMON ] = data[ OUTPUT_LOSEBACKGAMMON ];
+        data[ OUTPUT_LOSEBACKGAMMON ] = r;
 
-        r = reward.data[ OUTPUT_WINBACKGAMMON ];
-        reward.data[ OUTPUT_WINBACKGAMMON ] = reward.data[ OUTPUT_LOSEBACKGAMMON ];
-        reward.data[ OUTPUT_LOSEBACKGAMMON ] = r;
-
-        reward.data[ OUTPUT_EQUITY ] = -reward.data[ OUTPUT_EQUITY ];
-
-        return reward;
+        data[ OUTPUT_EQUITY ] = -data[ OUTPUT_EQUITY ];
     }
 
     public Reward clamp() {

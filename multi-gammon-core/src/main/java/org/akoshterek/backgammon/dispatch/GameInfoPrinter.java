@@ -66,7 +66,8 @@ public class GameInfoPrinter {
         apch[match.fMove != 0 ? 4 : 2] = "";
 
         if (match.anDice[0] != 0) {
-            System.out.println(String.format("%s %d%d", "Rolled", match.anDice[0], match.anDice[1]));
+            System.out.println(String.format("%s %s %d%d", match.fTurn == 0 ? apch[0] : apch[6], "Rolled",
+                    match.anDice[0], match.anDice[1]));
         } else {
             System.out.println(match.board.gameStatus() != 0 ? "On roll" : "");
         }
