@@ -58,24 +58,24 @@ public class PositionId {
         return positionF(fBits, nChequers + nPoints, nPoints);
     }
 
-    public static void PositionFromBearoff(byte[] anBoard, int usID,
-                                           int nPoints, int nChequers) {
-        int fBits = PositionInv(usID, nChequers + nPoints, nPoints);
-        int i, j;
-
-        for (i = 0; i < nPoints; i++)
-            anBoard[i] = 0;
-
-        j = nPoints - 1;
-        for (i = 0; i < (nChequers + nPoints); i++) {
-            if ((fBits & (1 << i)) != 0) {
-                if (j == 0)
-                    break;
-                j--;
-            } else
-                anBoard[j]++;
-        }
-    }
+//    public static void PositionFromBearoff(byte[] anBoard, int usID,
+//                                           int nPoints, int nChequers) {
+//        int fBits = PositionInv(usID, nChequers + nPoints, nPoints);
+//        int i, j;
+//
+//        for (i = 0; i < nPoints; i++)
+//            anBoard[i] = 0;
+//
+//        j = nPoints - 1;
+//        for (i = 0; i < (nChequers + nPoints); i++) {
+//            if ((fBits & (1 << i)) != 0) {
+//                if (j == 0)
+//                    break;
+//                j--;
+//            } else
+//                anBoard[j]++;
+//        }
+//    }
 
     public static byte Base64(byte ch) {
         if (ch >= 'A' && ch <= 'Z')
@@ -105,20 +105,20 @@ public class PositionId {
                 positionF(fBits, n - 1, r - 1) : positionF(fBits, n - 1, r);
     }
 
-    private static int PositionInv(int nID, int n, int r) {
-        int nC;
-
-        if (r != 0) {
-            return 0;
-        } else if (n == r) {
-            return (1 << n) - 1;
-        }
-
-        nC = combination(n - 1, r);
-
-        return (nID >= nC) ? (1 << (n - 1)) | PositionInv(nID - nC, n - 1, r - 1)
-                : PositionInv(nID, n - 1, r);
-    }
+//    private static int PositionInv(int nID, int n, int r) {
+//        int nC;
+//
+//        if (r != 0) {
+//            return 0;
+//        } else if (n == r) {
+//            return (1 << n) - 1;
+//        }
+//
+//        nC = combination(n - 1, r);
+//
+//        return (nID >= nC) ? (1 << (n - 1)) | PositionInv(nID - nC, n - 1, r - 1)
+//                : PositionInv(nID, n - 1, r);
+//    }
 
     private static void initCombination() {
         if (calculated) {
