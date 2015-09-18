@@ -80,8 +80,9 @@ public class NeuralNet {
                         ar[prIndex++] += arHiddenWeight[prWeight++] * ari;
                     }
                 }
-            } else
+            } else {
                 prWeight += cHidden;
+            }
         }
 
         for (int i = 0; i < cHidden; i++) {

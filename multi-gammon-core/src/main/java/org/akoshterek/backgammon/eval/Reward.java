@@ -85,4 +85,9 @@ public final class Reward {
         }
         return reward;
     }
+
+    @Override
+    public String toString() {
+        return Arrays.toString(data);
+    }
 }

@@ -25,7 +25,7 @@ public class GameInfoPrinter {
 
 
     public static void printStatistics(GameDispatcher.AgentEntry[] agents, int numGames) {
-        System.out.println(String.format("\n\tStatistics after %d game(s)", numGames));
+        System.out.println(String.format("\tStatistics after %d game(s)", numGames));
 
         for (int i = 0; i < 2; i++) {
             System.out.println(String.format("%c:%s: games %d/%d = %5.2f%%, points %d = %5.2f%%",
@@ -61,12 +61,12 @@ public class GameInfoPrinter {
 
         apch[0] = "O: " + agents[0].agent.getFullName();
         apch[6] = "X: " + agents[1].agent.getFullName();
-        apch[1] = String.format("%d point(s)", match.anScore[0]);
-        apch[5] = String.format("%d point(s)", match.anScore[1]);
+        //apch[1] = String.format("%d point(s)", match.anScore[0]);
+        //apch[5] = String.format("%d point(s)", match.anScore[1]);
         apch[match.fMove != 0 ? 4 : 2] = "";
 
         if (match.anDice[0] != 0) {
-            System.out.println(String.format("%s %s %d%d", match.fTurn == 0 ? apch[0] : apch[6], "Rolled",
+            System.out.println(String.format("%s %s %d%d", match.fTurn == 0 ? apch[0] : apch[6], "rolled",
                     match.anDice[0], match.anDice[1]));
         } else {
             System.out.println(match.board.gameStatus() != 0 ? "On roll" : "");
@@ -102,15 +102,15 @@ public class GameInfoPrinter {
     public static void showAutoMove(ChequerMove anMove, GameDispatcher.AgentEntry[] agents, MatchState match) {
         char symbol = match.fTurn != 0? 'X' : 'O';
         if( anMove.move[ 0 ] == -1 ) {
-            System.out.println(String.format("%c:%s cannot move.", symbol, agents[match.fTurn].agent.getFullName()));
+            System.out.println(String.format("%c:%s cannot move.\n", symbol, agents[match.fTurn].agent.getFullName()));
         } else {
-            System.out.println(String.format("%c:%s moves %s.", symbol, agents[match.fTurn].agent.getFullName(),
+            System.out.println(String.format("%c:%s moves %s.\n", symbol, agents[match.fTurn].agent.getFullName(),
                     BoardFormatter.formatMovePlain(anMove, match.board)));
         }
     }
 
     public static void printGameOver(GameDispatcher.AgentEntry[] agents, int fWinner, int nPoints, int result) {
-        System.out.println(String.format("\nEnd Game done.\n%c:%s wins a %s and %d point(s)\n",
+        System.out.println(String.format("Game over.\n%c:%s wins a %s and %d point(s)\n",
                 fWinner != 0 ? 'X' : 'O',
                 agents[fWinner].agent.getFullName(),
                 gameResult[ result - 1 ], nPoints));

@@ -1,5 +1,6 @@
 package org.akoshterek.backgammon.agent.gnubg;
 
+import com.google.common.io.LittleEndianDataInputStream;
 import org.akoshterek.backgammon.agent.fa.InputRepresentation;
 import org.akoshterek.backgammon.board.Board;
 
@@ -833,42 +834,24 @@ public class GnuBgRepresentation implements InputRepresentation {
     }
 
     private static void computeTable0() {
-        int i, c, n0, n1;
-        for (i = 0; i < 0x1000; i++) {
-            c = 0;
-            for (n0 = 0; n0 <= 5; n0++) {
-                for (n1 = 0; n1 <= n0; n1++) {
-                    if ((i & (1 << (n0 + n1 + 1))) == 0 &&
-                            ((i & (1 << n0)) == 0 && (i & (1 << n1)) != 0)) {
-                        c += (n0 == n1) ? 1 : 2;
-                    }
-                }
+        try (LittleEndianDataInputStream is = new LittleEndianDataInputStream(GnubgAgent.class.getResourceAsStream(
+                "/org/akoshterek/backgammon/gnu/escapes0.dat"))) {
+            for (int i = 0; i < 0x1000; i++) {
+                anEscapes[i] = is.readInt();
             }
-
-            anEscapes[i] = c;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
     private static void computeTable1() {
-        int i, c, n0, n1, low;
-        for (i = 1; i < 0x1000; i++) {
-            c = 0;
-            low = 0;
-            while ((i & (1 << low)) == 0) {
-                ++low;
+        try (LittleEndianDataInputStream is = new LittleEndianDataInputStream(GnubgAgent.class.getResourceAsStream(
+                "/org/akoshterek/backgammon/gnu/escapes1.dat"))) {
+            for (int i = 0; i < 0x1000; i++) {
+                anEscapes1[i] = is.readInt();
             }
-
-            for (n0 = 0; n0 <= 5; n0++) {
-                for (n1 = 0; n1 <= n0; n1++) {
-                    if ((n0 + n1 + 1 > low) &&
-                            (i & (1 << (n0 + n1 + 1))) == 0 &&
-                            ((i & (1 << n0)) == 0 && (i & (1 << n1)) != 0)) {
-                        c += (n0 == n1) ? 1 : 2;
-                    }
-                }
-            }
-
-            anEscapes1[i] = c;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
