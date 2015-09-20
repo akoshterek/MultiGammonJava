@@ -7,13 +7,15 @@
     <groupId>multi-gammon</groupId>
     <artifactId>multi-gammon</artifactId>
     <packaging>pom</packaging>
-    <version>0.1</version>
+    <version>${version}</version>
     <modules>
         <module>multi-gammon-core</module>
+        <module>multi-gammon-util</module>
     </modules>
 
     <properties>
         <skipTests>true</skipTests>
+        <version>0.1</version>
     </properties>
 
     <dependencies>
@@ -91,7 +93,7 @@
                     </archive>
                 </configuration>
             </plugin>
-            <plugin>
+            <!--plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>2.5.5</version>
@@ -114,7 +116,7 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>
+            </plugin-->
         </plugins>
     </build>
 </project>

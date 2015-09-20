@@ -7,7 +7,6 @@ import org.akoshterek.backgammon.move.ChequerMove;
 import org.akoshterek.backgammon.move.Move;
 import org.akoshterek.backgammon.move.MoveList;
 
-import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 
 import static org.akoshterek.backgammon.Constants.*;
@@ -24,8 +23,6 @@ public class Board {
     public static final int TOTAL_MEN = 15;
 
     public byte[][] anBoard = new byte[2][25];
-
-    public static final String aszBase64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
     public Board() {
         clearBoard();
@@ -66,18 +63,6 @@ public class Board {
         anBoard[0][5]  = anBoard[1][5]  = anBoard[0][12] = anBoard[1][12] = 5;
         anBoard[0][7]  = anBoard[1][7]  = 3;
         anBoard[0][23] = anBoard[1][23] = 2;
-    }
-
-    public void PipCount(int[] anPips)
-    {
-        anPips[ OPPONENT ] = 0;
-        anPips[ SELF ] = 0;
-
-        for(int i = 0; i < 25; i++ )
-        {
-            anPips[ OPPONENT ] += anBoard[ OPPONENT ][ i ] * ( i + 1 );
-            anPips[ SELF ] += anBoard[ SELF ][ i ] * ( i + 1 );
-        }
     }
 
     public void chequersCount(int[] anChequers) {
@@ -124,33 +109,7 @@ public class Board {
 
     public String positionID() {
         AuchKey auch = PositionKey();
-        return positionIDFromKey(auch);
-    }
-
-    public static String positionIDFromKey(AuchKey auchKey) {
-        int puch = 0;
-        byte[] szID = new byte[PositionId.L_POSITIONID];
-        int pch = 0;
-
-        for (int i = 0; i < 3; i++) {
-            szID[pch++] = (byte) aszBase64.charAt(auchKey.intKey(puch) >> 2);
-            szID[pch++] = (byte) aszBase64.charAt(((auchKey.intKey(puch) & 0x03) << 4) |
-                    (auchKey.intKey(puch + 1) >> 4));
-            szID[pch++] = (byte) aszBase64.charAt(((auchKey.intKey(puch + 1) & 0x0F) << 2) |
-                    (auchKey.intKey(puch + 2) >> 6));
-            szID[pch++] = (byte) aszBase64.charAt(auchKey.intKey(puch + 2) & 0x3F);
-
-            puch += 3;
-        }
-
-        szID[pch++] = (byte) aszBase64.charAt(auchKey.intKey(puch) >> 2);
-        szID[pch] = (byte) aszBase64.charAt((auchKey.intKey(puch) & 0x03) << 4);
-
-        try {
-            return new String(szID, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
-        }
+        return PositionId.positionIDFromKey(auch);
     }
 
     public static Board positionFromKey(AuchKey auch) {
@@ -177,7 +136,6 @@ public class Board {
         }
 
         return newBoard;
-
     }
 
     public static Board positionFromID(String pchEnc) {

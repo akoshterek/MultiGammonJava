@@ -1,5 +1,9 @@
 package org.akoshterek.backgammon.board;
 
+import org.akoshterek.backgammon.move.AuchKey;
+
+import java.io.UnsupportedEncodingException;
+
 /**
  * @author Alex
  *         date 19.07.2015.
@@ -11,6 +15,7 @@ public class PositionId {
     private static final int MAX_R = 25;
     private static boolean calculated = false;
     private static int[][] anCombination = new int[MAX_N][MAX_R];
+    private static final String aszBase64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
     public static int positionIndex(int g, int[] anBoard) {
         int fBits;
@@ -94,6 +99,32 @@ public class PositionId {
             return 63;
 
         return (byte) 255;
+    }
+
+    public static String positionIDFromKey(AuchKey auchKey) {
+        int puch = 0;
+        byte[] szID = new byte[PositionId.L_POSITIONID];
+        int pch = 0;
+
+        for (int i = 0; i < 3; i++) {
+            szID[pch++] = (byte) aszBase64.charAt(auchKey.intKey(puch) >> 2);
+            szID[pch++] = (byte) aszBase64.charAt(((auchKey.intKey(puch) & 0x03) << 4) |
+                    (auchKey.intKey(puch + 1) >> 4));
+            szID[pch++] = (byte) aszBase64.charAt(((auchKey.intKey(puch + 1) & 0x0F) << 2) |
+                    (auchKey.intKey(puch + 2) >> 6));
+            szID[pch++] = (byte) aszBase64.charAt(auchKey.intKey(puch + 2) & 0x3F);
+
+            puch += 3;
+        }
+
+        szID[pch++] = (byte) aszBase64.charAt(auchKey.intKey(puch) >> 2);
+        szID[pch] = (byte) aszBase64.charAt((auchKey.intKey(puch) & 0x03) << 4);
+
+        try {
+            return new String(szID, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private static int positionF(int fBits, int n, int r) {

@@ -1,23 +1,34 @@
 package org.akoshterek.backgammon.move;
 
-import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 
-/**
- * @author Alex
- *         date 19.07.2015.
- */
 public class AuchKey {
     public final byte[] key = new byte[10];
 
     public AuchKey() {}
 
-    public AuchKey(byte[] key) {
-        System.arraycopy(key, 0, this.key, 0, this.key.length);
-    }
-
     public int intKey(int index) {
         return key[index] < 0 ? 256 + key[index] : key[index];
+    }
+
+    public static AuchKey fromNnPosition(String positionId) {
+        if(positionId == null || positionId.length() != 20) {
+            throw new IllegalArgumentException("Illegal position string " + positionId);
+        }
+
+        AuchKey key = new AuchKey();
+        for (int i = 0; i < 10; i++) {
+            char i2_0 = positionId.charAt(2 * i);
+            char i2_1 = positionId.charAt(2 * i + 1);
+            if (i2_0 >= 'A' && i2_0 <= 'P' && i2_1 >= 'A' && i2_1 <= 'P') {
+                key.key[i] = (byte)(((i2_0 - 'A') << 4) + (i2_1 - 'A'));
+            }
+            else {
+                throw new IllegalArgumentException("Illegal position string " + positionId);
+            }
+        }
+
+        return key;
     }
 
     public boolean equals(Object o) {
@@ -31,7 +42,7 @@ public class AuchKey {
     public String toString() {
         try {
             return new String(key, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
