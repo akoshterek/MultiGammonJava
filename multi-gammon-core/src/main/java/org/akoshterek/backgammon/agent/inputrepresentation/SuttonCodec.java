@@ -10,6 +10,6 @@ public class SuttonCodec implements PointCodec {
         inputs[offset] = men >= 1 ? 1.0f : 0.0f;
         inputs[offset + 1] = men >= 2 ? 1.0f : 0.0f;
         inputs[offset + 2] = men >= 3 ? 1.0f : 0.0f;
-        inputs[offset + 3] = men >= 4 ? (men - 3) / 2.0f : 0.0f;
+        inputs[offset + 3] = men >= 4 ? (men - 3) / 12.0f : 0.0f;
     }
 }
