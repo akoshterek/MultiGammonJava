@@ -1,14 +1,14 @@
 package org.akoshterek.backgammon.agent.gnubg;
 
 import com.google.common.io.LittleEndianDataInputStream;
-import org.akoshterek.backgammon.agent.fa.InputRepresentation;
+import org.akoshterek.backgammon.agent.inputrepresentation.InputRepresentation;
 import org.akoshterek.backgammon.board.Board;
 
 import java.util.Arrays;
 
-import static org.akoshterek.backgammon.agent.fa.InputConstants.*;
-import static org.akoshterek.backgammon.agent.fa.InputConstants.ContactInputs.*;
-import static org.akoshterek.backgammon.agent.fa.InputConstants.RaceInputs.*;
+import static org.akoshterek.backgammon.agent.gnubg.InputConstants.*;
+import static org.akoshterek.backgammon.agent.gnubg.InputConstants.ContactInputs.*;
+import static org.akoshterek.backgammon.agent.gnubg.InputConstants.RaceInputs.*;
 
 /**
  * @author Alex

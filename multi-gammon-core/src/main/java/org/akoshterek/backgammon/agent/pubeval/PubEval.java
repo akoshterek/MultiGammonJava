@@ -1,4 +1,4 @@
-package org.akoshterek.backgammon.agent;
+package org.akoshterek.backgammon.agent.pubeval;
 
 import java.util.Arrays;
 

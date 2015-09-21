@@ -1,4 +1,4 @@
-package org.akoshterek.backgammon.agent.fa;
+package org.akoshterek.backgammon.agent.gnubg;
 
 /**
  * @author Alex
@@ -70,7 +70,7 @@ public interface InputConstants {
 
          1. If board is weak (less than 3 anchors), don't consider hitting on
             points 22 and 23.
-         2. Dont break anchors inside home to hit.
+         2. Don't break anchors inside home to hit.
        */
         int I_PIPLOSS = 7;
 
@@ -122,7 +122,7 @@ public interface InputConstants {
       */
         int I_ENTER = 17;
 
-      /* Probablity of one checker not entering from bar.
+      /* Probability of one checker not entering from bar.
          1 - (1 - n/6)^2, where n is number of closed points in op home.
        */
         int I_ENTER2 = 18;
@@ -140,7 +140,6 @@ public interface InputConstants {
         int I_BACKRESCAPES = 24;
 
         int MORE_INPUTS = 25;
-
     }
 
     int MINPPERPOINT = 4;

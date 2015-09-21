@@ -1,6 +1,7 @@
-package org.akoshterek.backgammon.agent;
+package org.akoshterek.backgammon.agent.pubeval;
 
 import org.akoshterek.backgammon.Constants;
+import org.akoshterek.backgammon.agent.AbsAgent;
 import org.akoshterek.backgammon.board.Board;
 import org.akoshterek.backgammon.board.PositionClass;
 import org.akoshterek.backgammon.eval.Reward;

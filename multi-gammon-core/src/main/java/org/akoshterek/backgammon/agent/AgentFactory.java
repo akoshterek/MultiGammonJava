@@ -1,6 +1,7 @@
 package org.akoshterek.backgammon.agent;
 
 import org.akoshterek.backgammon.agent.gnubg.GnubgAgent;
+import org.akoshterek.backgammon.agent.pubeval.PubEvalAgent;
 import org.akoshterek.backgammon.eval.Evaluator;
 
 /**

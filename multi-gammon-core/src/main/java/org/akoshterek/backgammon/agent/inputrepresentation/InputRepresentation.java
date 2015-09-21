@@ -1,4 +1,4 @@
-package org.akoshterek.backgammon.agent.fa;
+package org.akoshterek.backgammon.agent.inputrepresentation;
 
 import org.akoshterek.backgammon.board.Board;
 
