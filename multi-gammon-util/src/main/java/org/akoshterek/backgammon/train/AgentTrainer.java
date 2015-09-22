@@ -1,8 +1,6 @@
 package org.akoshterek.backgammon.train;
 
 import org.akoshterek.backgammon.agent.inputrepresentation.RepresentationFactory;
-import org.akoshterek.backgammon.agent.inputrepresentation.SuttonCodec;
-import org.akoshterek.backgammon.agent.raw.RawRepresentation;
 import org.akoshterek.backgammon.board.PositionClass;
 
 /**
