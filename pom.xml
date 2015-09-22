@@ -7,7 +7,7 @@
     <groupId>multi-gammon</groupId>
     <artifactId>multi-gammon</artifactId>
     <packaging>pom</packaging>
-    <version>${version}</version>
+    <version>0.1</version>
     <modules>
         <module>multi-gammon-core</module>
         <module>multi-gammon-util</module>

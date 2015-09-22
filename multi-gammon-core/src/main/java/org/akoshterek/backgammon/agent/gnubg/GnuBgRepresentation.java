@@ -164,6 +164,21 @@ public class GnuBgRepresentation implements InputRepresentation {
     }
 
     @Override
+    public int getRaceInputsCouns() {
+        return NUM_RACE_INPUTS;
+    }
+
+    @Override
+    public int getCrashedInputsCount() {
+        return NUM_INPUTS;
+    }
+
+    @Override
+    public int getContactInputsCount() {
+        return NUM_INPUTS;
+    }
+
+    @Override
     public double[] calculateRaceInputs(Board anBoard) {
         double[] inputs = new double[NUM_RACE_INPUTS];
         for (int side = 0; side < 2; ++side) {

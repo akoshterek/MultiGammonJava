@@ -7,6 +7,10 @@ import org.akoshterek.backgammon.board.Board;
  *         date 12.09.2015.
  */
 public interface InputRepresentation {
+    int getRaceInputsCouns();
+    int getCrashedInputsCount();
+    int getContactInputsCount();
+
     double[] calculateRaceInputs(Board anBoard);
     double[] calculateCrashedInputs(Board anBoard);
     double[] calculateContactInputs(Board anBoard);

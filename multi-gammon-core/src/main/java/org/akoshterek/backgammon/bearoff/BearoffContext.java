@@ -9,7 +9,8 @@ import java.io.IOException;
  * @author Alex
  *         date 31.08.2015.
  */
-public class BearoffContext {
+public class
+        BearoffContext {
     private boolean isTwoSided; /* type of bearoff database */
     private int nPoints;    /* number of points covered by database */
     private int nChequers;  /* number of chequers for one-sided database */
