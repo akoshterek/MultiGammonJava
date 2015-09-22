@@ -47,31 +47,24 @@ public class NetworkTrainer {
     public NetworkHolder trainNetwork() {
         MLDataSet trainingSet = loadTraingSet(getResourceName());
 
-        NetworkHolder holder = new NetworkHolder();
-        holder.network = createNetwork(getInputNeuronsCount(), settings.hiddenNeuronCount, Constants.NUM_OUTPUTS);
-        holder.epoch = 1;
-        Propagation train = createPropagation(holder.network, trainingSet);
+        NetworkHolder holder = new NetworkHolder(
+                createNetwork(getInputNeuronsCount(), settings.hiddenNeuronCount, Constants.NUM_OUTPUTS),
+                networkType, settings
+        );
+        Propagation train = createPropagation(holder.getNetwork(), trainingSet);
 
         do {
             train.iteration();
-            System.out.println("Epoch #" + holder.epoch + " Error:" + train.getError());
-            holder.epoch++;
+            System.out.println("Epoch #" + holder.getEpoch() + " Error:" + train.getError());
+            holder.incEpoch();
         } while(!train.isTrainingDone());
         train.finishTraining();
         return holder;
     }
 
     private String getResourceName() {
-        switch (networkType) {
-            case CLASS_CONTACT:
-                return "/org/akoshterek/backgammon/data/contact-train-data.gz";
-            case CLASS_CRASHED:
-                return "/org/akoshterek/backgammon/data/crashed-train-data.gz";
-            case CLASS_RACE:
-                return "/org/akoshterek/backgammon/data/race-train-data.gz";
-            default:
-                throw new IllegalArgumentException("Unknown network type " + networkType);
-        }
+        return String.format("/org/akoshterek/backgammon/data/%s-train-data.gz",
+                PositionClass.getNetworkType(networkType));
     }
 
     private int getInputNeuronsCount() {

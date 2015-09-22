@@ -1,16 +1,17 @@
 package org.akoshterek.backgammon.train;
 
 import org.akoshterek.backgammon.agent.inputrepresentation.InputRepresentation;
-import org.akoshterek.backgammon.agent.inputrepresentation.PointCodec;
+
+import java.io.Serializable;
 
 /**
  * @author Alex
  *         date 22.09.2015.
  */
-public class AgentSettings {
+public class AgentSettings implements Serializable {
     public InputRepresentation representation;
     public int hiddenNeuronCount;
     public String getAgentName() {
-        return representation.getName();
+        return representation.getName() + "-" + hiddenNeuronCount;
     }
 }

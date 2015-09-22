@@ -40,4 +40,17 @@ public enum PositionClass {
                 return false;
         }
     }
+
+    public static String getNetworkType(PositionClass pc) {
+        switch (pc) {
+            case CLASS_CONTACT:
+                return "contact";
+            case CLASS_CRASHED:
+                return "crashed";
+            case CLASS_RACE:
+                return "race";
+            default:
+                return null;
+        }
+    }
 }

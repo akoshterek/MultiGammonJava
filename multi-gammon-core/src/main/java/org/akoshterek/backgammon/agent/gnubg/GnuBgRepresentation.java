@@ -164,6 +164,11 @@ public class GnuBgRepresentation implements InputRepresentation {
     }
 
     @Override
+    public String getName() {
+        return "GnuBg";
+    }
+
+    @Override
     public int getRaceInputsCouns() {
         return NUM_RACE_INPUTS;
     }
