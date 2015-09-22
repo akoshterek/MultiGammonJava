@@ -17,6 +17,10 @@
             <artifactId>multi-gammon-core</artifactId>
             <version>${version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.encog</groupId>
+            <artifactId>encog-core</artifactId>
+        </dependency>
     </dependencies>
 
 
