@@ -3,7 +3,7 @@ package org.akoshterek.backgammon.dispatch;
 import org.akoshterek.backgammon.License;
 import org.akoshterek.backgammon.agent.AbsAgent;
 import org.akoshterek.backgammon.agent.AgentFactory;
-import org.akoshterek.backgammon.agent.IAgent;
+import org.akoshterek.backgammon.agent.Agent;
 import org.akoshterek.backgammon.eval.Evaluator;
 import org.akoshterek.backgammon.util.OptionsBean;
 import org.akoshterek.backgammon.util.OptionsBuilder;
@@ -66,10 +66,10 @@ public class Dispatcher {
     private void runAgentIteration(String agentName, String benchAgentName,
                                    int trainingGames, int benchmarkGames, int benchmarkPeriod) {
 
-        IAgent agent1 = AgentFactory.createAgent(agentName);
-        IAgent benchAgent = AgentFactory.createAgent(benchAgentName);
+        Agent agent1 = AgentFactory.createAgent(agentName);
+        Agent benchAgent = AgentFactory.createAgent(benchAgentName);
         assert(agent1 != null && benchAgent != null);
-        IAgent agent2;
+        Agent agent2;
         if(agent1 instanceof Cloneable) {
             agent2 = ((AbsAgent)agent1).clone();
         }
@@ -80,7 +80,7 @@ public class Dispatcher {
         runIteration(agent1, benchAgent, agent2, trainingGames, benchmarkGames, benchmarkPeriod);
     }
 
-    private void runIteration(IAgent agent1, IAgent benchAgent, IAgent agent2,
+    private void runIteration(Agent agent1, Agent benchAgent, Agent agent2,
                                     int trainGames, int benchmarkGames, int benchmarkPeriod) {
         GameDispatcher gameDispatcher = new GameDispatcher(agent1, agent2);
         gameDispatcher.setIsShowLog(options.isVerbose());

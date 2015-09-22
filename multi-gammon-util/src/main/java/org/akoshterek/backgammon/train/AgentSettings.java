@@ -9,6 +9,8 @@ import org.akoshterek.backgammon.agent.inputrepresentation.PointCodec;
  */
 public class AgentSettings {
     public InputRepresentation representation;
-    public PointCodec pointCodec;
     public int hiddenNeuronCount;
+    public String getAgentName() {
+        return representation.getName();
+    }
 }

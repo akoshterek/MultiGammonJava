@@ -6,6 +6,11 @@ package org.akoshterek.backgammon.agent.inputrepresentation;
  */
 public class SuttonCodec implements PointCodec {
     @Override
+    public String getName() {
+        return "Sutton";
+    }
+
+    @Override
     public void setPoint(byte men, double[] inputs, int offset) {
         inputs[offset] = men >= 1 ? 1.0f : 0.0f;
         inputs[offset + 1] = men >= 2 ? 1.0f : 0.0f;

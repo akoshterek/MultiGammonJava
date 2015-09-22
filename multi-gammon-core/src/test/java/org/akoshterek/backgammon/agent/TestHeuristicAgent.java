@@ -15,11 +15,11 @@ public class TestHeuristicAgent {
 
     @Test
     public void testAgent() {
-        IAgent agent = new HeuristicAgent(Paths.get("."));
+        Agent agent = new HeuristicAgent(Paths.get("."));
         checkPosition(agent, "4HPwATDYZvDBAA");
     }
 
-    private void checkPosition(IAgent agent, String positionId) {
+    private void checkPosition(Agent agent, String positionId) {
         Board board = Board.positionFromID(positionId);
 //        System.out.println(BoardFormatter.drawBoard(board, 0, new String[7], ""));
         Reward reward = agent.evalContact(board);

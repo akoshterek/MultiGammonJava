@@ -16,6 +16,11 @@ public class RawRepresentation implements InputRepresentation {
     }
 
     @Override
+    public String getName() {
+        return "Raw-" + codec.getName();
+    }
+
+    @Override
     public int getRaceInputsCouns() {
         return getContactInputsCount();
     }

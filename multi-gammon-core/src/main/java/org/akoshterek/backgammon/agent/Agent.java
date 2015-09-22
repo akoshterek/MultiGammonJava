@@ -12,7 +12,7 @@ import java.nio.file.Path;
  * @author Alex
  *         date 02.08.2015.
  */
-public interface IAgent {
+public interface Agent {
     String getFullName();
     Path getPath();
     int getPlayedGames();

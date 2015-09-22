@@ -9,11 +9,11 @@ import org.akoshterek.backgammon.eval.Evaluator;
  *         date 02.08.2015.
  */
 public class AgentFactory {
-    public static IAgent createAgent(String fullName) {
+    public static Agent createAgent(String fullName) {
         String fullNameLower = fullName.toLowerCase();
         //String[] tokens = fullNameLower.split("-");
 
-        IAgent agent;
+        Agent agent;
         switch (fullNameLower) {
             case "random":
                 agent = new RandomAgent(Evaluator.getInstance().getBasePath());

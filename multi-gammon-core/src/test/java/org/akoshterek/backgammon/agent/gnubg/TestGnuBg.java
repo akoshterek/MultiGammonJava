@@ -1,6 +1,6 @@
 package org.akoshterek.backgammon.agent.gnubg;
 
-import org.akoshterek.backgammon.agent.IAgent;
+import org.akoshterek.backgammon.agent.Agent;
 import org.akoshterek.backgammon.board.Board;
 import org.akoshterek.backgammon.board.PositionClass;
 import org.akoshterek.backgammon.eval.Evaluator;
@@ -19,7 +19,7 @@ import java.nio.file.Paths;
 public class TestGnuBg {
     @Test
     public void testRace() {
-        IAgent agent = new GnubgAgent(Evaluator.getInstance().getBasePath());
+        Agent agent = new GnubgAgent(Evaluator.getInstance().getBasePath());
         String positionId = "4PPBQRCw58gBMA";
         System.out.println(positionId);
         Board board = Board.positionFromID(positionId);

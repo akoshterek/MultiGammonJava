@@ -3,7 +3,6 @@ package org.akoshterek.backgammon.agent;
 import org.akoshterek.backgammon.board.Board;
 import org.akoshterek.backgammon.board.PositionClass;
 import org.akoshterek.backgammon.eval.Evaluator;
-import org.akoshterek.backgammon.eval.Reward;
 import org.akoshterek.backgammon.move.Move;
 
 import java.nio.file.Path;
@@ -13,7 +12,7 @@ import java.nio.file.Paths;
  * @author Alex
  *         date 02.08.2015.
  */
-public abstract class AbsAgent implements IAgent {
+public abstract class AbsAgent implements Agent {
     private static final String AGENTS_SUBFOLDER = "agents";
 
     private final Path path;

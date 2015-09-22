@@ -1,6 +1,6 @@
 package org.akoshterek.backgammon.dispatch;
 
-import org.akoshterek.backgammon.agent.IAgent;
+import org.akoshterek.backgammon.agent.Agent;
 import org.akoshterek.backgammon.board.Board;
 import org.akoshterek.backgammon.board.PositionClass;
 import org.akoshterek.backgammon.eval.Evaluator;
@@ -32,7 +32,7 @@ public class GameDispatcher {
     private MoveRecord pmrHint;
     private Move[] amMoves;
 
-    public GameDispatcher(IAgent agent1, IAgent agent2) {
+    public GameDispatcher(Agent agent1, Agent agent2) {
         agents[0].agent = agent1;
         agents[1].agent = agent2;
 
@@ -523,7 +523,7 @@ public class GameDispatcher {
             return -1;
         }
 
-        IAgent agent = agents[currentMatch.fMove].agent;
+        Agent agent = agents[currentMatch.fMove].agent;
 
         if(agent.needsInvertedEval()) {
             arEval.invert();
@@ -546,7 +546,7 @@ public class GameDispatcher {
 
     private void evaluatePositionFull(Board anBoard, Reward arOutput, PositionClass pc ) {
 	    // at leaf node; use static evaluation
-        IAgent agent = agents[currentMatch.fMove].agent;
+        Agent agent = agents[currentMatch.fMove].agent;
         arOutput.assign(agent.evaluatePosition(anBoard, pc));
 
         if (!PositionClass.isExact(pc) && agent.supportsSanityCheck() && !agent.isLearnMode()) {
@@ -557,7 +557,7 @@ public class GameDispatcher {
 
 
     class AgentEntry {
-        public IAgent agent;
+        public Agent agent;
         public int wonGames = 0;
         public int wonPoints = 0;
     }

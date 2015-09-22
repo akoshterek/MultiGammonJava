@@ -1,5 +1,6 @@
 package org.akoshterek.backgammon.train;
 
+import org.akoshterek.backgammon.agent.inputrepresentation.RepresentationFactory;
 import org.akoshterek.backgammon.agent.inputrepresentation.SuttonCodec;
 import org.akoshterek.backgammon.agent.raw.RawRepresentation;
 import org.akoshterek.backgammon.board.PositionClass;
@@ -10,10 +11,13 @@ import org.akoshterek.backgammon.board.PositionClass;
  */
 public class AgentTrainer {
     public static void main(String[] args) {
+        String representationName = args[0];
+        String hiddenNeuronsCount = args[1];
+
         AgentSettings settings = new AgentSettings();
-        settings.pointCodec = new SuttonCodec();
-        settings.representation = new RawRepresentation(settings.pointCodec);
-        settings.hiddenNeuronCount = 40;
+        settings.representation = RepresentationFactory.createInputRepresentation(representationName);
+        settings.hiddenNeuronCount = Integer.parseInt(hiddenNeuronsCount);
+
         NetworkTrainer trainer = new NetworkTrainer(settings, PositionClass.CLASS_CONTACT);
         trainer.trainNetwork();
     }

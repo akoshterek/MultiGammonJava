@@ -44,20 +44,21 @@ public class NetworkTrainer {
         this.networkType = networkType;
     }
 
-    public BasicNetwork trainNetwork() {
+    public NetworkHolder trainNetwork() {
         MLDataSet trainingSet = loadTraingSet(getResourceName());
 
-        BasicNetwork network = createNetwork(getInputNeuronsCount(), settings.hiddenNeuronCount, Constants.NUM_OUTPUTS);
-        Propagation train = createPropagation(network, trainingSet);
+        NetworkHolder holder = new NetworkHolder();
+        holder.network = createNetwork(getInputNeuronsCount(), settings.hiddenNeuronCount, Constants.NUM_OUTPUTS);
+        holder.epoch = 1;
+        Propagation train = createPropagation(holder.network, trainingSet);
 
-        int epoch = 1;
         do {
             train.iteration();
-            System.out.println("Epoch #" + epoch + " Error:" + train.getError());
-            epoch++;
+            System.out.println("Epoch #" + holder.epoch + " Error:" + train.getError());
+            holder.epoch++;
         } while(!train.isTrainingDone());
         train.finishTraining();
-        return network;
+        return holder;
     }
 
     private String getResourceName() {
