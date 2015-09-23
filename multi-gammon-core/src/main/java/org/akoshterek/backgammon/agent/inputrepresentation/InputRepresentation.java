@@ -7,8 +7,6 @@ import org.akoshterek.backgammon.board.Board;
  *         date 12.09.2015.
  */
 public interface InputRepresentation {
-    String getName();
-
     int getRaceInputsCouns();
     int getCrashedInputsCount();
     int getContactInputsCount();

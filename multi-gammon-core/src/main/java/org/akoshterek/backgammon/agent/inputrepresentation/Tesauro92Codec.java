@@ -6,11 +6,6 @@ package org.akoshterek.backgammon.agent.inputrepresentation;
  */
 public class Tesauro92Codec implements PointCodec {
     @Override
-    public String getName() {
-        return "Tesauro92";
-    }
-
-    @Override
     public void setPoint(byte men, double[] inputs, int offset) {
         inputs[offset] = men == 1 ? 1.0f : 0.0f;
         inputs[offset+1] = men >= 2 ? 1.0f : 0.0f;

@@ -10,20 +10,15 @@ import org.akoshterek.backgammon.data.TrainDataLoader;
 import org.akoshterek.backgammon.data.TrainEntry;
 import org.encog.engine.network.activation.ActivationSigmoid;
 import org.encog.mathutil.randomize.RangeRandomizer;
-import org.encog.ml.CalculateScore;
 import org.encog.ml.data.MLData;
 import org.encog.ml.data.MLDataPair;
 import org.encog.ml.data.MLDataSet;
 import org.encog.ml.data.basic.BasicMLData;
 import org.encog.ml.data.basic.BasicMLDataPair;
 import org.encog.ml.data.basic.BasicMLDataSet;
-import org.encog.ml.train.MLTrain;
-import org.encog.ml.train.strategy.HybridStrategy;
 import org.encog.ml.train.strategy.StopTrainingStrategy;
 import org.encog.neural.networks.BasicNetwork;
 import org.encog.neural.networks.layers.BasicLayer;
-import org.encog.neural.networks.training.TrainingSetScore;
-import org.encog.neural.networks.training.anneal.NeuralSimulatedAnnealing;
 import org.encog.neural.networks.training.propagation.Propagation;
 import org.encog.neural.networks.training.propagation.resilient.RPROPType;
 import org.encog.neural.networks.training.propagation.resilient.ResilientPropagation;
@@ -46,20 +41,33 @@ public class NetworkTrainer {
 
     public NetworkHolder trainNetwork() {
         MLDataSet trainingSet = loadTraingSet(getResourceName());
-
-        NetworkHolder holder = new NetworkHolder(
-                createNetwork(getInputNeuronsCount(), settings.hiddenNeuronCount, Constants.NUM_OUTPUTS),
-                networkType, settings
-        );
+        NetworkHolder holder = createLoadNetwork();
         Propagation train = createPropagation(holder.getNetwork(), trainingSet);
+        if(holder.getContinuation() != null) {
+            train.resume(holder.getContinuation());
+        }
 
         do {
             train.iteration();
             System.out.println("Epoch #" + holder.getEpoch() + " Error:" + train.getError());
             holder.incEpoch();
+            if(holder.getEpoch() % 10 == 0) {
+                holder.setContinuation(train.pause());
+                holder.serialize(settings);
+            }
         } while(!train.isTrainingDone());
         train.finishTraining();
+        holder.serializeTrainedNetwork(settings);
         return holder;
+    }
+
+    private NetworkHolder createLoadNetwork() {
+        NetworkHolder holder = new NetworkHolder(
+                createNetwork(getInputNeuronsCount(), settings.hiddenNeuronCount, Constants.NUM_OUTPUTS),
+                networkType
+        );
+        NetworkHolder loadedHolder = NetworkHolder.deserialize(holder, settings);
+        return loadedHolder != null ? loadedHolder : holder;
     }
 
     private String getResourceName() {
@@ -94,10 +102,7 @@ public class NetworkTrainer {
     private static Propagation createPropagation(BasicNetwork network, MLDataSet trainingSet) {
         ResilientPropagation train = new ResilientPropagation(network, trainingSet);
         train.setRPROPType(RPROPType.iRPROPp);
-        CalculateScore score = new TrainingSetScore(trainingSet);
-        MLTrain trainAlt = new NeuralSimulatedAnnealing(network, score, 10, 2, 100);
-        StopTrainingStrategy stop = new StopTrainingStrategy();
-        train.addStrategy(new HybridStrategy(trainAlt));
+        StopTrainingStrategy stop = new StopTrainingStrategy(0.00001, 50);
         train.addStrategy(stop);
         return train;
     }

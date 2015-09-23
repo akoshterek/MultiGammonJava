@@ -9,14 +9,25 @@ import org.akoshterek.backgammon.board.PositionClass;
  */
 public class AgentTrainer {
     public static void main(String[] args) {
-        String representationName = args[0];
-        String hiddenNeuronsCount = args[1];
+        String agentName = args[0];
 
         AgentSettings settings = new AgentSettings();
-        settings.representation = RepresentationFactory.createInputRepresentation(representationName);
-        settings.hiddenNeuronCount = Integer.parseInt(hiddenNeuronsCount);
+        settings.representation = RepresentationFactory.createInputRepresentation(agentName);
+        settings.agentName = agentName;
+        settings.hiddenNeuronCount = getHiddenNeuronsCount(agentName);
 
-        NetworkTrainer trainer = new NetworkTrainer(settings, PositionClass.CLASS_CONTACT);
+        trainNetwork(settings, PositionClass.CLASS_CONTACT);
+        trainNetwork(settings, PositionClass.CLASS_CRASHED);
+        trainNetwork(settings, PositionClass.CLASS_RACE);
+    }
+
+    private static void trainNetwork(AgentSettings settings, PositionClass networkType) {
+        NetworkTrainer trainer = new NetworkTrainer(settings, networkType);
         trainer.trainNetwork();
+    }
+
+    private static int getHiddenNeuronsCount(String agentName) {
+        String[] tokens = agentName.split("-");
+        return Integer.parseInt(tokens[2]);
     }
 }

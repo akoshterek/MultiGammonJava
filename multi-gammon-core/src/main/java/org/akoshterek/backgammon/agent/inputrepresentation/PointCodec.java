@@ -5,7 +5,6 @@ package org.akoshterek.backgammon.agent.inputrepresentation;
  *         date 21.09.2015.
  */
 public interface PointCodec {
-    String getName();
     default int getInputsPerPoint() {return 4;}
     void setPoint(byte men, double[] inputs, int offset);
 }
