@@ -7,6 +7,7 @@ release.properties
 
 .idea/
 *.iml
+bin/
 
 # =========================
 # Operating System Files
