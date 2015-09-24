@@ -34,12 +34,15 @@ public class Board {
     }
 
     public void swapSides() {
-        for(int i = 0; i < 25; i++ )
-        {
-            byte n = anBoard[ OPPONENT ][ i ];
-            anBoard[ OPPONENT ][ i ] = anBoard[ SELF ][ i ];
-            anBoard[ SELF ][ i ] = n;
-        }
+        byte[] tmp = anBoard[0];
+        anBoard[0] = anBoard[1];
+        anBoard[1] = tmp;
+//        for(int i = 0; i < 25; i++ )
+//        {
+//            byte n = anBoard[ OPPONENT ][ i ];
+//            anBoard[ OPPONENT ][ i ] = anBoard[ SELF ][ i ];
+//            anBoard[ SELF ][ i ] = n;
+//        }
     }
 
     public int gameStatus() {
