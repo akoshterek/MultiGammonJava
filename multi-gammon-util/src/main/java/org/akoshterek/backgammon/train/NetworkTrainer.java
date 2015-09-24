@@ -8,6 +8,7 @@ import org.akoshterek.backgammon.board.Board;
 import org.akoshterek.backgammon.board.PositionClass;
 import org.akoshterek.backgammon.data.TrainDataLoader;
 import org.akoshterek.backgammon.data.TrainEntry;
+import org.akoshterek.backgammon.util.Normalizer;
 import org.encog.engine.network.activation.ActivationSigmoid;
 import org.encog.mathutil.randomize.RangeRandomizer;
 import org.encog.ml.data.MLData;
@@ -17,6 +18,7 @@ import org.encog.ml.data.basic.BasicMLData;
 import org.encog.ml.data.basic.BasicMLDataPair;
 import org.encog.ml.data.basic.BasicMLDataSet;
 import org.encog.ml.train.strategy.StopTrainingStrategy;
+import org.encog.ml.train.strategy.end.SimpleEarlyStoppingStrategy;
 import org.encog.neural.networks.BasicNetwork;
 import org.encog.neural.networks.layers.BasicLayer;
 import org.encog.neural.networks.training.propagation.Propagation;
@@ -40,13 +42,17 @@ public class NetworkTrainer {
     }
 
     public NetworkHolder trainNetwork() {
+        if(NetworkHolder.deserializeTrainedNetwork(settings, networkType) != null) {
+            System.out.println("The network is already trained. Exiting.");
+        }
         MLDataSet trainingSet = loadTraingSet(getResourceName());
         NetworkHolder holder = createLoadNetwork();
-        Propagation train = createPropagation(holder.getNetwork(), trainingSet);
-        if(holder.getContinuation() != null) {
-            train.resume(holder.getContinuation());
-        }
+        Propagation train = createPropagation(holder, trainingSet);
+        trainingLoop(holder, train);
+        return holder;
+    }
 
+    private void trainingLoop(NetworkHolder holder, Propagation train) {
         do {
             train.iteration();
             System.out.println("Epoch #" + holder.getEpoch() + " Error:" + train.getError());
@@ -58,7 +64,6 @@ public class NetworkTrainer {
         } while(!train.isTrainingDone());
         train.finishTraining();
         holder.serializeTrainedNetwork(settings);
-        return holder;
     }
 
     private NetworkHolder createLoadNetwork() {
@@ -99,11 +104,17 @@ public class NetworkTrainer {
         return network;
     }
 
-    private static Propagation createPropagation(BasicNetwork network, MLDataSet trainingSet) {
-        ResilientPropagation train = new ResilientPropagation(network, trainingSet);
+    private static Propagation createPropagation(NetworkHolder holder, MLDataSet trainingSet) {
+        ResilientPropagation train = new ResilientPropagation(holder.getNetwork(), trainingSet);
         train.setRPROPType(RPROPType.iRPROPp);
-        StopTrainingStrategy stop = new StopTrainingStrategy(0.00001, 50);
+        StopTrainingStrategy stop = new StopTrainingStrategy(0.00001, 100);
+        train.addStrategy(new SimpleEarlyStoppingStrategy(trainingSet, 10));
         train.addStrategy(stop);
+
+        if(holder.getContinuation() != null) {
+            train.resume(holder.getContinuation());
+        }
+
         return train;
     }
 
@@ -113,12 +124,19 @@ public class NetworkTrainer {
 
         MLDataSet trainingSet = new BasicMLDataSet();
         InputRepresentation representation = new RawRepresentation(new SuttonCodec());
-        data.stream().forEach(e -> {
+        //double min = Double.MAX_VALUE;
+        //double max = Double.MIN_VALUE;
+        for(TrainEntry e : data) {
             MLData input = new BasicMLData(representation.calculateContactInputs(Board.positionFromID(e.positionId)));
+//            for(int i = 0; i < input.size(); i++) {
+//                min = Math.min(min, input.getData()[i]);
+//                max = Math.max(max, input.getData()[i]);
+//            }
+            Normalizer.sigmoidToSmaller(e.reward);
             MLData ideal = new BasicMLData(e.reward);
             MLDataPair pair = new BasicMLDataPair(input, ideal);
             trainingSet.add(pair);
-        });
+        }
 
         return trainingSet;
     }

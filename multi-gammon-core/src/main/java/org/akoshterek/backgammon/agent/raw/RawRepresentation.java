@@ -45,6 +45,7 @@ public class RawRepresentation implements InputRepresentation {
         double[] inputs = new double[getContactInputsCount()];
         calculateHalfBoard(anBoard.anBoard[0], inputs, 0);
         calculateHalfBoard(anBoard.anBoard[1], inputs, inputs.length / 2);
+        //Normalizer.sigmoidToTanhNormalizer(inputs);
         return inputs;
     }
 

@@ -43,6 +43,11 @@
         </dependency>
 
         <dependency>
+            <groupId>org.encog</groupId>
+            <artifactId>encog-core</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
         </dependency>

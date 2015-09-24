@@ -14,6 +14,7 @@ import java.io.*;
  */
 public class NetworkHolder implements Serializable {
     private static final String DIRECTORY = "bin/";
+    private static final long serialVersionUID = -7252112052540032945L;
 
     public NetworkHolder(BasicNetwork network, PositionClass networkType) {
         this.network = network;
@@ -26,7 +27,7 @@ public class NetworkHolder implements Serializable {
     private TrainingContinuation continuation;
 
     public void serialize(AgentSettings agentSettings) {
-        File file = new File(getResumeFileName(agentSettings));
+        File file = new File(getResumeFileName(agentSettings, networkType));
         if(!file.getParentFile().exists()) {
             file.getParentFile().mkdirs();
         }
@@ -38,7 +39,7 @@ public class NetworkHolder implements Serializable {
     }
 
     public void serializeTrainedNetwork(AgentSettings agentSettings) {
-        File file = new File(getTrainedNetworkFileName(agentSettings));
+        File file = new File(getTrainedNetworkFileName(agentSettings, networkType));
         if(!file.getParentFile().exists()) {
             file.getParentFile().mkdirs();
         }
@@ -46,8 +47,17 @@ public class NetworkHolder implements Serializable {
         EncogDirectoryPersistence.saveObject(file, network);
     }
 
+    public static BasicNetwork deserializeTrainedNetwork(AgentSettings agentSettings, PositionClass networkType) {
+        File file = new File(getTrainedNetworkFileName(agentSettings, networkType));
+        if(file.exists()) {
+            return (BasicNetwork) EncogDirectoryPersistence.loadObject(file);
+        } else {
+            return null;
+        }
+    }
+
     public static NetworkHolder deserialize(NetworkHolder template, AgentSettings agentSettings) {
-        try(InputStream is = new FileInputStream(template.getResumeFileName(agentSettings))) {
+        try(InputStream is = new FileInputStream(getResumeFileName(agentSettings, template.networkType))) {
             return SerializationUtils.<NetworkHolder>deserialize(is);
         } catch (FileNotFoundException e) {
             return null;
@@ -68,11 +78,11 @@ public class NetworkHolder implements Serializable {
         epoch++;
     }
 
-    private String getResumeFileName(AgentSettings agentSettings) {
+    private static String getResumeFileName(AgentSettings agentSettings, PositionClass networkType) {
         return DIRECTORY + agentSettings.agentName + "-" + PositionClass.getNetworkType(networkType) + "-resume.egs";
     }
 
-    private String getTrainedNetworkFileName(AgentSettings agentSettings) {
+    private static String getTrainedNetworkFileName(AgentSettings agentSettings, PositionClass networkType) {
         return DIRECTORY + agentSettings.agentName + "-" + PositionClass.getNetworkType(networkType) + "-resume.eg";
     }
 
