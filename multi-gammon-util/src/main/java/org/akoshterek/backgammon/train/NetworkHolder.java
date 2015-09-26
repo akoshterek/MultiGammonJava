@@ -83,7 +83,7 @@ public class NetworkHolder implements Serializable {
     }
 
     private static String getTrainedNetworkFileName(AgentSettings agentSettings, PositionClass networkType) {
-        return DIRECTORY + agentSettings.agentName + "-" + PositionClass.getNetworkType(networkType) + "-resume.eg";
+        return DIRECTORY + agentSettings.agentName + "-" + PositionClass.getNetworkType(networkType) + ".eg";
     }
 
     public TrainingContinuation getContinuation() {
