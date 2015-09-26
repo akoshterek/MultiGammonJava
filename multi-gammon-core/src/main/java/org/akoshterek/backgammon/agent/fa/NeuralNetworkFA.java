@@ -10,4 +10,5 @@ public interface NeuralNetworkFA extends FunctionApproximator {
     void createNN(int inputNeurons, int hiddenNeurons);
     void saveNN(File path);
     void loadNN(File file);
+    void loadNNFromResource(String resource);
 }

@@ -39,6 +39,11 @@ public class SimpleEncogFA implements NeuralNetworkFA {
     }
 
     @Override
+    public void loadNNFromResource(String resource) {
+        network = (BasicNetwork)EncogDirectoryPersistence.loadResourceObject(resource);
+    }
+
+    @Override
     public Reward getReward(double[] input) {
         Reward reward = new Reward();
         network.compute(input, reward.data);
