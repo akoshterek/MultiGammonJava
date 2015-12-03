@@ -14,8 +14,10 @@ import java.io.File;
  * @author Alex
  *         date 26.09.2015.
  */
-public class SimpleEncogFA implements NeuralNetworkFA {
-    private BasicNetwork network;
+public class SimpleEncogFA extends AbsNeuralNetworkFA {
+    public SimpleEncogFA(BasicNetwork network) {
+        super(network);
+    }
 
     @Override
     public void createNN(int inputNeurons, int hiddenNeurons) {
@@ -34,17 +36,7 @@ public class SimpleEncogFA implements NeuralNetworkFA {
     }
 
     @Override
-    public void loadNN(File file) {
-        network = (BasicNetwork)EncogDirectoryPersistence.loadObject(file);
-    }
-
-    @Override
-    public void loadNNFromResource(String resource) {
-        network = (BasicNetwork)EncogDirectoryPersistence.loadResourceObject(resource);
-    }
-
-    @Override
-    public Reward getReward(double[] input) {
+    public Reward calculateReward(double[] input) {
         Reward reward = new Reward();
         network.compute(input, reward.data);
         return reward;

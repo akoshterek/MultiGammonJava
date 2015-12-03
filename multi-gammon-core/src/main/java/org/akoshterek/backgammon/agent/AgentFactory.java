@@ -27,6 +27,9 @@ public class AgentFactory {
             case "gnubg":
                 agent = new GnubgAgent(Evaluator.getInstance().getBasePath());
                 break;
+            case "rawbatch40":
+                agent = new RawBatch40(Evaluator.getInstance().getBasePath());
+                break;
             default:
                 throw new IllegalArgumentException("Unknown agent name " + fullName);
         }

@@ -7,12 +7,12 @@ import org.akoshterek.backgammon.eval.Reward;
  *         date 02.08.2015.
  */
 public interface FunctionApproximator {
-    Reward getReward(double[] input);
+    Reward calculateReward(double[] input);
     void setReward(double[] input, Reward reward);
 
     default void updateAddToReward(double[] input, Reward deltaReward)
     {
-        Reward currentReward = getReward(input);
+        Reward currentReward = calculateReward(input);
         setReward(input, Reward.plus(currentReward, deltaReward).clamp());
     }
 }
