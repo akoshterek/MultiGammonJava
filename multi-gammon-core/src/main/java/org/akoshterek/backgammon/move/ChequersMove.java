@@ -21,13 +21,6 @@ public class ChequersMove {
             new ChequerMove()
     };
 
-    public void reset() {
-        for (ChequerMove aMove : move) {
-            aMove.from = -1;
-            aMove.to = -1;
-        }
-    }
-
     public void copyFrom(ChequersMove o) {
         for(int i = 0; i < move.length; i++) {
             move[i].from = o.move[i].from;
