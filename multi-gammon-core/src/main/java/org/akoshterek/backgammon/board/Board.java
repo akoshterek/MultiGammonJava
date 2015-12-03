@@ -3,7 +3,7 @@ package org.akoshterek.backgammon.board;
 import org.akoshterek.backgammon.eval.Reward;
 import org.akoshterek.backgammon.eval.Evaluator;
 import org.akoshterek.backgammon.move.AuchKey;
-import org.akoshterek.backgammon.move.ChequerMove;
+import org.akoshterek.backgammon.move.ChequersMove;
 import org.akoshterek.backgammon.move.Move;
 import org.akoshterek.backgammon.move.MoveList;
 
@@ -168,11 +168,12 @@ public class Board {
         return anBoard;
     }
 
-    public boolean applyMove(ChequerMove anMove, boolean fCheckLegal) {
-        for (int i = 0; i < anMove.move.length && anMove.move[i] >= 0; i += 2)
-            if (!applySubMove(anMove.move[i], anMove.move[i] - anMove.move[i + 1], fCheckLegal)) {
+    public boolean applyMove(ChequersMove anMove, boolean fCheckLegal) {
+        for (int i = 0; i < anMove.move.length && anMove.move[i].from >= 0; i++) {
+            if (!applySubMove(anMove.move[i].from, anMove.move[i].to - anMove.move[i].from, fCheckLegal)) {
                 return false;
             }
+        }
 
         return true;
     }
@@ -230,7 +231,7 @@ public class Board {
         return (nBack <= 5 && (iSrc == nBack || iDest == -1));
     }
 
-    public void saveMoves(MoveList pml, int cMoves, int cPip, ChequerMove anMoves, boolean fPartial) {
+    public void saveMoves(MoveList pml, int cMoves, int cPip, ChequersMove anMoves, boolean fPartial) {
         int i, j;
         Move pm;
 
@@ -264,14 +265,7 @@ public class Board {
             if (auch.equals(pml.amMoves[i].auch)) {
                 if (cMoves > pml.amMoves[i].cMoves ||
                         cPip > pml.amMoves[i].cPips) {
-                    for (j = 0; j < cMoves * 2; j++) {
-                        pml.amMoves[i].anMove.move[j] = anMoves.move[j] > -1 ? anMoves.move[j] : -1;
-                    }
-
-                    if (cMoves < 4) {
-                        pml.amMoves[i].anMove.move[cMoves * 2] = -1;
-                    }
-
+                    pml.amMoves[i].anMove.copyFrom(anMoves);
                     pml.amMoves[i].cMoves = cMoves;
                     pml.amMoves[i].cPips = cPip;
                 }
@@ -280,14 +274,7 @@ public class Board {
             }
         }
 
-        for (i = 0; i < cMoves * 2; i++) {
-            pm.anMove.move[i] = anMoves.move[i] > -1 ? anMoves.move[i] : -1;
-        }
-
-        if (cMoves < 4) {
-            pm.anMove.move[cMoves * 2] = -1;
-        }
-
+        pm.anMove.copyFrom(anMoves);
         pm.auch = auch;
 
         pm.cMoves = cMoves;
@@ -300,7 +287,7 @@ public class Board {
         assert (pml.cMoves < MoveList.MAX_INCOMPLETE_MOVES);
     }
 
-    public int locateMove(ChequerMove anMove, MoveList pml) {
+    public int locateMove(ChequersMove anMove, MoveList pml) {
         AuchKey key = calcMoveKey(anMove);
 
         for (int i = 0; i < pml.cMoves; ++i) {
@@ -313,7 +300,7 @@ public class Board {
         return 0;
     }
 
-    private AuchKey calcMoveKey(ChequerMove anMove) {
+    private AuchKey calcMoveKey(ChequersMove anMove) {
         Board anBoardMove = new Board(this);
         anBoardMove.applyMove(anMove, false);
         return anBoardMove.PositionKey();

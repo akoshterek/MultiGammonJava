@@ -9,7 +9,7 @@ import org.akoshterek.backgammon.board.Board;
 public class MoveGenerator {
     public static int generateMoves(Board board, MoveList pml, Move[] amMoves, int n0, int n1, boolean fPartial) {
         int[] anRoll = new int[4];
-        ChequerMove anMoves = new ChequerMove();
+        ChequersMove anMoves = new ChequersMove();
 
         anRoll[0] = n0;
         anRoll[1] = n1;
@@ -31,7 +31,7 @@ public class MoveGenerator {
     }
 
     public static boolean generateMovesSub(Board board, MoveList pml, int[] anRoll, int nMoveDepth,
-                                           int iPip, int cPip, ChequerMove anMoves, boolean fPartial) {
+                                           int iPip, int cPip, ChequersMove anMoves, boolean fPartial) {
         boolean fUsed = false;
         byte[][] anBoard = board.anBoard;
 
@@ -43,8 +43,8 @@ public class MoveGenerator {
             if (anBoard[Board.OPPONENT][anRoll[nMoveDepth] - 1] >= 2)
                 return true;
 
-            anMoves.move[nMoveDepth * 2] = 24;
-            anMoves.move[nMoveDepth * 2 + 1] = 24 - anRoll[nMoveDepth];
+            anMoves.move[nMoveDepth].from = 24;
+            anMoves.move[nMoveDepth].to = 24 - anRoll[nMoveDepth];
 
             Board anBoardNew = new Board(board);
             anBoardNew.applySubMove(24, anRoll[nMoveDepth], true);
@@ -59,8 +59,8 @@ public class MoveGenerator {
         } else {
             for (int i = iPip; i >= 0; i--) {
                 if (anBoard[Board.SELF][i] != 0 && board.isLegalMove(i, anRoll[nMoveDepth])) {
-                    anMoves.move[nMoveDepth * 2] = i;
-                    anMoves.move[nMoveDepth * 2 + 1] = i - anRoll[nMoveDepth];
+                    anMoves.move[nMoveDepth].from = i;
+                    anMoves.move[nMoveDepth].to = i - anRoll[nMoveDepth];
 
                     Board anBoardNew = new Board(board);
                     anBoardNew.applySubMove(i, anRoll[nMoveDepth], true);

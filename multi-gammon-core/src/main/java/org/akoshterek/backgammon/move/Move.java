@@ -10,7 +10,7 @@ import java.util.Comparator;
  *         date 20.07.2015.
  */
 public class Move {
-    public ChequerMove anMove = new ChequerMove();
+    public ChequersMove anMove = new ChequersMove();
     public AuchKey auch = new AuchKey();
     public int cMoves, cPips;
     /* scores for this move */

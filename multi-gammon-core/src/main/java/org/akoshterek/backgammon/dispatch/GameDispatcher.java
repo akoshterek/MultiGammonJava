@@ -225,14 +225,14 @@ public class GameDispatcher {
         }
     }
 
-    private void playMove(ChequerMove anMove, int fPlayer) {
+    private void playMove(ChequersMove anMove, int fPlayer) {
         if (currentMatch.fMove != -1 && fPlayer != currentMatch.fMove) {
             currentMatch.board.swapSides();
         }
 
-        for (int i = 0; i < 8; i += 2) {
-            int nSrc = anMove.move[i];
-            int nDest = anMove.move[i + 1];
+        for (int i = 0; i < 4; i++) {
+            int nSrc = anMove.move[i].from;
+            int nDest = anMove.move[i].to;
 
             if (nSrc < 0) {
                 // move is finished

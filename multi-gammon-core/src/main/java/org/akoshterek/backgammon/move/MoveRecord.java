@@ -23,9 +23,4 @@ public class MoveRecord {
     public XMoveGameInfo g = new XMoveGameInfo();	/* game information */
     public XMoveNormal n = new XMoveNormal();		/* chequerplay move */
     public XMoveSetBoard sb = new XMoveSetBoard();	/* setting up board */
-
-    public MoveRecord() {
-        n.anMove.move[ 0 ] = n.anMove.move[ 1 ] = -1;
-        n.iMove = Integer.MAX_VALUE;
-    }
 }

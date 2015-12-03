@@ -1,6 +1,6 @@
 package org.akoshterek.backgammon.board;
 
-import org.akoshterek.backgammon.move.ChequerMove;
+import org.akoshterek.backgammon.move.ChequersMove;
 
 /**
  * @author Alex
@@ -252,24 +252,21 @@ public class BoardFormatter {
         return pch;
     }
 
-    public static String formatMovePlain(ChequerMove anMove, Board anBoard)  {
+    public static String formatMovePlain(ChequersMove anMove, Board anBoard)  {
         String pch = "";
         int i, j;
 
-        for( i = 0; i < 8 && anMove.move[ i ] >= 0; i += 2 ) {
-            pch += formatPointPlain(anMove.move[ i ] + 1 );
+        for (i = 0; i < 4 && anMove.move[i].from >= 0; i++) {
+            pch += formatPointPlain(anMove.move[i].from + 1);
             pch += '/';
-            pch += formatPointPlain(anMove.move[i + 1] + 1);
+            pch += formatPointPlain(anMove.move[i].to + 1);
 
-            if(anMove.move[ i + 1 ] >= 0 &&
-                    anBoard.anBoard[ 0 ][ 23 - anMove.move[ i + 1 ] ] != 0)       {
-                for( j = 1; ; j += 2 )       {
-                    if( j > i )               {
+            if (anMove.move[i].to >= 0 && anBoard.anBoard[0][23 - anMove.move[i].to] != 0) {
+                for (j = 1; ; j += 2) {
+                    if (j > i) {
                         pch += '*';
                         break;
-                    }
-                    else
-                    if( anMove.move[ i + 1 ] == anMove.move[ j ] ) {
+                    } else if (anMove.move[i + 1] == anMove.move[j]) {
                         break;
                     }
                 }
@@ -283,7 +280,7 @@ public class BoardFormatter {
         return pch;
     }
 
-    private static String formatPointPlain(int n) {
+    public static String formatPointPlain(int n) {
         assert( n >= 0 );
         switch (n){
             case 25:
