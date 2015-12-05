@@ -1,6 +1,7 @@
-package org.akoshterek.backgammon.agent;
+package org.akoshterek.backgammon.agent.raw;
 
 import org.akoshterek.backgammon.Constants;
+import org.akoshterek.backgammon.agent.AbsFlexAgent;
 import org.akoshterek.backgammon.agent.fa.SimpleEncogFA;
 import org.akoshterek.backgammon.agent.inputrepresentation.GnuBgCodec;
 import org.akoshterek.backgammon.agent.inputrepresentation.Tesauro89Codec;

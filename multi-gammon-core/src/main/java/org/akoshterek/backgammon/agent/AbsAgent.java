@@ -96,5 +96,4 @@ public abstract class AbsAgent implements Agent {
             throw new RuntimeException(e);
         }
     }
-
 }
