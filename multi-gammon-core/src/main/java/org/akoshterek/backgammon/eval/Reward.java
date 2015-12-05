@@ -86,6 +86,20 @@ public final class Reward {
         return reward;
     }
 
+    /**
+     * Multiplies by constant
+     * @param val multiplier
+     * @return updated reward vector
+     */
+
+    public Reward multiply(double val) {
+        Reward res = new Reward();
+        for(int i = 0; i < data.length; i++) {
+            res.data[i] = data[i] * val;
+        }
+        return res;
+    }
+
     @Override
     public String toString() {
         return Arrays.toString(data);
