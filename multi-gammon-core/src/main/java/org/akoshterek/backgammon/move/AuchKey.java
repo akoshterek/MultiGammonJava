@@ -7,6 +7,10 @@ public class AuchKey {
 
     public AuchKey() {}
 
+    public AuchKey(AuchKey src) {
+        System.arraycopy(src.key, 0, key, 0, 10);
+    }
+
     public int intKey(int index) {
         return key[index] < 0 ? 256 + key[index] : key[index];
     }
