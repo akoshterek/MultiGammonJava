@@ -14,8 +14,6 @@ import java.util.Arrays;
 import java.util.Deque;
 import java.util.LinkedList;
 
-import static org.akoshterek.backgammon.Constants.OUTPUT_EQUITY;
-
 /**
  * @author Alex
  *         date 04.08.2015.
@@ -519,12 +517,9 @@ public class GameDispatcher {
 
         Reward arEval = new Reward();
         pm.pc = Evaluator.getInstance().classifyPosition(anBoardTemp);
-        if (generalEvaluationEPlied(arEval, anBoardTemp, pm.pc) != 0){
-            return -1;
-        }
+        evaluatePositionFull(anBoardTemp, arEval, pm.pc);
 
         Agent agent = agents[currentMatch.fMove].agent;
-
         if(agent.needsInvertedEval()) {
             arEval.invert();
         } else if(PositionClass.isExact(pm.pc)) {
@@ -534,13 +529,7 @@ public class GameDispatcher {
 
         // Save evaluations
         pm.arEvalMove = arEval;
-        pm.rScore = arEval.data[OUTPUT_EQUITY];
-        return 0;
-    }
-
-    private int generalEvaluationEPlied(Reward arOutput, Board anBoard, PositionClass pc) {
-        evaluatePositionFull(anBoard, arOutput, pc);
-        arOutput.data[OUTPUT_EQUITY] = arOutput.utility();
+        pm.rScore = arEval.equity();
         return 0;
     }
 

@@ -11,7 +11,7 @@ import static org.akoshterek.backgammon.Constants.*;
  * backgammon reward
  */
 public final class Reward {
-    public final double[] data = new double[NUM_ROLLOUT_OUTPUTS];
+    public final double[] data = new double[NUM_OUTPUTS];
 
     public Reward() {}
 
@@ -38,7 +38,7 @@ public final class Reward {
      *
      * @return money equity
      */
-    public double utility() {
+    public double equity() {
         return data[OUTPUT_WIN] * 2.0 - 1.0 +
                 (data[OUTPUT_WINGAMMON] - data[OUTPUT_LOSEGAMMON]) +
                 (data[OUTPUT_WINBACKGAMMON] - data[OUTPUT_LOSEBACKGAMMON]);
@@ -46,17 +46,15 @@ public final class Reward {
 
     public void invert() {
         double r;
-        data[ OUTPUT_WIN ] = 1.0 - data[ OUTPUT_WIN ];
+        data[OUTPUT_WIN] = 1.0 - data[OUTPUT_WIN];
 
-        r = data[ OUTPUT_WINGAMMON ];
-        data[ OUTPUT_WINGAMMON ] = data[ OUTPUT_LOSEGAMMON ];
-        data[ OUTPUT_LOSEGAMMON ] = r;
+        r = data[OUTPUT_WINGAMMON];
+        data[OUTPUT_WINGAMMON] = data[OUTPUT_LOSEGAMMON];
+        data[OUTPUT_LOSEGAMMON] = r;
 
-        r = data[ OUTPUT_WINBACKGAMMON ];
-        data[ OUTPUT_WINBACKGAMMON ] = data[ OUTPUT_LOSEBACKGAMMON ];
-        data[ OUTPUT_LOSEBACKGAMMON ] = r;
-
-        data[ OUTPUT_EQUITY ] = -data[ OUTPUT_EQUITY ];
+        r = data[OUTPUT_WINBACKGAMMON];
+        data[OUTPUT_WINBACKGAMMON] = data[OUTPUT_LOSEBACKGAMMON];
+        data[OUTPUT_LOSEBACKGAMMON] = r;
     }
 
     public Reward clamp() {

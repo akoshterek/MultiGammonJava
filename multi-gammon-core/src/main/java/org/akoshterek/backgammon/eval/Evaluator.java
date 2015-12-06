@@ -364,9 +364,10 @@ public class Evaluator {
             reward.data[OUTPUT_LOSEBACKGAMMON] = reward.data[OUTPUT_LOSEGAMMON];
 
         double noise = 1 / 10000.0f;
-        for (i = OUTPUT_WINGAMMON; i < OUTPUT_EQUITY; i++) {
-            if (reward.data[i] < noise)
+        for (i = OUTPUT_WINGAMMON; i < NUM_OUTPUTS; i++) {
+            if (reward.data[i] < noise) {
                 reward.data[i] = 0;
+            }
         }
     }
 

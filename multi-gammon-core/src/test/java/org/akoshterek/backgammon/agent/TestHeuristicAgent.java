@@ -25,6 +25,6 @@ public class TestHeuristicAgent {
         Reward reward = agent.evalContact(board);
         board.swapSides();
         Reward reward2 = agent.evalContact(board);
-        Assert.assertTrue("Wrong calculation for " + positionId, reward.utility() > reward2.utility());
+        Assert.assertTrue("Wrong calculation for " + positionId, reward.equity() > reward2.equity());
     }
 }
