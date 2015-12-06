@@ -14,10 +14,11 @@ public class ETraceEntry {
         this.input = Arrays.copyOf(input, input.length);
         this.pc = pc;
         this.auch = new AuchKey(auch);
+        eTrace = 1.0;
     }
 
     public double[] input;
-    public PositionClass pc = PositionClass.CLASS_CONTACT;
+    public PositionClass pc;
     public AuchKey auch;
-    public double eTrace = 1.0;
+    public double eTrace;
 }
