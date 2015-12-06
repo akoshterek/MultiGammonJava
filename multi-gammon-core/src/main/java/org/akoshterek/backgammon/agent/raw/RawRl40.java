@@ -12,7 +12,6 @@ import org.akoshterek.backgammon.board.PositionClass;
 import org.akoshterek.backgammon.board.PositionId;
 import org.akoshterek.backgammon.eval.Evaluator;
 import org.akoshterek.backgammon.eval.Reward;
-import org.akoshterek.backgammon.move.AuchKey;
 import org.akoshterek.backgammon.move.Move;
 import org.encog.neural.networks.BasicNetwork;
 
@@ -29,7 +28,7 @@ public class RawRl40  extends AbsAgent {
     private FunctionApproximator fa;
     private Map<String, ETraceEntry> eligibilityTraces = new TreeMap<>();
     private int step = 0;
-    private ETraceEntry prevEntry = new ETraceEntry();
+    private ETraceEntry prevEntry;
     private double gamma = 0.7;
 
     public RawRl40(Path path) {
@@ -84,12 +83,10 @@ public class RawRl40  extends AbsAgent {
         Reward reward = (move.pc == PositionClass.CLASS_OVER) ? move.arEvalMove : new Reward();
         Reward deltaReward = calcDeltaReward(move, reward);
 
-        ETraceEntry entry = new ETraceEntry();
-        entry.auch = new AuchKey(move.auch);
-        entry.pc = move.pc;
         Board board = Board.positionFromKey(move.auch);
-        entry.input = representation.calculateContactInputs(board);
-        entry.eTrace = 1.0;
+        ETraceEntry entry = new ETraceEntry(representation.calculateContactInputs(board),
+                move.pc,
+                move.auch);
         eligibilityTraces.put(PositionId.positionIDFromKey(entry.auch), entry);
         updateETrace(deltaReward);
 
@@ -145,7 +142,8 @@ public class RawRl40  extends AbsAgent {
     private void prepareStep0() {
         Board initBoard = new Board();
         initBoard.initBoard();
-        prevEntry.pc = Evaluator.getInstance().classifyPosition(initBoard);
-        prevEntry.auch = initBoard.PositionKey();
+        prevEntry = new ETraceEntry(representation.calculateContactInputs(initBoard),
+                Evaluator.getInstance().classifyPosition(initBoard),
+                initBoard.PositionKey());
     }
 }
