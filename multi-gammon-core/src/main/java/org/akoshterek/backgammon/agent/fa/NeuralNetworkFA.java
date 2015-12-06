@@ -7,6 +7,5 @@ import java.io.File;
  *         date 26.09.2015.
  */
 public interface NeuralNetworkFA extends FunctionApproximator {
-    void createNN(int inputNeurons, int hiddenNeurons);
     void saveNN(File path);
 }

@@ -3,6 +3,7 @@ package org.akoshterek.backgammon.agent;
 import org.akoshterek.backgammon.agent.gnubg.GnubgAgent;
 import org.akoshterek.backgammon.agent.pubeval.PubEvalAgent;
 import org.akoshterek.backgammon.agent.raw.RawBatch40;
+import org.akoshterek.backgammon.agent.raw.RawRl40;
 import org.akoshterek.backgammon.eval.Evaluator;
 
 /**
@@ -30,6 +31,10 @@ public class AgentFactory {
                 break;
             case "rawbatch40":
                 agent = new RawBatch40(Evaluator.getInstance().getBasePath());
+                break;
+            case "rawrl40":
+                agent = new RawRl40(Evaluator.getInstance().getBasePath());
+                agent.load();
                 break;
             default:
                 throw new IllegalArgumentException("Unknown agent name " + fullName);
