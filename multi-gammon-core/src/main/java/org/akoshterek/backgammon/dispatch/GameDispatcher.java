@@ -424,11 +424,11 @@ public class GameDispatcher {
             return;
         }
 		/* resorts the moves according to cubeful (if applicable),
-		* cubeless and chequer on highest point to avoid some silly
-		* looking moves */
+		  cubeless and chequer on highest point to avoid some silly
+		  looking moves */
             //RefreshMoveList(pmr.ml, NULL);
 
-		/* make the move found above */
+		// make the move found above
             if ( pmr.ml.cMoves != 0) {
                 pmr.n.anMove = pmr.ml.amMoves[0].anMove;
                 pmr.n.iMove = 0;
