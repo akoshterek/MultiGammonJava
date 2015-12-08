@@ -26,7 +26,7 @@ public enum PositionClass {
     }
 
     public static boolean isExact(PositionClass pc) {
-        return pc == CLASS_OVER && isBearoff(pc);
+        return pc == CLASS_OVER || isBearoff(pc);
     }
 
     public static boolean isBearoff(PositionClass pc) {

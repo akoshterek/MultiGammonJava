@@ -88,7 +88,7 @@ public class Dispatcher {
         if (trainGames > 0) {
             for (int game = 0; game < trainGames; game += benchmarkPeriod) {
                 //training
-                gameDispatcher.playGames(benchmarkPeriod, true);
+                gameDispatcher.playGames(Math.min(benchmarkPeriod, trainGames), true);
                 agent1.save();
 
                 //benchmark
