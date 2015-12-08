@@ -5,19 +5,32 @@ import org.akoshterek.backgammon.eval.Reward;
 import org.akoshterek.backgammon.util.Normalizer;
 import org.encog.engine.network.activation.ActivationSigmoid;
 import org.encog.mathutil.randomize.RangeRandomizer;
+import org.encog.ml.data.MLDataSet;
+import org.encog.neural.data.basic.BasicNeuralDataSet;
 import org.encog.neural.networks.BasicNetwork;
 import org.encog.neural.networks.layers.BasicLayer;
+import org.encog.neural.networks.training.propagation.Propagation;
+import org.encog.neural.networks.training.propagation.back.Backpropagation;
 import org.encog.persist.EncogDirectoryPersistence;
 
 import java.io.File;
+import java.util.Arrays;
 
 /**
  * @author Alex
  *         date 26.09.2015.
  */
 public class SimpleEncogFA extends AbsNeuralNetworkFA {
+    private MLDataSet trainingSet;
+    private Propagation propagation;
+
     public SimpleEncogFA(BasicNetwork network) {
         super(network);
+        trainingSet = new BasicNeuralDataSet(
+                new double[][] { new double[network.getInputCount()] },
+                new double[][] { new double[network.getOutputCount()] });
+
+        propagation = new Backpropagation(network, trainingSet, 0.1, 0);
     }
 
     public static BasicNetwork createNN(int inputNeurons, int hiddenNeurons) {
@@ -46,6 +59,10 @@ public class SimpleEncogFA extends AbsNeuralNetworkFA {
 
     @Override
     public void setReward(double[] input, Reward reward) {
-        throw new UnsupportedOperationException("Learning is not implemented in this FA");
+        double[] output = Arrays.copyOf(reward.data, Constants.NUM_OUTPUTS);
+        Normalizer.toSmallerSigmoid(output);
+        trainingSet.get(0).getInput().setData(input);
+        trainingSet.get(0).getIdeal().setData(output);
+        propagation.iteration();
     }
 }

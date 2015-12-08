@@ -515,9 +515,8 @@ public class GameDispatcher {
         Board anBoardTemp = Board.positionFromKey(pm.auch);
         anBoardTemp.swapSides();
 
-        Reward arEval = new Reward();
         pm.pc = Evaluator.getInstance().classifyPosition(anBoardTemp);
-        evaluatePositionFull(anBoardTemp, arEval, pm.pc);
+        Reward arEval = evaluatePositionFull(anBoardTemp, pm.pc);
 
         Agent agent = agents[currentMatch.fMove].agent;
         if(agent.needsInvertedEval()) {
@@ -533,15 +532,17 @@ public class GameDispatcher {
         return 0;
     }
 
-    private void evaluatePositionFull(Board anBoard, Reward arOutput, PositionClass pc ) {
+    private Reward evaluatePositionFull(Board anBoard, PositionClass pc ) {
 	    // at leaf node; use static evaluation
         Agent agent = agents[currentMatch.fMove].agent;
-        arOutput.assign(agent.evaluatePosition(anBoard, pc));
+        Reward reward = new Reward(agent.evaluatePosition(anBoard, pc));
 
         if (!PositionClass.isExact(pc) && agent.supportsSanityCheck() && !agent.isLearnMode()) {
 		    // no sanity check needed for exact evaluations
-            Evaluator.getInstance().sanityCheck(anBoard, arOutput);
+            Evaluator.getInstance().sanityCheck(anBoard, reward);
         }
+
+        return reward;
     }
 
 

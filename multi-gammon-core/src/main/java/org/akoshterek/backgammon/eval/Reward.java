@@ -27,10 +27,6 @@ public final class Reward {
         Arrays.fill(data, 0);
     }
 
-    public void assign(Reward reward) {
-        System.arraycopy(reward.data, 0, this.data, 0, this.data.length);
-    }
-
     /**
      * Move evaluation
      * let's keep things simple as I don't want to go into cube handling
