@@ -64,6 +64,9 @@ public class GameDispatcher {
         }
 
         numGames += games;
+        if(learn) {
+            agents[0].agent.save();
+        }
     }
 
     public void playGame() {

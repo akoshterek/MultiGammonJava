@@ -107,6 +107,6 @@ public class Dispatcher {
     }
 
     private static String formatTime(long millis) {
-        return DurationFormatUtils.formatDuration(millis, "HH:mm:ss.S");
+        return DurationFormatUtils.formatDuration(millis, "HH:mm:ss");
     }
 }

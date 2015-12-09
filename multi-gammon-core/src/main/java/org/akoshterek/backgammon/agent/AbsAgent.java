@@ -13,7 +13,7 @@ import java.nio.file.Paths;
  *         date 02.08.2015.
  */
 public abstract class AbsAgent implements Agent {
-    private static final String AGENTS_SUBFOLDER = "agents";
+    private static final String AGENTS_SUBFOLDER = "bin/agents";
 
     private final Path path;
     protected String fullName = "";

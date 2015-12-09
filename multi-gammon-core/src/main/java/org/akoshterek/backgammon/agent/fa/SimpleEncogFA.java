@@ -13,7 +13,7 @@ import org.encog.neural.networks.training.propagation.Propagation;
 import org.encog.neural.networks.training.propagation.back.Backpropagation;
 import org.encog.persist.EncogDirectoryPersistence;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.Arrays;
 
 /**
@@ -28,7 +28,7 @@ public class SimpleEncogFA extends AbsNeuralNetworkFA {
         super(network);
         trainingSet = new BasicNeuralDataSet(
                 new double[][] { new double[network.getInputCount()] },
-                new double[][] { new double[network.getOutputCount()] });
+                new double[][] { new double[1/*network.getOutputCount()*/] });
 
         propagation = new Backpropagation(network, trainingSet, 0.1, 0);
     }
@@ -37,7 +37,7 @@ public class SimpleEncogFA extends AbsNeuralNetworkFA {
         BasicNetwork network = new BasicNetwork();
         network.addLayer(new BasicLayer(null, false, inputNeurons));
         network.addLayer(new BasicLayer(new ActivationSigmoid(), false, hiddenNeurons));
-        network.addLayer(new BasicLayer(new ActivationSigmoid(), false, Constants.NUM_OUTPUTS));
+        network.addLayer(new BasicLayer(new ActivationSigmoid(), false, 1/*Constants.NUM_OUTPUTS*/));
         network.getStructure().finalizeStructure();
         (new RangeRandomizer(-0.5,0.5)).randomize(network);
         network.reset();
@@ -45,15 +45,15 @@ public class SimpleEncogFA extends AbsNeuralNetworkFA {
     }
 
     @Override
-    public void saveNN(File file) {
-        EncogDirectoryPersistence.saveObject(file, network);
+    public void saveNN(Path file) {
+        EncogDirectoryPersistence.saveObject(file.toFile(), network);
     }
 
     @Override
     public Reward calculateReward(double[] input) {
         Reward reward = new Reward();
         network.compute(input, reward.data);
-        Normalizer.fromSmallerSigmoid(reward.data);
+        Normalizer.fromSmallerSigmoid(reward.data, 1);
         return reward;
     }
 

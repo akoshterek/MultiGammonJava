@@ -1,11 +1,11 @@
 package org.akoshterek.backgammon.agent.fa;
 
-import java.io.File;
+import java.nio.file.Path;
 
 /**
  * @author Alex
  *         date 26.09.2015.
  */
 public interface NeuralNetworkFA extends FunctionApproximator {
-    void saveNN(File path);
+    void saveNN(Path path);
 }
