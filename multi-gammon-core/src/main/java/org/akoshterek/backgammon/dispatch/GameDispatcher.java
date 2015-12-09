@@ -57,7 +57,7 @@ public class GameDispatcher {
         {
             playGame();
             if(i % 100 == 0) {
-                System.out.println(String.format("%d ", i));
+                System.out.print(String.format("%d ", i));
             }
 
             //ExportMatchMat("-", true);
