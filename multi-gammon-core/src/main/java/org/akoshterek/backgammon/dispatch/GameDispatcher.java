@@ -483,9 +483,7 @@ public class GameDispatcher {
         }
 
 	    // Resort the moves, in case the new evaluation reordered them.
-        //std::vector<move>::iterator it(pml->amMoves);
         Arrays.sort(pml.amMoves, 0, pml.cMoves, Move.moveComparator);
-        //qsort( pml->amMoves, pml->cMoves, sizeof( move ), (cfunc) move::CompareMovesGeneral );
         pml.iMoveBest = 0;
 	    // set the proper size of the movelist
         pml.cMoves = nMoves;
@@ -523,7 +521,9 @@ public class GameDispatcher {
             arEval.invert();
         } else if(PositionClass.isExact(pm.pc)) {
             //TODO why?
-            arEval.invert();
+            if(pm.pc == PositionClass.CLASS_OVER || agent.supportsBearoff()) {
+                arEval.invert();
+            }
         }
 
         // Save evaluations
