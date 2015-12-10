@@ -37,12 +37,6 @@ public class Board {
         byte[] tmp = anBoard[0];
         anBoard[0] = anBoard[1];
         anBoard[1] = tmp;
-//        for(int i = 0; i < 25; i++ )
-//        {
-//            byte n = anBoard[ OPPONENT ][ i ];
-//            anBoard[ OPPONENT ][ i ] = anBoard[ SELF ][ i ];
-//            anBoard[ SELF ][ i ] = n;
-//        }
     }
 
     public int gameStatus() {
@@ -232,7 +226,7 @@ public class Board {
     }
 
     public void saveMoves(MoveList pml, int cMoves, int cPip, ChequersMove anMoves, boolean fPartial) {
-        int i, j;
+        int i;
         Move pm;
 
         if (fPartial) {

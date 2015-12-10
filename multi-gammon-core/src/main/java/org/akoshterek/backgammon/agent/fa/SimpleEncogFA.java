@@ -30,7 +30,7 @@ public class SimpleEncogFA extends AbsNeuralNetworkFA {
                 new double[][] { new double[network.getInputCount()] },
                 new double[][] { new double[1/*network.getOutputCount()*/] });
 
-        propagation = new Backpropagation(network, trainingSet, 0.1, 0);
+        propagation = new Backpropagation(network, trainingSet, 0.05, 0);
     }
 
     public static BasicNetwork createNN(int inputNeurons, int hiddenNeurons) {
@@ -39,7 +39,7 @@ public class SimpleEncogFA extends AbsNeuralNetworkFA {
         network.addLayer(new BasicLayer(new ActivationSigmoid(), false, hiddenNeurons));
         network.addLayer(new BasicLayer(new ActivationSigmoid(), false, 1/*Constants.NUM_OUTPUTS*/));
         network.getStructure().finalizeStructure();
-        (new RangeRandomizer(-0.5,0.5)).randomize(network);
+        (new RangeRandomizer(-0.1,0.1)).randomize(network);
         network.reset();
         return network;
     }

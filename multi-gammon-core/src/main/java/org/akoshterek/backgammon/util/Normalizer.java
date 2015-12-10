@@ -19,7 +19,7 @@ public class Normalizer {
      */
     public static void toSmallerSigmoid(double[] data, int length) {
         for(int i = 0; i < length; i++) {
-            data[i] = data[i] * 0.8 + 0.1;
+            data[i] = data[i] * 0.98 + 0.01;
         }
     }
 
@@ -38,7 +38,7 @@ public class Normalizer {
      */
     public static void fromSmallerSigmoid(double[] data, int length) {
         for(int i = 0; i < length; i++) {
-            data[i] = (data[i] - 0.1 ) / 0.8;
+            data[i] = (data[i] - 0.01 ) / 0.98;
         }
     }
 }

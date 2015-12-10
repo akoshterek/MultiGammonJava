@@ -432,26 +432,35 @@ public class GameDispatcher {
             //RefreshMoveList(pmr.ml, NULL);
 
 		// make the move found above
-            if ( pmr.ml.cMoves != 0) {
-                pmr.n.anMove = pmr.ml.amMoves[0].anMove;
-                pmr.n.iMove = 0;
-                agents[currentMatch.fMove].agent.doMove(pmr.ml.amMoves[0]);
-                if(pmr.ml.amMoves[0].pc == PositionClass.CLASS_OVER) {
-                    Move endMove = pmr.ml.amMoves[0];
-                    Board board = Board.positionFromKey(endMove.auch);
-                    board.swapSides();
-                    endMove.auch = board.PositionKey();
-                    endMove.arEvalMove.invert();
-                    agents[currentMatch.fMove == 1 ? 0 : 1].agent.doMove(endMove);
-                }
+        if (pmr.ml.cMoves != 0) {
+            pmr.n.anMove = pmr.ml.amMoves[0].anMove;
+            pmr.n.iMove = 0;
+            agents[currentMatch.fMove].agent.doMove(pmr.ml.amMoves[0]);
+            if (pmr.ml.amMoves[0].pc == PositionClass.CLASS_OVER) {
+                //update the lost agent
+                forceMove(pmr);
             }
-            pmr.ml.deleteMoves();
+        } else {
+            // no moves possible agent is blocked.
+            // Update the blocked agent with current position for learning purpose
+            forceMove(pmr);
+        }
+        pmr.ml.deleteMoves();
 
 		// write move to status bar or stdout
         if(isShowLog()) {
             GameInfoPrinter.showAutoMove( pmr.n.anMove, agents, currentMatch);
         }
         addMoveRecord(pmr);
+    }
+
+    private void forceMove(MoveRecord pmr) {
+        Move endMove = pmr.ml.amMoves[0];
+        Board board = Board.positionFromKey(endMove.auch);
+        board.swapSides();
+        endMove.auch = board.PositionKey();
+        endMove.arEvalMove.invert();
+        agents[currentMatch.fMove == 1 ? 0 : 1].agent.doMove(endMove);
     }
 
     private int findMove(FindData pfd) {

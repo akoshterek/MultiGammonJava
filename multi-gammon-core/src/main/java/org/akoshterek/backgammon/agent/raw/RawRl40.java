@@ -3,7 +3,7 @@ package org.akoshterek.backgammon.agent.raw;
 import org.akoshterek.backgammon.Constants;
 import org.akoshterek.backgammon.agent.AbsAgent;
 import org.akoshterek.backgammon.agent.ETraceEntry;
-import org.akoshterek.backgammon.agent.fa.FunctionApproximator;
+import org.akoshterek.backgammon.agent.fa.NeuralNetworkFA;
 import org.akoshterek.backgammon.agent.fa.SimpleEncogFA;
 import org.akoshterek.backgammon.agent.inputrepresentation.InputRepresentation;
 import org.akoshterek.backgammon.agent.inputrepresentation.Tesauro89Codec;
@@ -16,20 +16,23 @@ import org.akoshterek.backgammon.move.Move;
 import org.encog.neural.networks.BasicNetwork;
 
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.TreeMap;
 
 /**
  * @author Alex
  *         date: 05.12.2015
  */
-public class RawRl40  extends AbsAgent {
+public class RawRl40 extends AbsAgent implements Cloneable {
+    private static final double MIN_ETRACE = 0.00000001;
     private InputRepresentation representation = new RawRepresentation(new Tesauro89Codec());
-    private FunctionApproximator fa;
-    private Map<String, ETraceEntry> eligibilityTraces = new TreeMap<>();
+    private NeuralNetworkFA fa;
+    private Map<String, ETraceEntry> eligibilityTraces;
     private int step = 0;
     private ETraceEntry prevEntry;
-    private double gamma = 0.7;
+//    private Move prevMove;
+    private static final double gamma = 1.0;
+    private static final double lambda = 0.7;
 
     public RawRl40(Path path) {
         super(path);
@@ -39,11 +42,14 @@ public class RawRl40  extends AbsAgent {
 
         BasicNetwork network = SimpleEncogFA.createNN(representation.getContactInputsCount(), 40);
         fa = new SimpleEncogFA(network);
+        supportsBearoff = false;
+        eligibilityTraces = new HashMap<>();
     }
 
     @Override
     public Reward evalContact(Board board) {
-        return null;
+        double[] inputs = representation.calculateContactInputs(board);
+        return fa.calculateReward(inputs);
     }
 
     @Override
@@ -60,13 +66,13 @@ public class RawRl40  extends AbsAgent {
         RawRl40 other = (RawRl40)super.clone();
         other.fa = fa;
         other.representation = representation;
+        other.eligibilityTraces = new HashMap<>();
         return other;
     }
 
     @Override
     public void startGame() {
         super.startGame();
-        eligibilityTraces.clear();
         step = 0;
     }
 
@@ -80,9 +86,7 @@ public class RawRl40  extends AbsAgent {
             prepareStep0();
         }
 
-        Reward reward = (move.pc == PositionClass.CLASS_OVER) ? move.arEvalMove : new Reward();
-        Reward deltaReward = calcDeltaReward(move, reward);
-
+        Reward deltaReward = calcDeltaReward(move);
         Board board = Board.positionFromKey(move.auch);
         ETraceEntry entry = new ETraceEntry(representation.calculateContactInputs(board),
                 move.pc,
@@ -92,10 +96,12 @@ public class RawRl40  extends AbsAgent {
 
         step++;
         prevEntry = entry;
+        //prevMove = move;
     }
 
     public void endGame() {
         super.endGame();
+        //doMove(prevMove);
         step = 0;
     }
 
@@ -106,25 +112,49 @@ public class RawRl40  extends AbsAgent {
 
     @Override
     public void save() {
-        //Path folder = getPath().resolve(fullName);
+        Path folder = getPath().resolve(fullName);
+        folder.toFile().mkdirs();
+        Path nn = folder.resolve(fullName + ".eg");
+        fa.saveNN(nn);
     }
+
+    public Reward evaluatePosition(Board board, PositionClass pc) {
+        Reward reward;
+        switch (pc) {
+            case CLASS_OVER:
+                reward = evalOver(board);
+                break;
+            default:
+                reward = evalContact(board);
+        }
+
+        for(int i = 1; i < Constants.NUM_OUTPUTS; i++) {
+            reward.data[i] = 0;
+        }
+        return reward;
+    }
+
 
     private void updateETrace(Reward deltaReward) {
-        eligibilityTraces.entrySet().stream().forEach(entry -> updateTraceEntry(entry, deltaReward));
-        eligibilityTraces.entrySet().removeIf(entry -> entry.getValue().eTrace < 0.0000001);
+        eligibilityTraces
+                .values()
+                .stream()
+                .sorted((o1, o2) -> Double.valueOf(o2.eTrace).compareTo(o1.eTrace))
+                .forEach(entry -> updateTraceEntry(entry, deltaReward));
+        eligibilityTraces
+                .values()
+                .removeIf(entry -> entry.eTrace < MIN_ETRACE);
     }
 
-    private Map.Entry<String, ETraceEntry> updateTraceEntry(Map.Entry<String, ETraceEntry> entry, Reward deltaReward) {
-        ETraceEntry eTraceEntry = entry.getValue();
-        fa.updateAddToReward(eTraceEntry.input, deltaReward.multiply(eTraceEntry.eTrace));
-        eTraceEntry.eTrace *= gamma;
-        return entry;
+    private void updateTraceEntry(ETraceEntry entry, Reward deltaReward) {
+        fa.updateAddToReward(entry.input, deltaReward.multiply(entry.eTrace));
+        entry.eTrace *= lambda;
     }
 
     /**
      * Q update rule
      */
-    private Reward calcDeltaReward(final Move move, final Reward reward) {
+    private Reward calcDeltaReward(final Move move) {
         //prev reward
         Board prevBoard = Board.positionFromKey(prevEntry.auch);
         Reward prevQValue = evaluatePosition(prevBoard, prevEntry.pc);
@@ -132,8 +162,9 @@ public class RawRl40  extends AbsAgent {
         //Predicted greedy reward
         Reward predictedGreedyReward = move.arEvalMove;
         Reward deltaReward = new Reward();
-        for(int i = 0; i < Constants.NUM_OUTPUTS; i++) {
-            deltaReward.data[i] = reward.data[i] + predictedGreedyReward.data[i] * gamma - prevQValue.data[i];
+        for(int i = 0; i < 1/*Constants.NUM_OUTPUTS*/; i++) {
+            deltaReward.data[i] = /*reward.data[i] +*/ predictedGreedyReward.data[i] * gamma - prevQValue.data[i];
+            //deltaReward.data[i] *= 0.3;
         }
 
         return deltaReward;
