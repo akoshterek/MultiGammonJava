@@ -91,6 +91,7 @@ public class RawRl40 extends AbsAgent implements Cloneable {
         ETraceEntry entry = new ETraceEntry(representation.calculateContactInputs(board),
                 move.pc,
                 move.auch);
+        eligibilityTraces.clear();
         eligibilityTraces.put(PositionId.positionIDFromKey(entry.auch), entry);
         updateETrace(deltaReward);
 

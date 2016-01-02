@@ -423,9 +423,7 @@ public class GameDispatcher {
         fd.ml = pmr.ml;
         fd.board = anBoardMove;
         fd.auchMove = null;
-        if (findMove(fd) != 0) {
-            return;
-        }
+        findMove(fd);
 		/* resorts the moves according to cubeful (if applicable),
 		  cubeless and chequer on highest point to avoid some silly
 		  looking moves */
@@ -440,16 +438,16 @@ public class GameDispatcher {
                 //update the lost agent
                 forceMove(pmr.ml.amMoves[0]);
             }
-        } else {
-            // no moves possible agent is blocked.
-            // Update the blocked agent with current position for learning purpose
-            Board board = new Board(ms.board);
-            Move move = new Move();
-            move.auch = board.calcPositionKey();
-            move.pc = Evaluator.getInstance().classifyPosition(board);
-            move.arEvalMove = agents[currentMatch.fMove == 1 ? 0 : 1].agent.evaluatePosition(board, move.pc);
-            forceMove(move);
-        }
+        } //else {
+//            // no moves possible agent is blocked.
+//            // Update the blocked agent with current position for learning purpose
+//            Board board = new Board(ms.board);
+//            Move move = new Move();
+//            move.auch = board.calcPositionKey();
+//            move.pc = Evaluator.getInstance().classifyPosition(board);
+//            move.arEvalMove = agents[currentMatch.fMove == 1 ? 0 : 1].agent.evaluatePosition(board, move.pc);
+//            //forceMove(move);
+//        }
         pmr.ml.deleteMoves();
 
 		// write move to status bar or stdout
@@ -467,11 +465,11 @@ public class GameDispatcher {
         agents[currentMatch.fMove == 1 ? 0 : 1].agent.doMove(endMove);
     }
 
-    private int findMove(FindData pfd) {
-        return findAndSaveBestMoves(pfd.ml, currentMatch.anDice[0], currentMatch.anDice[1], pfd.board);
+    private void findMove(FindData pfd) {
+        findAndSaveBestMoves(pfd.ml, currentMatch.anDice[0], currentMatch.anDice[1], pfd.board);
     }
 
-    private int findAndSaveBestMoves(MoveList pml, int nDice0, int nDice1,Board anBoard) {
+    private void findAndSaveBestMoves(MoveList pml, int nDice0, int nDice1,Board anBoard) {
         // Find best moves.
 	    /* Find all moves -- note that pml contains internal pointers to static
 		data, so we can't call GenerateMoves again (or anything that calls
@@ -483,49 +481,32 @@ public class GameDispatcher {
         if (pml.cMoves == 0) {
             // no legal moves
             pml.amMoves = null;
-            return 0;
+            return;
         }
 
 	    // Save moves
         Move[] pm = new Move[pml.cMoves];
         System.arraycopy(pml.amMoves, 0, pm, 0, pml.cMoves);
         pml.amMoves = pm;
-        int nMoves = pml.cMoves;
-
 	    // evaluate moves on top ply
-        if( scoreMoves(pml) < 0 ) {
-            pml.deleteMoves();
-            return -1;
-        }
-
+        scoreMoves(pml);
 	    // Resort the moves, in case the new evaluation reordered them.
         Arrays.sort(pml.amMoves, 0, pml.cMoves, Move.moveComparator);
         pml.iMoveBest = 0;
-	    // set the proper size of the movelist
-        pml.cMoves = nMoves;
-        return 0;
     }
 
-    private int scoreMoves(MoveList pml) {
-        int r = 0;    // return value
+    private void scoreMoves(MoveList pml) {
         pml.rBestScore = -99999.9;
-
         for (int i = 0; i < pml.cMoves; i++) {
-            if (scoreMove(pml.amMoves[i]) < 0) {
-                r = -1;
-                break;
-            }
-
+            scoreMove(pml.amMoves[i]);
             if (pml.amMoves[i].rScore > pml.rBestScore) {
                 pml.iMoveBest = i;
                 pml.rBestScore = pml.amMoves[i].rScore;
             }
         }
-
-        return r;
     }
 
-    private int scoreMove(Move pm) {
+    private void scoreMove(Move pm) {
         Board anBoardTemp = Board.positionFromKey(pm.auch);
         anBoardTemp.swapSides();
 
@@ -545,7 +526,6 @@ public class GameDispatcher {
         // Save evaluations
         pm.arEvalMove = arEval;
         pm.rScore = arEval.equity();
-        return 0;
     }
 
     private Reward evaluatePositionFull(Board anBoard, PositionClass pc ) {
