@@ -406,7 +406,7 @@ public class GameDispatcher {
 		//Don't use the global board for this call, to avoid
 		//race conditions with updating the board and aborting the
 		//move with an interrupt.
-        Board anBoardMove = new Board( ms.board);
+        Board anBoardMove = new Board(ms.board);
 
         // Roll dice and move
         if (ms.anDice[ 0 ] == 0) {
@@ -438,12 +438,17 @@ public class GameDispatcher {
             agents[currentMatch.fMove].agent.doMove(pmr.ml.amMoves[0]);
             if (pmr.ml.amMoves[0].pc == PositionClass.CLASS_OVER) {
                 //update the lost agent
-                forceMove(pmr);
+                forceMove(pmr.ml.amMoves[0]);
             }
         } else {
             // no moves possible agent is blocked.
             // Update the blocked agent with current position for learning purpose
-            forceMove(pmr);
+            Board board = new Board(ms.board);
+            Move move = new Move();
+            move.auch = board.calcPositionKey();
+            move.pc = Evaluator.getInstance().classifyPosition(board);
+            move.arEvalMove = agents[currentMatch.fMove == 1 ? 0 : 1].agent.evaluatePosition(board, move.pc);
+            forceMove(move);
         }
         pmr.ml.deleteMoves();
 
@@ -454,11 +459,10 @@ public class GameDispatcher {
         addMoveRecord(pmr);
     }
 
-    private void forceMove(MoveRecord pmr) {
-        Move endMove = pmr.ml.amMoves[0];
+    private void forceMove(Move endMove) {
         Board board = Board.positionFromKey(endMove.auch);
         board.swapSides();
-        endMove.auch = board.PositionKey();
+        endMove.auch = board.calcPositionKey();
         endMove.arEvalMove.invert();
         agents[currentMatch.fMove == 1 ? 0 : 1].agent.doMove(endMove);
     }

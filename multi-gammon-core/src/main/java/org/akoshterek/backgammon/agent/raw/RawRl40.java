@@ -175,6 +175,6 @@ public class RawRl40 extends AbsAgent implements Cloneable {
         initBoard.initBoard();
         prevEntry = new ETraceEntry(representation.calculateContactInputs(initBoard),
                 Evaluator.getInstance().classifyPosition(initBoard),
-                initBoard.PositionKey());
+                initBoard.calcPositionKey());
     }
 }

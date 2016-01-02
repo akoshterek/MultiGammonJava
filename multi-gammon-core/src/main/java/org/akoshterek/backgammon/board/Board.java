@@ -84,7 +84,7 @@ public class Board {
         return back;
     }
 
-    public AuchKey PositionKey() {
+    public AuchKey calcPositionKey() {
         int i, iBit = 0;
         AuchKey auchKey = new AuchKey();
 
@@ -105,7 +105,7 @@ public class Board {
     }
 
     public String positionID() {
-        AuchKey auch = PositionKey();
+        AuchKey auch = calcPositionKey();
         return PositionId.positionIDFromKey(auch);
     }
 
@@ -253,7 +253,7 @@ public class Board {
         }
 
         pm = pml.amMoves[pml.cMoves];
-        AuchKey auch = PositionKey();
+        AuchKey auch = calcPositionKey();
 
         for (i = 0; i < pml.cMoves; i++) {
             if (auch.equals(pml.amMoves[i].auch)) {
@@ -297,7 +297,7 @@ public class Board {
     private AuchKey calcMoveKey(ChequersMove anMove) {
         Board anBoardMove = new Board(this);
         anBoardMove.applyMove(anMove, false);
-        return anBoardMove.PositionKey();
+        return anBoardMove.calcPositionKey();
     }
 
     private boolean checkPosition() {
