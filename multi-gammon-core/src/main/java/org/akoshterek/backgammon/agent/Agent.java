@@ -44,10 +44,12 @@ public interface Agent {
         }
     }
 
+    void scoreMoves(Move[] moves, int count);
+    Reward scoreMove(Move pm);
+
     default Reward evalOver(Board board) {
         return Evaluator.getInstance().evalOver(board);
     }
-
     default Reward evalRace(Board board) {
         return evalContact(board);
     }

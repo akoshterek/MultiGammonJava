@@ -64,4 +64,31 @@ public class HeuristicAgent extends AbsAgent {
         reward.data[Constants.OUTPUT_WIN] = value;
         return reward;
     }
+
+    /*
+    @Override
+    public void scoreMoves(Move[] moves, int count) {
+        if(count <= 8) {
+            super.scoreMoves(moves, count);
+        } else {
+
+            final ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+            try {
+
+                List<ScoreMoveCallable> taskList = new ArrayList<>(count);
+                for (int i = 0; i < count; i++) {
+                    taskList.add(new ScoreMoveCallable(this, moves[i]));
+                }
+                List<Future<Reward>> futures = executor.invokeAll(taskList);
+                for (Future<Reward> future : futures) {
+                    future.get();
+                }
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            } finally {
+                executor.shutdown();
+            }
+        }
+    }
+    */
 }

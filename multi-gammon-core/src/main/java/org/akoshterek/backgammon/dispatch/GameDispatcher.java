@@ -3,8 +3,6 @@ package org.akoshterek.backgammon.dispatch;
 import org.akoshterek.backgammon.agent.Agent;
 import org.akoshterek.backgammon.board.Board;
 import org.akoshterek.backgammon.board.PositionClass;
-import org.akoshterek.backgammon.eval.Evaluator;
-import org.akoshterek.backgammon.eval.Reward;
 import org.akoshterek.backgammon.match.GameState;
 import org.akoshterek.backgammon.match.MatchMove;
 import org.akoshterek.backgammon.match.MatchState;
@@ -496,51 +494,20 @@ public class GameDispatcher {
     }
 
     private void scoreMoves(MoveList pml) {
+        Agent agent = agents[currentMatch.fMove].agent;
+        agent.scoreMoves(pml.amMoves, pml.cMoves);
+        findBestMove(pml);
+    }
+
+    private void findBestMove(MoveList pml) {
         pml.rBestScore = -99999.9;
         for (int i = 0; i < pml.cMoves; i++) {
-            scoreMove(pml.amMoves[i]);
             if (pml.amMoves[i].rScore > pml.rBestScore) {
                 pml.iMoveBest = i;
                 pml.rBestScore = pml.amMoves[i].rScore;
             }
         }
     }
-
-    private void scoreMove(Move pm) {
-        Board anBoardTemp = Board.positionFromKey(pm.auch);
-        anBoardTemp.swapSides();
-
-        pm.pc = Evaluator.getInstance().classifyPosition(anBoardTemp);
-        Reward arEval = evaluatePositionFull(anBoardTemp, pm.pc);
-
-        Agent agent = agents[currentMatch.fMove].agent;
-        if(agent.needsInvertedEval()) {
-            arEval.invert();
-        } else if(PositionClass.isExact(pm.pc)) {
-            //TODO why?
-            if(pm.pc == PositionClass.CLASS_OVER || agent.supportsBearoff()) {
-                arEval.invert();
-            }
-        }
-
-        // Save evaluations
-        pm.arEvalMove = arEval;
-        pm.rScore = arEval.equity();
-    }
-
-    private Reward evaluatePositionFull(Board anBoard, PositionClass pc ) {
-	    // at leaf node; use static evaluation
-        Agent agent = agents[currentMatch.fMove].agent;
-        Reward reward = new Reward(agent.evaluatePosition(anBoard, pc));
-
-        if (!PositionClass.isExact(pc) && agent.supportsSanityCheck() && !agent.isLearnMode()) {
-		    // no sanity check needed for exact evaluations
-            Evaluator.getInstance().sanityCheck(anBoard, reward);
-        }
-
-        return reward;
-    }
-
 
     class AgentEntry {
         public Agent agent;

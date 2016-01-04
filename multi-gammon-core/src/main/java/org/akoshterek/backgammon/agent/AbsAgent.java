@@ -3,10 +3,12 @@ package org.akoshterek.backgammon.agent;
 import org.akoshterek.backgammon.board.Board;
 import org.akoshterek.backgammon.board.PositionClass;
 import org.akoshterek.backgammon.eval.Evaluator;
+import org.akoshterek.backgammon.eval.Reward;
 import org.akoshterek.backgammon.move.Move;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 
 /**
  * @author Alex
@@ -95,5 +97,44 @@ public abstract class AbsAgent implements Agent {
         } catch (CloneNotSupportedException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public void scoreMoves(Move[] moves, int count) {
+        Arrays.stream(moves, 0, count).forEach(this::scoreMove);
+    }
+
+    @Override
+    public Reward scoreMove(Move pm) {
+        Board anBoardTemp = Board.positionFromKey(pm.auch);
+        anBoardTemp.swapSides();
+
+        pm.pc = Evaluator.getInstance().classifyPosition(anBoardTemp);
+        Reward arEval = evaluatePositionFull(anBoardTemp, pm.pc);
+
+        if(needsInvertedEval()) {
+            arEval.invert();
+        } else if(PositionClass.isExact(pm.pc)) {
+            //TODO why?
+            if(pm.pc == PositionClass.CLASS_OVER || supportsBearoff()) {
+                arEval.invert();
+            }
+        }
+
+        // Save evaluations
+        pm.arEvalMove = arEval;
+        pm.rScore = arEval.equity();
+        return arEval;
+    }
+
+    private Reward evaluatePositionFull(Board anBoard, PositionClass pc) {
+        // at leaf node; use static evaluation
+        Reward reward = new Reward(evaluatePosition(anBoard, pc));
+        if (!PositionClass.isExact(pc) && supportsSanityCheck() && !isLearnMode()) {
+            // no sanity check needed for exact evaluations
+            Evaluator.getInstance().sanityCheck(anBoard, reward);
+        }
+
+        return reward;
     }
 }
