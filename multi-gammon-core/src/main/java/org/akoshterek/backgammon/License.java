@@ -22,12 +22,11 @@ public class License {
         printResourse("/org/akoshterek/backgammon/BANNER");
     }
 
-    private static void printResourse(String resourceName) {
+    private static void printResourse(final String resourceName) {
         try (InputStream inputStream = License.class.getResourceAsStream(resourceName)){
             IOUtils.copy(inputStream, System.out);
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new RuntimeException(e);
         }
     }
-
 }
