@@ -33,21 +33,21 @@ public class RawBatch40 extends AbsFlexAgent {
     @Override
     public Reward evalContact(Board board) {
         Reward reward = super.evalContact(board);
-        Normalizer.fromSmallerSigmoid(reward.data, Constants.NUM_OUTPUTS);
+        Normalizer.fromSmallerSigmoid(reward.data, Constants.NUM_OUTPUTS());
         return reward;
     }
 
     @Override
     public Reward evalRace(Board board) {
         Reward reward = super.evalRace(board);
-        Normalizer.fromSmallerSigmoid(reward.data, Constants.NUM_OUTPUTS);
+        Normalizer.fromSmallerSigmoid(reward.data, Constants.NUM_OUTPUTS());
         return reward;
     }
 
     @Override
     public Reward evalCrashed(Board board) {
         Reward reward = super.evalCrashed(board);
-        Normalizer.fromSmallerSigmoid(reward.data, Constants.NUM_OUTPUTS);
+        Normalizer.fromSmallerSigmoid(reward.data, Constants.NUM_OUTPUTS());
         return reward;
     }
 }

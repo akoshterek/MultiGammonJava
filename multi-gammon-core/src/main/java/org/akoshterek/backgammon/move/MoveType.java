@@ -13,7 +13,7 @@ public enum MoveType {
 
     private final int value;
 
-    MoveType(int value) {
+    MoveType(final int value) {
         this.value = value;
     }
 

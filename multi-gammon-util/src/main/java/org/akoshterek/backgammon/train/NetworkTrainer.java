@@ -68,7 +68,7 @@ public class NetworkTrainer {
 
     private NetworkHolder createLoadNetwork() {
         NetworkHolder holder = new NetworkHolder(
-                createNetwork(getInputNeuronsCount(), settings.hiddenNeuronCount, Constants.NUM_OUTPUTS),
+                createNetwork(getInputNeuronsCount(), settings.hiddenNeuronCount(), Constants.NUM_OUTPUTS()),
                 networkType
         );
         NetworkHolder loadedHolder = NetworkHolder.deserialize(holder, settings);
@@ -83,11 +83,11 @@ public class NetworkTrainer {
     private int getInputNeuronsCount() {
         switch (networkType) {
             case CLASS_CONTACT:
-                return settings.representation.getContactInputsCount();
+                return settings.representation().getContactInputsCount();
             case CLASS_CRASHED:
-                return settings.representation.getCrashedInputsCount();
+                return settings.representation().getCrashedInputsCount();
             case CLASS_RACE:
-                return settings.representation.getRaceInputsCouns();
+                return settings.representation().getRaceInputsCouns();
             default:
                 throw new IllegalArgumentException("Unknown network type " + networkType);
         }
@@ -127,13 +127,13 @@ public class NetworkTrainer {
         //double min = Double.MAX_VALUE;
         //double max = Double.MIN_VALUE;
         for(TrainEntry e : data) {
-            MLData input = new BasicMLData(representation.calculateContactInputs(Board.positionFromID(e.positionId)));
+            MLData input = new BasicMLData(representation.calculateContactInputs(Board.positionFromID(e.positionId())));
 //            for(int i = 0; i < input.size(); i++) {
 //                min = Math.min(min, input.getData()[i]);
 //                max = Math.max(max, input.getData()[i]);
 //            }
-            Normalizer.toSmallerSigmoid(e.reward);
-            MLData ideal = new BasicMLData(e.reward);
+            Normalizer.toSmallerSigmoid(e.reward());
+            MLData ideal = new BasicMLData(e.reward());
             MLDataPair pair = new BasicMLDataPair(input, ideal);
             trainingSet.add(pair);
         }

@@ -12,11 +12,11 @@ import java.io.*;
  * @author Alex
  *         date 22.09.2015.
  */
-public class NetworkHolder implements Serializable {
+class NetworkHolder implements Serializable {
     private static final String DIRECTORY = "bin/";
     private static final long serialVersionUID = -7252112052540032945L;
 
-    public NetworkHolder(BasicNetwork network, PositionClass networkType) {
+    NetworkHolder(final BasicNetwork network, final PositionClass networkType) {
         this.network = network;
         this.networkType = networkType;
     }
@@ -26,19 +26,19 @@ public class NetworkHolder implements Serializable {
     private PositionClass networkType;
     private TrainingContinuation continuation;
 
-    public void serialize(AgentSettings agentSettings) {
+    void serialize(final AgentSettings agentSettings) {
         File file = new File(getResumeFileName(agentSettings, networkType));
         if(!file.getParentFile().exists()) {
             file.getParentFile().mkdirs();
         }
         try(OutputStream os = new FileOutputStream(file)) {
             SerializationUtils.serialize(this, os);
-        } catch (Exception e) {
+        } catch (final Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    public void serializeTrainedNetwork(AgentSettings agentSettings) {
+    void serializeTrainedNetwork(final AgentSettings agentSettings) {
         File file = new File(getTrainedNetworkFileName(agentSettings, networkType));
         if(!file.getParentFile().exists()) {
             file.getParentFile().mkdirs();
@@ -47,7 +47,7 @@ public class NetworkHolder implements Serializable {
         EncogDirectoryPersistence.saveObject(file, network);
     }
 
-    public static BasicNetwork deserializeTrainedNetwork(AgentSettings agentSettings, PositionClass networkType) {
+    static BasicNetwork deserializeTrainedNetwork(final AgentSettings agentSettings, PositionClass networkType) {
         File file = new File(getTrainedNetworkFileName(agentSettings, networkType));
         if(file.exists()) {
             return (BasicNetwork) EncogDirectoryPersistence.loadObject(file);
@@ -79,11 +79,11 @@ public class NetworkHolder implements Serializable {
     }
 
     private static String getResumeFileName(AgentSettings agentSettings, PositionClass networkType) {
-        return DIRECTORY + agentSettings.agentName + "-" + PositionClass.getNetworkType(networkType) + "-resume.egs";
+        return DIRECTORY + agentSettings.agentName() + "-" + PositionClass.getNetworkType(networkType) + "-resume.egs";
     }
 
     private static String getTrainedNetworkFileName(AgentSettings agentSettings, PositionClass networkType) {
-        return DIRECTORY + agentSettings.agentName + "-" + PositionClass.getNetworkType(networkType) + ".eg";
+        return DIRECTORY + agentSettings.agentName() + "-" + PositionClass.getNetworkType(networkType) + ".eg";
     }
 
     public TrainingContinuation getContinuation() {

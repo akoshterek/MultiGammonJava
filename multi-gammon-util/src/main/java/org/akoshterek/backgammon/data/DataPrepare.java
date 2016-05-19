@@ -37,7 +37,7 @@ public class DataPrepare {
                 String[] tokens = line.split("\\s");
                 String positionId = PositionId.positionIDFromKey(AuchKey.fromNnPosition(tokens[0]));
                 Reward reward = new Reward();
-                for(int i = 0; i < Constants.NUM_OUTPUTS; i++) {
+                for(int i = 0; i < Constants.NUM_OUTPUTS(); i++) {
                     reward.data[i] = Double.parseDouble(tokens[i + 1]);
                 }
 

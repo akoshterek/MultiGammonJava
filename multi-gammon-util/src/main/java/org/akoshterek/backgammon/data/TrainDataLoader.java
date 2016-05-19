@@ -22,7 +22,7 @@ public class TrainDataLoader {
                 String[] tokens = line.split("\\s");
                 TrainEntry entry = new TrainEntry();
                 entry.positionId = tokens[0];
-                for(int i = 0; i < Constants.NUM_OUTPUTS; i++) {
+                for(int i = 0; i < Constants.NUM_OUTPUTS(); i++) {
                     entry.reward[i] = Double.parseDouble(tokens[i + 1]);
                 }
 
