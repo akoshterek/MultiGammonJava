@@ -129,7 +129,7 @@ public class RawRl40 extends AbsAgent implements Cloneable {
                 reward = evalContact(board);
         }
 
-        for(int i = 1; i < Constants.NUM_OUTPUTS(); i++) {
+        for(int i = 1; i < Constants.NUM_OUTPUTS; i++) {
             reward.data[i] = 0;
         }
         return reward;

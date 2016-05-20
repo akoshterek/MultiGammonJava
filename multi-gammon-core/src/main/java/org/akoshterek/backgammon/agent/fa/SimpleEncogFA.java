@@ -59,7 +59,7 @@ public class SimpleEncogFA extends AbsNeuralNetworkFA {
 
     @Override
     public void setReward(double[] input, Reward reward) {
-        double[] output = Arrays.copyOf(reward.data, Constants.NUM_OUTPUTS());
+        double[] output = Arrays.copyOf(reward.data, Constants.NUM_OUTPUTS);
         Normalizer.toSmallerSigmoid(output);
         trainingSet.get(0).getInput().setData(input);
         trainingSet.get(0).getIdeal().setData(output);

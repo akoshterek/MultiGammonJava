@@ -5,7 +5,6 @@ import org.akoshterek.backgammon.agent.AbsFlexAgent;
 import org.akoshterek.backgammon.agent.fa.SimpleEncogFA;
 import org.akoshterek.backgammon.agent.inputrepresentation.GnuBgCodec;
 import org.akoshterek.backgammon.agent.inputrepresentation.Tesauro89Codec;
-import org.akoshterek.backgammon.agent.raw.RawRepresentation;
 import org.akoshterek.backgammon.board.Board;
 import org.akoshterek.backgammon.eval.Reward;
 import org.akoshterek.backgammon.util.Normalizer;
@@ -17,7 +16,7 @@ import java.nio.file.Path;
  *         date 29.11.2015.
  */
 public class RawBatch40 extends AbsFlexAgent {
-    public RawBatch40(Path path) {
+    public RawBatch40(final Path path) {
         super(path);
         fullName = "RawBatch40";
 
@@ -31,23 +30,23 @@ public class RawBatch40 extends AbsFlexAgent {
     }
 
     @Override
-    public Reward evalContact(Board board) {
+    public Reward evalContact(final Board board) {
         Reward reward = super.evalContact(board);
-        Normalizer.fromSmallerSigmoid(reward.data, Constants.NUM_OUTPUTS());
+        Normalizer.fromSmallerSigmoid(reward.data, Constants.NUM_OUTPUTS);
         return reward;
     }
 
     @Override
-    public Reward evalRace(Board board) {
+    public Reward evalRace(final Board board) {
         Reward reward = super.evalRace(board);
-        Normalizer.fromSmallerSigmoid(reward.data, Constants.NUM_OUTPUTS());
+        Normalizer.fromSmallerSigmoid(reward.data, Constants.NUM_OUTPUTS);
         return reward;
     }
 
     @Override
-    public Reward evalCrashed(Board board) {
+    public Reward evalCrashed(final Board board) {
         Reward reward = super.evalCrashed(board);
-        Normalizer.fromSmallerSigmoid(reward.data, Constants.NUM_OUTPUTS());
+        Normalizer.fromSmallerSigmoid(reward.data, Constants.NUM_OUTPUTS);
         return reward;
     }
 }
