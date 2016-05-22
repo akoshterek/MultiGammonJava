@@ -7,7 +7,7 @@ import org.akoshterek.backgammon.move.ChequersMove;
  *         date 26.07.2015.
  */
 public class BoardFormatter {
-    public static String drawBoard(Board board, int fRoll, String[] asz)
+    public static String drawBoard(final Board board, final int fRoll, final String[] asz)
     {
         return drawBoardStd(board, fRoll, asz);
     }
@@ -29,7 +29,7 @@ public class BoardFormatter {
      *  +12-11-10--9--8--7-------6--5--4--3--2--1-+     X: Gary (Cube: 2)
      *
      */
-    private static String drawBoardStd(Board board, int fRoll, String[] asz) {
+    private static String drawBoardStd(final Board board, final int fRoll, final String[] asz) {
         String pch = "";
         int x, y;
         int cOffO = Board.TOTAL_MEN, cOffX = Board.TOTAL_MEN;
@@ -135,7 +135,7 @@ public class BoardFormatter {
 
         pch += fRoll != 0 ? 'v' : '^';
         pch += "|                  |BAR|                  |     ";
-        //pch = strchr ( pch, 0 ); TODO: check
+        //pch = strchr ( pch, 0 );
 
         if (asz[3] != null) {
             pch += asz[3];
@@ -223,50 +223,50 @@ public class BoardFormatter {
         return pch;
     }
 
-    public static String fibsBoardShort(Board board) {
-        String pch = "";
-        int[] anOff = new int[] {0, 0};
-        byte[][] anBoard = board.anBoard;
+//    public static String fibsBoardShort(Board board) {
+//        String pch = "";
+//        int[] anOff = new int[] {0, 0};
+//        byte[][] anBoard = board.anBoard;
+//
+//        // Opponent on bar
+//        pch += String.format("%d:", -(int)anBoard[ 0 ][ 24 ] );
+//
+//        // Board
+//        for(int i = 0; i < 24; i++ )
+//        {
+//            int point = (int)anBoard[ 0 ][ 23 - i ];
+//            pch += String.format("%d:", (point > 0) ?  -point : (int)anBoard[ 1 ][ i ] );
+//        }
+//
+//        // Player on bar
+//        pch += String.format("%d:", anBoard[ 1 ][ 24 ] );
+//
+//        anOff[ 0 ] = anOff[ 1 ] = Board.TOTAL_MEN;
+//        for(int i = 0; i < 25; i++ )
+//        {
+//            anOff[ 0 ] -= anBoard[ 0 ][ i ];
+//            anOff[ 1 ] -= anBoard[ 1 ][ i ];
+//        }
+//
+//        pch += String.format("%d:%d", anOff[ 1 ], -anOff[ 0 ]);
+//        return pch;
+//    }
 
-        // Opponent on bar
-        pch += String.format("%d:", -(int)anBoard[ 0 ][ 24 ] );
-
-        // Board
-        for(int i = 0; i < 24; i++ )
-        {
-            int point = (int)anBoard[ 0 ][ 23 - i ];
-            pch += String.format("%d:", (point > 0) ?  -point : (int)anBoard[ 1 ][ i ] );
-        }
-
-        // Player on bar
-        pch += String.format("%d:", anBoard[ 1 ][ 24 ] );
-
-        anOff[ 0 ] = anOff[ 1 ] = Board.TOTAL_MEN;
-        for(int i = 0; i < 25; i++ )
-        {
-            anOff[ 0 ] -= anBoard[ 0 ][ i ];
-            anOff[ 1 ] -= anBoard[ 1 ][ i ];
-        }
-
-        pch += String.format("%d:%d", anOff[ 1 ], -anOff[ 0 ]);
-        return pch;
-    }
-
-    public static String formatMovePlain(ChequersMove anMove, Board anBoard)  {
+    public static String formatMovePlain(final ChequersMove anMove, final Board anBoard)  {
         String pch = "";
         int i, j;
 
-        for (i = 0; i < 4 && anMove.move[i].from >= 0; i++) {
-            pch += formatPointPlain(anMove.move[i].from + 1);
+        for (i = 0; i < 4 && anMove.move()[i].from() >= 0; i++) {
+            pch += formatPointPlain(anMove.move()[i].from() + 1);
             pch += '/';
-            pch += formatPointPlain(anMove.move[i].to + 1);
+            pch += formatPointPlain(anMove.move()[i].to() + 1);
 
-            if (anMove.move[i].to >= 0 && anBoard.anBoard[0][23 - anMove.move[i].to] != 0) {
+            if (anMove.move()[i].to() >= 0 && anBoard.anBoard[0][23 - anMove.move()[i].to()] != 0) {
                 for (j = 1; ; j += 2) {
                     if (j > i) {
                         pch += '*';
                         break;
-                    } else if (anMove.move[i + 1] == anMove.move[j]) {
+                    } else if (anMove.move()[i + 1] == anMove.move()[j]) {
                         break;
                     }
                 }
@@ -280,7 +280,7 @@ public class BoardFormatter {
         return pch;
     }
 
-    public static String formatPointPlain(int n) {
+    public static String formatPointPlain(final int n) {
         assert( n >= 0 );
         switch (n){
             case 25:
