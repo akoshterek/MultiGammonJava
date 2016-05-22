@@ -1,4 +1,4 @@
-package org.akoshterek.backgammon.match;
+package org.akoshterek.backgammon.matchstate;
 
 /**
  * @author Alex

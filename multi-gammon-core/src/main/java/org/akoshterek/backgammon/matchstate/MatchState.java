@@ -1,4 +1,4 @@
-package org.akoshterek.backgammon.match;
+package org.akoshterek.backgammon.matchstate;
 
 import org.akoshterek.backgammon.board.Board;
 import org.akoshterek.backgammon.eval.Evaluator;

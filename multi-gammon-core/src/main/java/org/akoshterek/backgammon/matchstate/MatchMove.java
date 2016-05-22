@@ -1,10 +1,9 @@
-package org.akoshterek.backgammon.match;
+package org.akoshterek.backgammon.matchstate;
 
 import org.akoshterek.backgammon.move.MoveRecord;
 
 import java.util.Deque;
 import java.util.LinkedList;
-import java.util.List;
 
 /**
  * @author Alex
