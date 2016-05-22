@@ -20,8 +20,7 @@ public class Move {
     public PositionClass pc;
     public int backChequer;
 
-    static int compareMoves(Move pm0, Move pm1)
-    {
+    private static int compareMoves(final Move pm0, final Move pm1) {
         if(pm1.rScore ==  pm0.rScore) return 0;
 		/*high score first */
         return (pm1.rScore > pm0.rScore) ? 1 : -1;
@@ -30,7 +29,7 @@ public class Move {
     public static final Comparator<Move> moveComparator = new MoveComparator();
     // compare moves according to equity and back chequer
     private static class MoveComparator implements Comparator<Move> {
-        public int compare(Move p, Move q) {
+        public int compare(final Move p, final Move q) {
             if(p == q) return 0;
 
             if (p.rScore != q.rScore)
