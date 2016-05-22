@@ -21,7 +21,7 @@ public interface Agent {
     void endGame();
     void doMove(Move move);
 
-    default Reward evaluatePosition(Board board, PositionClass pc) {
+    default Reward evaluatePosition(final Board board, PositionClass pc) {
         if(PositionClass.isBearoff(pc) && !supportsBearoff()) {
             pc = PositionClass.CLASS_RACE;
         }
@@ -47,13 +47,13 @@ public interface Agent {
     void scoreMoves(Move[] moves, int count);
     Reward scoreMove(Move pm);
 
-    default Reward evalOver(Board board) {
+    default Reward evalOver(final Board board) {
         return Evaluator.getInstance().evalOver(board);
     }
-    default Reward evalRace(Board board) {
+    default Reward evalRace(final Board board) {
         return evalContact(board);
     }
-    default Reward evalCrashed(Board board) {
+    default Reward evalCrashed(final Board board) {
         return evalContact(board);
     }
 

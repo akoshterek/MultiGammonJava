@@ -1,5 +1,10 @@
 package org.akoshterek.backgammon.board;
 
+import static org.akoshterek.backgammon.Constants.OUTPUT_LOSEBACKGAMMON;
+import static org.akoshterek.backgammon.Constants.OUTPUT_LOSEGAMMON;
+import static org.akoshterek.backgammon.Constants.OUTPUT_WINBACKGAMMON;
+import static org.akoshterek.backgammon.Constants.OUTPUT_WINGAMMON;
+
 import org.akoshterek.backgammon.eval.Reward;
 import org.akoshterek.backgammon.eval.Evaluator;
 import org.akoshterek.backgammon.move.AuchKey;
@@ -8,8 +13,6 @@ import org.akoshterek.backgammon.move.Move;
 import org.akoshterek.backgammon.move.MoveList;
 
 import java.util.Arrays;
-
-import static org.akoshterek.backgammon.Constants.*;
 
 /**
  * @author Alex
@@ -28,7 +31,7 @@ public class Board {
         clearBoard();
     }
 
-    public Board(Board board) {
+    public Board(final Board board) {
         System.arraycopy(board.anBoard[0], 0, this.anBoard[0], 0, this.anBoard[0].length);
         System.arraycopy(board.anBoard[1], 0, this.anBoard[1], 0, this.anBoard[1].length);
     }
@@ -62,7 +65,7 @@ public class Board {
         anBoard[0][23] = anBoard[1][23] = 2;
     }
 
-    public void chequersCount(int[] anChequers) {
+    public void chequersCount(final int[] anChequers) {
         anChequers[OPPONENT] = 0;
         anChequers[SELF] = 0;
 
@@ -162,9 +165,9 @@ public class Board {
         return anBoard;
     }
 
-    public boolean applyMove(ChequersMove anMove, boolean fCheckLegal) {
-        for (int i = 0; i < anMove.move.length && anMove.move[i].from >= 0; i++) {
-            if (!applySubMove(anMove.move[i].from, anMove.move[i].to - anMove.move[i].from, fCheckLegal)) {
+    boolean applyMove(ChequersMove anMove, boolean fCheckLegal) {
+        for (int i = 0; i < anMove.move().length && anMove.move()[i].from() >= 0; i++) {
+            if (!applySubMove(anMove.move()[i].from(), anMove.move()[i].to() - anMove.move()[i].from(), fCheckLegal)) {
                 return false;
             }
         }
