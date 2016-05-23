@@ -18,14 +18,14 @@ import java.util.zip.GZIPOutputStream;
  *         date 20.09.2015.
  */
 public class DataPrepare {
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
         String inputFileName = args[0];
         Map<String, Reward> trainingData = loadTrainingData(inputFileName);
         String outputFileName = replaceLast(inputFileName, ".gz", "-processed.gz");
         saveTrainingData(trainingData, outputFileName);
     }
 
-    private static Map<String, Reward> loadTrainingData(String inputFileName) {
+    private static Map<String, Reward> loadTrainingData(final String inputFileName) {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(inputFileName))))) {
             Map<String, Reward> data = new TreeMap<>();
             String line;
@@ -37,7 +37,7 @@ public class DataPrepare {
                 String[] tokens = line.split("\\s");
                 String positionId = PositionId.positionIDFromKey(AuchKey.fromNnPosition(tokens[0]));
                 Reward reward = new Reward();
-                for(int i = 0; i < Constants.NUM_OUTPUTS(); i++) {
+                for(int i = 0; i < Constants.NUM_OUTPUTS; i++) {
                     reward.data[i] = Double.parseDouble(tokens[i + 1]);
                 }
 
@@ -46,12 +46,12 @@ public class DataPrepare {
 
             addMissedInversions(data);
             return data;
-        } catch (Exception e) {
+        } catch (final Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    private static void saveTrainingData(Map<String, Reward> data, String outputFileName) {
+    private static void saveTrainingData(final Map<String, Reward> data, final String outputFileName) {
         try(PrintWriter writer = new PrintWriter(new GZIPOutputStream(new FileOutputStream(outputFileName)))) {
             data.forEach((positionId, reward) -> {
                 String s = String.format(Locale.US, "%s %f %f %f %f %f", positionId,
@@ -62,12 +62,12 @@ public class DataPrepare {
                         reward.data[4]);
                 writer.println(s);
             });
-        } catch (Exception e) {
+        } catch (final Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    private static void addMissedInversions(Map<String, Reward> data) {
+    private static void addMissedInversions(final Map<String, Reward> data) {
         Map<String, Reward> missed = new TreeMap<>();
 
         for(String key : data.keySet()) {
@@ -84,7 +84,7 @@ public class DataPrepare {
         data.putAll(missed);
     }
 
-    private static String replaceLast(String string, String toReplace, String replacement) {
+    private static String replaceLast(final String string, final String toReplace, final String replacement) {
         int pos = string.lastIndexOf(toReplace);
         if (pos > -1) {
             return string.substring(0, pos)

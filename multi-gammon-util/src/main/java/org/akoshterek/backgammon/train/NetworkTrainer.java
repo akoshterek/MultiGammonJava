@@ -68,7 +68,7 @@ public class NetworkTrainer {
 
     private NetworkHolder createLoadNetwork() {
         NetworkHolder holder = new NetworkHolder(
-                createNetwork(getInputNeuronsCount(), settings.hiddenNeuronCount(), Constants.NUM_OUTPUTS()),
+                createNetwork(getInputNeuronsCount(), settings.hiddenNeuronCount(), Constants.NUM_OUTPUTS),
                 networkType
         );
         NetworkHolder loadedHolder = NetworkHolder.deserialize(holder, settings);

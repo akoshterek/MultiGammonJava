@@ -14,30 +14,30 @@ import java.util.zip.GZIPInputStream;
  *         date 21.09.2015.
  */
 public class TrainDataLoader {
-    public static List<TrainEntry> loadData(InputStream is) {
+    private static List<TrainEntry> loadData(final InputStream is) {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(is))) {
             List<TrainEntry> data = new ArrayList<>();
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] tokens = line.split("\\s");
                 TrainEntry entry = new TrainEntry();
-                entry.positionId = tokens[0];
-                for(int i = 0; i < Constants.NUM_OUTPUTS(); i++) {
-                    entry.reward[i] = Double.parseDouble(tokens[i + 1]);
+                entry.positionId_$eq(tokens[0]);
+                for(int i = 0; i < Constants.NUM_OUTPUTS; i++) {
+                    entry.reward()[i] = Double.parseDouble(tokens[i + 1]);
                 }
 
                 data.add(entry);
             }
             return data;
-        } catch (Exception e) {
+        } catch (final Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    public static List<TrainEntry> loadGzipResourceData(String resource) {
+    public static List<TrainEntry> loadGzipResourceData(final String resource) {
         try(GZIPInputStream is = new GZIPInputStream(TrainDataLoader.class.getResourceAsStream(resource))) {
             return loadData(is);
-        } catch (Exception e) {
+        } catch (final Exception e) {
             throw new RuntimeException(e);
         }
     }

@@ -30,7 +30,7 @@ public class MoveGenerator {
         return pml.cMoves;
     }
 
-    public static boolean generateMovesSub(Board board, MoveList pml, int[] anRoll, int nMoveDepth,
+    static boolean generateMovesSub(Board board, MoveList pml, int[] anRoll, int nMoveDepth,
                                            int iPip, int cPip, ChequersMove anMoves, boolean fPartial) {
         boolean fUsed = false;
         byte[][] anBoard = board.anBoard;
@@ -43,8 +43,8 @@ public class MoveGenerator {
             if (anBoard[Board.OPPONENT][anRoll[nMoveDepth] - 1] >= 2)
                 return true;
 
-            anMoves.move[nMoveDepth].from = 24;
-            anMoves.move[nMoveDepth].to = 24 - anRoll[nMoveDepth];
+            anMoves.move()[nMoveDepth].from_$eq(24);
+            anMoves.move()[nMoveDepth].to_$eq(24 - anRoll[nMoveDepth]);
 
             Board anBoardNew = new Board(board);
             anBoardNew.applySubMove(24, anRoll[nMoveDepth], true);
@@ -59,8 +59,8 @@ public class MoveGenerator {
         } else {
             for (int i = iPip; i >= 0; i--) {
                 if (anBoard[Board.SELF][i] != 0 && board.isLegalMove(i, anRoll[nMoveDepth])) {
-                    anMoves.move[nMoveDepth].from = i;
-                    anMoves.move[nMoveDepth].to = i - anRoll[nMoveDepth];
+                    anMoves.move()[nMoveDepth].from_$eq(i);
+                    anMoves.move()[nMoveDepth].to_$eq(i - anRoll[nMoveDepth]);
 
                     Board anBoardNew = new Board(board);
                     anBoardNew.applySubMove(i, anRoll[nMoveDepth], true);

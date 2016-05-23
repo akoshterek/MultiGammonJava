@@ -19,7 +19,7 @@ import static org.akoshterek.backgammon.Constants.*;
  *         date 25.07.2015.
  */
 public class Evaluator {
-    public static int CHEQUERS = 15;
+    private static int CHEQUERS = 15;
 
     private static Evaluator instance;
     private final RandomGenerator rng;
@@ -50,11 +50,11 @@ public class Evaluator {
         return distribution.sample();
     }
 
-    public void setSeed(long seed) {
+    public void setSeed(final long seed) {
         rng.setSeed(seed);
     }
 
-    public PositionClass classifyPosition(Board anBoard) {
+    public PositionClass classifyPosition(final Board anBoard) {
         int nOppBack, nBack;
 
         for (nOppBack = 24; nOppBack >= 0; --nOppBack) {
@@ -119,7 +119,7 @@ public class Evaluator {
         }
     }
 
-    public Reward evalOver(Board anBoard) {
+    public Reward evalOver(final Board anBoard) {
         Reward reward = new Reward();
         final double[] arOutput = reward.data;
         int i, c;
@@ -198,11 +198,11 @@ public class Evaluator {
         return reward;
     }
 
-    public Reward evalBearoff2(Board anBoard) {
+    public Reward evalBearoff2(final Board anBoard) {
         return Bearoff.bearoffEval(pbc2, anBoard);
     }
 
-    public Reward evalBearoff1(Board anBoard) {
+    public Reward evalBearoff1(final Board anBoard) {
         return Bearoff.bearoffEval(pbc1, anBoard);
     }
 
@@ -214,7 +214,7 @@ public class Evaluator {
 //        return Bearoff.bearoffEval(pbcOS, anBoard);
 //    }
 
-    public void sanityCheck(Board board, Reward reward) {
+    public void sanityCheck(final Board board, final Reward reward) {
         int i, j, nciq;
         int[] ac = new int[2];
         int[] anBack = new int[2];
@@ -371,7 +371,7 @@ public class Evaluator {
         }
     }
 
-    private int maxTurns(int id) {
+    private int maxTurns(final int id) {
         short[] aus = new short[32];
 
         Bearoff.bearoffDist(pbc1, id, null, null, null, aus, null);
@@ -383,7 +383,7 @@ public class Evaluator {
         return -1;
     }
 
-    public float raceBGprob(Board anBoard, int side) {
+    public float raceBGprob(final Board anBoard, final int side) {
         int totMenHome = 0;
         int totPipsOp = 0;
 
@@ -441,7 +441,7 @@ public class Evaluator {
         return basePath;
     }
 
-    public void load(Path basePath) {
+    public void load(final Path basePath) {
         this.basePath = basePath;
     }
 
