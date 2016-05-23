@@ -13,6 +13,10 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.scala-lang</groupId>
+            <artifactId>scala-library</artifactId>
+        </dependency>
+        <dependency>
             <groupId>multi-gammon</groupId>
             <artifactId>multi-gammon-core</artifactId>
             <version>${version}</version>
@@ -22,6 +26,4 @@
             <artifactId>encog-core</artifactId>
         </dependency>
     </dependencies>
-
-
 </project>
