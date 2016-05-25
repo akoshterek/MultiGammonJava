@@ -19,7 +19,6 @@ import static org.akoshterek.backgammon.Constants.*;
  *         date 25.07.2015.
  */
 public class Evaluator {
-    private static int CHEQUERS = 15;
 
     private static Evaluator instance;
     private final RandomGenerator rng;
@@ -119,28 +118,52 @@ public class Evaluator {
         }
     }
 
-    public Reward evalOver(final Board anBoard) {
-        Reward reward = new Reward();
-        final double[] arOutput = reward.data;
-        int i, c;
-        int n = CHEQUERS;
-
+    private int findFirstChequer(final Board anBoard, final int side) {
+        int i;
         for (i = 0; i < 25; i++) {
-            if (anBoard.anBoard[0][i] != 0) {
+            if (anBoard.anBoard[side][i] != 0) {
                 break;
             }
         }
 
+        return i;
+    }
+
+    private int findOpponentChequer(final Board anBoard) {
+        return findFirstChequer(anBoard, Board.OPPONENT);
+    }
+
+    private int findSelfChequer(final Board anBoard) {
+        return findFirstChequer(anBoard, Board.SELF);
+    }
+
+    private int calculateChequers(final Board anBoard, final int side) {
+        int count = 0;
+        for (int i = 0; i < 25; i++) {
+            count += anBoard.anBoard[1][i];
+        }
+        return count;
+    }
+
+    private int calculateSelfChequers(final Board anBoard) {
+        return calculateChequers(anBoard, Board.SELF);
+    }
+
+    private int calculateOpponentChequers(final Board anBoard) {
+        return calculateChequers(anBoard, Board.OPPONENT);
+    }
+
+    public Reward evalOver(final Board anBoard) {
+        Reward reward = new Reward();
+        final double[] arOutput = reward.data();
+        final int CHEQUERS = 15;
+
+        int i = findOpponentChequer(anBoard);
         if (i == 25) {
-        /* opponent has no pieces on board; player has lost */
+            // opponent has no pieces on board; player has lost
             arOutput[OUTPUT_WIN] = arOutput[OUTPUT_WINGAMMON] = arOutput[OUTPUT_WINBACKGAMMON] = 0.0f;
-
-            for (i = 0, c = 0; i < 25; i++) {
-                c += anBoard.anBoard[1][i];
-            }
-
-            if (c == n) {
-			/* player still has all pieces on board; loses gammon */
+            if (CHEQUERS == calculateSelfChequers(anBoard)) {
+			    // player still has all pieces on board; loses gammon
                 arOutput[OUTPUT_LOSEGAMMON] = 1.0f;
 
                 for (i = 18; i < 25; i++) {
@@ -160,23 +183,14 @@ public class Evaluator {
             return reward;
         }
 
-        for (i = 0; i < 25; i++) {
-            if (anBoard.anBoard[1][i] != 0) {
-                break;
-            }
-        }
-
+        i = findSelfChequer(anBoard);
         if (i == 25) {
-		/* player has no pieces on board; wins */
+		    // player has no pieces on board; wins
             arOutput[OUTPUT_WIN] = 1.0f;
             arOutput[OUTPUT_LOSEGAMMON] = arOutput[OUTPUT_LOSEBACKGAMMON] = 0.0f;
 
-            for (i = 0, c = 0; i < 25; i++) {
-                c += anBoard.anBoard[0][i];
-            }
-
-            if (c == n) {
-			/* opponent still has all pieces on board; win gammon */
+            if (CHEQUERS == calculateOpponentChequers(anBoard)) {
+			    // opponent still has all pieces on board; win gammon
                 arOutput[OUTPUT_WINGAMMON] = 1.0f;
 
                 for (i = 18; i < 25; i++) {
@@ -224,10 +238,10 @@ public class Evaluator {
         int[] anMaxTurns = new int[2];
         boolean fContact;
 
-        if (reward.data[OUTPUT_WIN] < 0.0f) {
-            reward.data[OUTPUT_WIN] = 0.0f;
-        } else if (reward.data[OUTPUT_WIN] > 1.0f) {
-            reward.data[OUTPUT_WIN] = 1.0f;
+        if (reward.data()[OUTPUT_WIN] < 0.0f) {
+            reward.data()[OUTPUT_WIN] = 0.0f;
+        } else if (reward.data()[OUTPUT_WIN] > 1.0f) {
+            reward.data()[OUTPUT_WIN] = 1.0f;
         }
 
         ac[0] = ac[1] = anBack[0] = anBack[1] = anCross[0] =
@@ -298,75 +312,75 @@ public class Evaluator {
 
         if (!fContact && anCross[0] > 4 * (anMaxTurns[1] - 1)) {
             // Certain win
-            reward.data[OUTPUT_WIN] = 1.0f;
+            reward.data()[OUTPUT_WIN] = 1.0f;
         }
 
         if (ac[0] < 15) {
             // Opponent has borne off; no gammons or backgammons possible
-            reward.data[OUTPUT_WINGAMMON] = reward.data[OUTPUT_WINBACKGAMMON] = 0.0f;
+            reward.data()[OUTPUT_WINGAMMON] = reward.data()[OUTPUT_WINBACKGAMMON] = 0.0f;
         } else if (!fContact) {
             if (anCross[1] > 8 * anGammonCross[0]) {
                 // Gammon impossible
-                reward.data[OUTPUT_WINGAMMON] = 0.0f;
+                reward.data()[OUTPUT_WINGAMMON] = 0.0f;
             } else if (anGammonCross[0] > 4 * (anMaxTurns[1] - 1)) {
                 // Certain gammon
-                reward.data[OUTPUT_WINGAMMON] = 1.0f;
+                reward.data()[OUTPUT_WINGAMMON] = 1.0f;
             }
 
             if (anCross[1] > 8 * anBackgammonCross[0]) {
                 // Backgammon impossible
-                reward.data[OUTPUT_WINBACKGAMMON] = 0.0f;
+                reward.data()[OUTPUT_WINBACKGAMMON] = 0.0f;
             } else if (anBackgammonCross[0] > 4 * (anMaxTurns[1] - 1)) {
                 // Certain backgammon
-                reward.data[OUTPUT_WINGAMMON] = reward.data[OUTPUT_WINBACKGAMMON] = 1.0f;
+                reward.data()[OUTPUT_WINGAMMON] = reward.data()[OUTPUT_WINBACKGAMMON] = 1.0f;
             }
         }
 
         if (!fContact && anCross[1] > 4 * anMaxTurns[0]) {
             // Certain loss
-            reward.data[OUTPUT_WIN] = 0.0f;
+            reward.data()[OUTPUT_WIN] = 0.0f;
         }
 
         if (ac[1] < 15) {
             // Player has borne off; no gammon or backgammon losses possible
-            reward.data[OUTPUT_LOSEGAMMON] = reward.data[OUTPUT_LOSEBACKGAMMON] = 0.0f;
+            reward.data()[OUTPUT_LOSEGAMMON] = reward.data()[OUTPUT_LOSEBACKGAMMON] = 0.0f;
         } else if (!fContact) {
             if (anCross[0] > 8 * anGammonCross[1] - 4) {
                 // Gammon loss impossible
-                reward.data[OUTPUT_LOSEGAMMON] = 0.0f;
+                reward.data()[OUTPUT_LOSEGAMMON] = 0.0f;
             } else if (anGammonCross[1] > 4 * anMaxTurns[0]) {
                 // Certain gammon loss
-                reward.data[OUTPUT_LOSEGAMMON] = 1.0f;
+                reward.data()[OUTPUT_LOSEGAMMON] = 1.0f;
             }
 
             if (anCross[0] > 8 * anBackgammonCross[1] - 4) {
                 // Backgammon loss impossible
-                reward.data[OUTPUT_LOSEBACKGAMMON] = 0.0f;
+                reward.data()[OUTPUT_LOSEBACKGAMMON] = 0.0f;
             } else if (anBackgammonCross[1] > 4 * anMaxTurns[0]) {
                 // Certain backgammon loss
-                reward.data[OUTPUT_LOSEGAMMON] = reward.data[OUTPUT_LOSEBACKGAMMON] = 1.0f;
+                reward.data()[OUTPUT_LOSEGAMMON] = reward.data()[OUTPUT_LOSEBACKGAMMON] = 1.0f;
             }
         }
 
         // gammons must be less than wins
-        if (reward.data[OUTPUT_WINGAMMON] > reward.data[OUTPUT_WIN])
-            reward.data[OUTPUT_WINGAMMON] = reward.data[OUTPUT_WIN];
+        if (reward.data()[OUTPUT_WINGAMMON] > reward.data()[OUTPUT_WIN])
+            reward.data()[OUTPUT_WINGAMMON] = reward.data()[OUTPUT_WIN];
 
-        double lose = 1.0 - reward.data[OUTPUT_WIN];
-        if (reward.data[OUTPUT_LOSEGAMMON] > lose)
-            reward.data[OUTPUT_LOSEGAMMON] = lose;
+        double lose = 1.0 - reward.data()[OUTPUT_WIN];
+        if (reward.data()[OUTPUT_LOSEGAMMON] > lose)
+            reward.data()[OUTPUT_LOSEGAMMON] = lose;
 
         // Backgammons cannot exceed gammons
-        if (reward.data[OUTPUT_WINBACKGAMMON] > reward.data[OUTPUT_WINGAMMON])
-            reward.data[OUTPUT_WINBACKGAMMON] = reward.data[OUTPUT_WINGAMMON];
+        if (reward.data()[OUTPUT_WINBACKGAMMON] > reward.data()[OUTPUT_WINGAMMON])
+            reward.data()[OUTPUT_WINBACKGAMMON] = reward.data()[OUTPUT_WINGAMMON];
 
-        if (reward.data[OUTPUT_LOSEBACKGAMMON] > reward.data[OUTPUT_LOSEGAMMON])
-            reward.data[OUTPUT_LOSEBACKGAMMON] = reward.data[OUTPUT_LOSEGAMMON];
+        if (reward.data()[OUTPUT_LOSEBACKGAMMON] > reward.data()[OUTPUT_LOSEGAMMON])
+            reward.data()[OUTPUT_LOSEBACKGAMMON] = reward.data()[OUTPUT_LOSEGAMMON];
 
         double noise = 1 / 10000.0f;
         for (i = OUTPUT_WINGAMMON; i < NUM_OUTPUTS; i++) {
-            if (reward.data[i] < noise) {
-                reward.data[i] = 0;
+            if (reward.data()[i] < noise) {
+                reward.data()[i] = 0;
             }
         }
     }
@@ -431,7 +445,7 @@ public class Evaluator {
                     p = evalBearoff2(dummy);
                 }
 
-                return (float) (side == 1 ? p.data[0] : 1 - p.data[0]);
+                return (float) (side == 1 ? p.data()[0] : 1 - p.data()[0]);
             }
         }
     }

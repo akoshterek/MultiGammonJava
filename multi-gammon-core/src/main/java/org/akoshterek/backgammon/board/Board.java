@@ -48,9 +48,9 @@ public class Board {
         }
 
         Reward ar = Evaluator.getInstance().evalOver(this);
-        if (ar.data[OUTPUT_WINBACKGAMMON] != 0 || ar.data[OUTPUT_LOSEBACKGAMMON] != 0) {
+        if (ar.data()[OUTPUT_WINBACKGAMMON] != 0 || ar.data()[OUTPUT_LOSEBACKGAMMON] != 0) {
             return 3;
-        } else if (ar.data[OUTPUT_WINGAMMON] != 0 || ar.data[OUTPUT_LOSEGAMMON] != 0) {
+        } else if (ar.data()[OUTPUT_WINGAMMON] != 0 || ar.data()[OUTPUT_LOSEGAMMON] != 0) {
             return 2;
         } else {
             return 1;
@@ -75,7 +75,7 @@ public class Board {
         }
     }
 
-    public int calcBackChequer() {
+    private int calcBackChequer() {
         int back = -1;
         for (int b = 24; b > -1; b--) {
             if (anBoard[SELF][b] > 0) {
@@ -112,7 +112,7 @@ public class Board {
         return PositionId.positionIDFromKey(auch);
     }
 
-    public static Board positionFromKey(AuchKey auch) {
+    public static Board positionFromKey(final AuchKey auch) {
         int i = 0, j = 0;
         Board newBoard = new Board();
 
@@ -138,7 +138,7 @@ public class Board {
         return newBoard;
     }
 
-    public static Board positionFromID(String pchEnc) {
+    public static Board positionFromID(final String pchEnc) {
         AuchKey auchKey = new AuchKey();
         byte[] ach = new byte[PositionId.L_POSITIONID];
         int pch = 0;
@@ -165,7 +165,7 @@ public class Board {
         return anBoard;
     }
 
-    boolean applyMove(ChequersMove anMove, boolean fCheckLegal) {
+    private boolean applyMove(final ChequersMove anMove, final boolean fCheckLegal) {
         for (int i = 0; i < anMove.move().length && anMove.move()[i].from() >= 0; i++) {
             if (!applySubMove(anMove.move()[i].from(), anMove.move()[i].to() - anMove.move()[i].from(), fCheckLegal)) {
                 return false;
@@ -175,7 +175,7 @@ public class Board {
         return true;
     }
 
-    public boolean applySubMove(int iSrc, int nRoll, boolean fCheckLegal) {
+    public boolean applySubMove(final int iSrc, final int nRoll, final boolean fCheckLegal) {
         int iDest = iSrc - nRoll;
 
         if (fCheckLegal && (nRoll < 1 || nRoll > 6)) {
@@ -212,7 +212,7 @@ public class Board {
         return true;
     }
 
-    public boolean isLegalMove(int iSrc, int nPips) {
+    public boolean isLegalMove(final int iSrc, final int nPips) {
         int i, nBack = 0, iDest = iSrc - nPips;
 
         if (iDest >= 0) {
@@ -228,7 +228,7 @@ public class Board {
         return (nBack <= 5 && (iSrc == nBack || iDest == -1));
     }
 
-    public void saveMoves(MoveList pml, int cMoves, int cPip, ChequersMove anMoves, boolean fPartial) {
+    public void saveMoves(final MoveList pml, final int cMoves, final int cPip, final ChequersMove anMoves, final boolean fPartial) {
         int i;
         Move pm;
 
@@ -284,7 +284,7 @@ public class Board {
         assert (pml.cMoves < MoveList.MAX_INCOMPLETE_MOVES);
     }
 
-    public int locateMove(ChequersMove anMove, MoveList pml) {
+    public int locateMove(final ChequersMove anMove, final MoveList pml) {
         AuchKey key = calcMoveKey(anMove);
 
         for (int i = 0; i < pml.cMoves; ++i) {
@@ -297,7 +297,7 @@ public class Board {
         return 0;
     }
 
-    private AuchKey calcMoveKey(ChequersMove anMove) {
+    private AuchKey calcMoveKey(final ChequersMove anMove) {
         Board anBoardMove = new Board(this);
         anBoardMove.applyMove(anMove, false);
         return anBoardMove.calcPositionKey();
@@ -330,7 +330,7 @@ public class Board {
         return anBoard[0][BAR] == 0 || anBoard[1][BAR] == 0;
     }
 
-    public boolean equals(Object board) {
+    public boolean equals(final Object board) {
         if(board == null) return false;
         if(board == this) return true;
 
@@ -345,7 +345,7 @@ public class Board {
         return true;
     }
 
-    private void addBits(AuchKey auchKey, int bitPos, int nBits)
+    private static void addBits(final AuchKey auchKey, final int bitPos, final int nBits)
     {
         int k = bitPos >> 3;
         int r = (bitPos & 0x7);
