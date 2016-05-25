@@ -51,6 +51,11 @@ final class Reward {
     }
 
     def clamp: Reward = {
+        def crop(minVal: Double, maxVal: Double, value: Double): Double = {
+            if(minVal > maxVal) throw new IllegalArgumentException ("min is greater than max")
+            maxVal.min(minVal.max(value))
+        }
+
         val res: Reward = new Reward
         for (i <- res.data.indices) {
             res.data(i) = crop(0, 1, res.data(i))
@@ -72,11 +77,6 @@ final class Reward {
             res.data(i) = this.data(i) + that.data(i)
         }
         res
-    }
-
-    private def crop(minVal: Double, maxVal: Double, value: Double): Double = {
-        if(minVal > maxVal) throw new IllegalArgumentException ("min is greater than max")
-        maxVal.min(minVal.max(value))
     }
 
     override def toString: String = {
