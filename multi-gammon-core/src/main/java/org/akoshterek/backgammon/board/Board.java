@@ -11,6 +11,7 @@ import org.akoshterek.backgammon.move.AuchKey;
 import org.akoshterek.backgammon.move.ChequersMove;
 import org.akoshterek.backgammon.move.Move;
 import org.akoshterek.backgammon.move.MoveList;
+import org.akoshterek.backgammon.util.Base64;
 
 import java.util.Arrays;
 
@@ -140,13 +141,13 @@ public class Board {
 
     public static Board positionFromID(final String pchEnc) {
         AuchKey auchKey = new AuchKey();
-        byte[] ach = new byte[PositionId.L_POSITIONID];
+        byte[] ach = new byte[PositionId.L_POSITIONID()];
         int pch = 0;
         int puch = 0;
         int i;
 
-        for (i = 0; i < PositionId.L_POSITIONID; i++)
-            ach[pch + i] = PositionId.Base64((byte) pchEnc.charAt(i));
+        for (i = 0; i < PositionId.L_POSITIONID(); i++)
+            ach[pch + i] = Base64.base64((byte) pchEnc.charAt(i));
 
         for (i = 0; i < 3; i++) {
             auchKey.key[puch++] = (byte) ((ach[pch] << 2) | (ach[pch + 1] >> 4));
