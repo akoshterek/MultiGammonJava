@@ -17,6 +17,10 @@
             <artifactId>scala-library</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.jsuereth</groupId>
+            <artifactId>scala-arm_2.11</artifactId>
+        </dependency>
+        <dependency>
             <groupId>multi-gammon</groupId>
             <artifactId>multi-gammon-core</artifactId>
             <version>${version}</version>
