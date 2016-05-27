@@ -130,7 +130,7 @@ public class RawRl40 extends AbsAgent implements Cloneable {
         }
 
         for(int i = 1; i < Constants.NUM_OUTPUTS; i++) {
-            reward.data[i] = 0;
+            reward.data()[i] = 0;
         }
         return reward;
     }
@@ -148,7 +148,7 @@ public class RawRl40 extends AbsAgent implements Cloneable {
     }
 
     private void updateTraceEntry(ETraceEntry entry, Reward deltaReward) {
-        fa.updateAddToReward(entry.input, deltaReward.multiply(entry.eTrace));
+        fa.updateAddToReward(entry.input, deltaReward.$times(entry.eTrace));
         entry.eTrace *= lambda;
     }
 
@@ -164,7 +164,7 @@ public class RawRl40 extends AbsAgent implements Cloneable {
         Reward predictedGreedyReward = move.arEvalMove;
         Reward deltaReward = new Reward();
         for(int i = 0; i < 1/*Constants.NUM_OUTPUTS*/; i++) {
-            deltaReward.data[i] = /*reward.data[i] +*/ predictedGreedyReward.data[i] * gamma - prevQValue.data[i];
+            deltaReward.data()[i] = /*reward.data[i] +*/ predictedGreedyReward.data()[i] * gamma - prevQValue.data()[i];
             //deltaReward.data[i] *= 0.3;
         }
 

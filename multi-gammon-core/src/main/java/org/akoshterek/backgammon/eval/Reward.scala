@@ -50,7 +50,7 @@ final class Reward {
         data(OUTPUT_LOSEBACKGAMMON) = r
     }
 
-    def clamp: Reward = {
+    def clamp(): Reward = {
         def crop(minVal: Double, maxVal: Double, value: Double): Double = {
             if(minVal > maxVal) throw new IllegalArgumentException ("min is greater than max")
             maxVal.min(minVal.max(value))

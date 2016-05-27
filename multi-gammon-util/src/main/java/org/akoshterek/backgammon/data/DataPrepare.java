@@ -38,7 +38,7 @@ public class DataPrepare {
                 String positionId = PositionId.positionIDFromKey(AuchKey.fromNnPosition(tokens[0]));
                 Reward reward = new Reward();
                 for(int i = 0; i < Constants.NUM_OUTPUTS; i++) {
-                    reward.data[i] = Double.parseDouble(tokens[i + 1]);
+                    reward.data()[i] = Double.parseDouble(tokens[i + 1]);
                 }
 
                 data.put(positionId, reward);
@@ -55,11 +55,11 @@ public class DataPrepare {
         try(PrintWriter writer = new PrintWriter(new GZIPOutputStream(new FileOutputStream(outputFileName)))) {
             data.forEach((positionId, reward) -> {
                 String s = String.format(Locale.US, "%s %f %f %f %f %f", positionId,
-                        reward.data[0],
-                        reward.data[1],
-                        reward.data[2],
-                        reward.data[3],
-                        reward.data[4]);
+                        reward.data()[0],
+                        reward.data()[1],
+                        reward.data()[2],
+                        reward.data()[3],
+                        reward.data()[4]);
                 writer.println(s);
             });
         } catch (final Exception e) {

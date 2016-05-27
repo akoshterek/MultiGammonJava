@@ -27,7 +27,7 @@ public class PubEvalAgent extends AbsAgent {
         preparePos(board, pos);
 
         int race = curPC.getValue() <= PositionClass.CLASS_RACE.getValue() ? 1 : 0;
-        reward.data[Constants.OUTPUT_WIN] = eval.pubeval(race, pos);
+        reward.data()[Constants.OUTPUT_WIN] = eval.pubeval(race, pos);
         return reward;
     }
 

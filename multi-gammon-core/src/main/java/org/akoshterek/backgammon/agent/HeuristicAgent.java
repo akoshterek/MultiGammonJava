@@ -61,7 +61,7 @@ public class HeuristicAgent extends AbsAgent {
             value += (12.5 - dist) * (double) points[i] / 225.0;
         }
 
-        reward.data[Constants.OUTPUT_WIN] = value;
+        reward.data()[Constants.OUTPUT_WIN] = value;
         return reward;
     }
 

@@ -67,7 +67,7 @@ public class Bearoff {
 
         ReadTwoSidedBearoff(pbc, iPos, ar);
         Reward reward = new Reward();
-        reward.data[OUTPUT_WIN ] = ar[ 0 ] / 2.0 + 0.5;
+        reward.data()[OUTPUT_WIN ] = ar[ 0 ] / 2.0 + 0.5;
         return reward;
     }
 
@@ -113,7 +113,7 @@ public class Bearoff {
         }
 
         Reward arOutput = new Reward();
-        arOutput.data[OUTPUT_WIN] = r;
+        arOutput.data()[OUTPUT_WIN] = r;
 
         // calculate gammon chances
         for (i = 0; i < 2; ++i) {
@@ -133,7 +133,7 @@ public class Bearoff {
                     }
                 }
 
-                arOutput.data[OUTPUT_WINGAMMON] = r;
+                arOutput.data()[OUTPUT_WINGAMMON] = r;
 
                 // opp gammon chance
                 r = 0;
@@ -143,7 +143,7 @@ public class Bearoff {
                     }
                 }
 
-                arOutput.data[OUTPUT_LOSEGAMMON] = r;
+                arOutput.data()[OUTPUT_LOSEGAMMON] = r;
             } else {
                 throw new IllegalArgumentException("Invalid bearoff database");
 //                MutableFloat g0 = new MutableFloat();
@@ -154,13 +154,13 @@ public class Bearoff {
             }
         } else {
             // no gammons possible
-            arOutput.data[OUTPUT_WINGAMMON] = 0;
-            arOutput.data[OUTPUT_LOSEGAMMON] = 0;
+            arOutput.data()[OUTPUT_WINGAMMON] = 0;
+            arOutput.data()[OUTPUT_LOSEGAMMON] = 0;
         }
 
         // no backgammons possible
-        arOutput.data[OUTPUT_LOSEBACKGAMMON] = 0;
-        arOutput.data[OUTPUT_WINBACKGAMMON] = 0;
+        arOutput.data()[OUTPUT_LOSEBACKGAMMON] = 0;
+        arOutput.data()[OUTPUT_WINBACKGAMMON] = 0;
         return arOutput;
     }
 
