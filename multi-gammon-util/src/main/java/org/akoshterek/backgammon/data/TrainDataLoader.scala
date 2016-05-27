@@ -47,7 +47,7 @@ object TrainDataLoader {
         managed(new GZIPInputStream(classOf[TrainDataLoader].getResourceAsStream(resource)))
             .acquireAndGet(is => {
             try {
-                return loadData(is)
+                loadData(is)
             }
             catch {
                 case e: Exception =>
