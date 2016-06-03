@@ -6,7 +6,7 @@ import java.util.Arrays;
  * @author Alex
  *         date 31.08.2015.
  */
-public class PubEval {
+class PubEval {
     private static float[] wr = new float[] {
             .00000f, -.17160f, .27010f, .29906f, -.08471f, .00000f, -1.40375f,
             -1.05121f, .07217f, -.01351f, .00000f, -1.29506f, -2.16183f, .13246f,
@@ -50,7 +50,7 @@ public class PubEval {
     /**
      * sets input vector x[] given board position pos[]
      */
-    public void setx(int[] pos) {
+    private void setx(final int[] pos) {
         // initialize
         Arrays.fill(x, 0);
 
@@ -72,7 +72,7 @@ public class PubEval {
         x[121] = (float) (pos[26]) / 15.0f;
     }
 
-    public float pubeval(int race, int pos[]) {
+    float pubeval(final int race, final int pos[]) {
     /* Backgammon move-selection evaluation function
        for benchmark comparisons.  Computes a linear
        evaluation function:  Score = W * X, where X is

@@ -1,0 +1,57 @@
+package org.akoshterek.backgammon.agent.fa
+
+import org.akoshterek.backgammon.Constants
+import org.akoshterek.backgammon.eval.Reward
+import org.akoshterek.backgammon.util.Normalizer
+import org.encog.engine.network.activation.ActivationSigmoid
+import org.encog.mathutil.randomize.RangeRandomizer
+import org.encog.ml.data.MLDataSet
+import org.encog.neural.data.basic.BasicNeuralDataSet
+import org.encog.neural.networks.BasicNetwork
+import org.encog.neural.networks.layers.BasicLayer
+import org.encog.neural.networks.training.propagation.Propagation
+import org.encog.neural.networks.training.propagation.back.Backpropagation
+import org.encog.persist.EncogDirectoryPersistence
+import java.nio.file.Path
+import java.util
+
+object SimpleEncogFA {
+    def createNN(inputNeurons: Int, hiddenNeurons: Int): BasicNetwork = {
+        val network: BasicNetwork = new BasicNetwork
+        network.addLayer(new BasicLayer(null, false, inputNeurons))
+        network.addLayer(new BasicLayer(new ActivationSigmoid, false, hiddenNeurons))
+        network.addLayer(new BasicLayer(new ActivationSigmoid, false, 1))
+        network.getStructure.finalizeStructure()
+        new RangeRandomizer(-0.1, 0.1).randomize(network)
+        network.reset()
+        network
+    }
+}
+
+class SimpleEncogFA(override val network: BasicNetwork) extends AbsNeuralNetworkFA(network) {
+    private val trainingSet: MLDataSet = new BasicNeuralDataSet(
+        Array[Array[Double]](new Array[Double](network.getInputCount)),
+        Array[Array[Double]](new Array[Double](1/*network.getOutputCount()*/))
+    )
+
+    private val propagation: Propagation = new Backpropagation(network, trainingSet, 0.05, 0)
+
+    override def saveNN(file: Path) {
+        EncogDirectoryPersistence.saveObject(file.toFile, network)
+    }
+
+    override def calculateReward(input: Array[Double]): Reward = {
+        val reward: Reward = new Reward
+        network.compute(input, reward.data)
+        Normalizer.fromSmallerSigmoid(reward.data, 1)
+        reward
+    }
+
+    override def setReward(input: Array[Double], reward: Reward) {
+        val output: Array[Double] = util.Arrays.copyOf(reward.data, Constants.NUM_OUTPUTS)
+        Normalizer.toSmallerSigmoid(output)
+        trainingSet.get(0).getInput.setData(input)
+        trainingSet.get(0).getIdeal.setData(output)
+        propagation.iteration()
+    }
+}
