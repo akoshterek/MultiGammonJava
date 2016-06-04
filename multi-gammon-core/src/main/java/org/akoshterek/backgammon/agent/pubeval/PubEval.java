@@ -7,7 +7,7 @@ import java.util.Arrays;
  *         date 31.08.2015.
  */
 class PubEval {
-    private static float[] wr = new float[] {
+    private static double[] wr = new double[] {
             .00000f, -.17160f, .27010f, .29906f, -.08471f, .00000f, -1.40375f,
             -1.05121f, .07217f, -.01351f, .00000f, -1.29506f, -2.16183f, .13246f,
             -1.03508f, .00000f, -2.29847f, -2.34631f, .17253f, .08302f, .00000f,
@@ -26,7 +26,7 @@ class PubEval {
             .00000f, -2.77982f, -7.26713f, -3.40177f, -12.32252f, .00000f, 3.42040f
     };
 
-    private static float[] wc = new float[] {
+    private static double[] wc = new double[] {
             .25696f, -.66937f, -1.66135f, -2.02487f, -2.53398f, -.16092f, -1.11725f,
             -1.06654f, -.92830f, -1.99558f, -1.10388f, -.80802f, .09856f, -.62086f,
             -1.27999f, -.59220f, -.73667f, .89032f, -.38933f, -1.59847f, -1.50197f,
@@ -45,7 +45,7 @@ class PubEval {
             1.23606f, -1.59529f, .10438f, -1.30206f, -4.11520f, 5.62596f, -2.75800f
     };
 
-    private final float[] x = new float[122];
+    private final double[] x = new double[122];
 
     /**
      * sets input vector x[] given board position pos[]
@@ -72,7 +72,7 @@ class PubEval {
         x[121] = (float) (pos[26]) / 15.0f;
     }
 
-    float pubeval(final int race, final int pos[]) {
+    double pubeval(final int race, final int pos[]) {
     /* Backgammon move-selection evaluation function
        for benchmark comparisons.  Computes a linear
        evaluation function:  Score = W * X, where X is
@@ -110,7 +110,7 @@ class PubEval {
        (negative integer).                                  */
 
         int i;
-        float score;
+        double score;
 
         if (pos[26] == 15) return (99999999.f);
         // all men off, best possible move
