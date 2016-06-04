@@ -43,7 +43,7 @@ object PositionId {
         anCombination(n - 1)(r - 1)
     }
 
-    def positionBearoff(anBoard: Array[Byte], nPoints: Int, nChequers: Int): Int = {
+    def positionBearoff(anBoard: Array[Int], nPoints: Int, nChequers: Int): Int = {
         var fBits: Int = 0
         var j: Int = 0
 

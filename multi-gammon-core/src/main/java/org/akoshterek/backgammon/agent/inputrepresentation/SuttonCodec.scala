@@ -1,7 +1,7 @@
 package org.akoshterek.backgammon.agent.inputrepresentation
 
 class SuttonCodec extends PointCodec {
-    def setPoint(men: Byte, inputs: Array[Double], offset: Int) {
+    def setPoint(men: Int, inputs: Array[Double], offset: Int) {
         inputs(offset) = if (men >= 1) 1.0f else 0.0f
         inputs(offset + 1) = if (men >= 2) 1.0f else 0.0f
         inputs(offset + 2) = if (men >= 3) 1.0f else 0.0f

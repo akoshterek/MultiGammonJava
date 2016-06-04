@@ -181,7 +181,7 @@ class GnuBgRepresentation implements InputRepresentation {
     public double[] calculateRaceInputs(final Board anBoard) {
         double[] inputs = new double[NUM_RACE_INPUTS];
         for (int side = 0; side < 2; ++side) {
-            byte[] board = anBoard.anBoard[side];
+            int[] board = anBoard.anBoard()[side];
             int afInputIndex = side * HALF_RACE_INPUTS;
 
             int menOff = 15;
@@ -204,7 +204,6 @@ class GnuBgRepresentation implements InputRepresentation {
             }
 
             int nCross = 0;
-
             for (int k = 1; k < 4; ++k) {
                 for (int i = 6 * k; i < 6 * k + 6; ++i) {
                     int nc = board[i];
@@ -225,12 +224,12 @@ class GnuBgRepresentation implements InputRepresentation {
         baseInputs(anBoard, inputs);
 
         int index = 4 * 25 * 2;
-        menOffAll(anBoard.anBoard[1], inputs, index + I_OFF1);
-        calculateHalfInputs(anBoard.anBoard[1], anBoard.anBoard[0], inputs, index);
+        menOffAll(anBoard.anBoard()[1], inputs, index + I_OFF1);
+        calculateHalfInputs(anBoard.anBoard()[1], anBoard.anBoard()[0], inputs, index);
 
         index = 4 * 25 * 2 + MORE_INPUTS;
-        menOffAll(anBoard.anBoard[0], inputs, index + I_OFF1);
-        calculateHalfInputs(anBoard.anBoard[0], anBoard.anBoard[1], inputs, index);
+        menOffAll(anBoard.anBoard()[0], inputs, index + I_OFF1);
+        calculateHalfInputs(anBoard.anBoard()[0], anBoard.anBoard()[1], inputs, index);
 
         return inputs;
     }
@@ -242,17 +241,17 @@ class GnuBgRepresentation implements InputRepresentation {
 
         int index = 4 * 25 * 2;
         // I accidentally switched sides (0 and 1) when I trained the net
-        menOffNonCrashed(anBoard.anBoard[0], inputs, index + I_OFF1);
-        calculateHalfInputs(anBoard.anBoard[1], anBoard.anBoard[0], inputs, index);
+        menOffNonCrashed(anBoard.anBoard()[0], inputs, index + I_OFF1);
+        calculateHalfInputs(anBoard.anBoard()[1], anBoard.anBoard()[0], inputs, index);
 
         index = (4 * 25 * 2 + MORE_INPUTS);
-        menOffNonCrashed(anBoard.anBoard[1], inputs, index + I_OFF1);
-        calculateHalfInputs(anBoard.anBoard[0], anBoard.anBoard[1], inputs, index);
+        menOffNonCrashed(anBoard.anBoard()[1], inputs, index + I_OFF1);
+        calculateHalfInputs(anBoard.anBoard()[0], anBoard.anBoard()[1], inputs, index);
 
         return inputs;
     }
 
-    private static void calculateHalfInputs(final byte[] anBoard, final byte[] anBoardOpp, final double[] input, final int index) {
+    private static void calculateHalfInputs(final int[] anBoard, final int[] anBoardOpp, final double[] input, final int index) {
         int i, j, k, l, nOppBack, nBoard;
         int[] aHit = new int[39];
 
@@ -777,7 +776,7 @@ class GnuBgRepresentation implements InputRepresentation {
         }
     }
 
-    private static void menOffAll(final byte[] anBoard, final double[] afInput, final int index) {
+    private static void menOffAll(final int[] anBoard, final double[] afInput, final int index) {
         //* Men off
         int menOff = 15;
 
@@ -799,7 +798,7 @@ class GnuBgRepresentation implements InputRepresentation {
         }
     }
 
-    private static void menOffNonCrashed(final byte[] anBoard, final double[] afInput, final int index) {
+    private static void menOffNonCrashed(final int[] anBoard, final double[] afInput, final int index) {
         int menOff = 15;
         int i;
 
@@ -826,7 +825,7 @@ class GnuBgRepresentation implements InputRepresentation {
     private static void baseInputs(final Board anBoard, final double[] arInput) {
         for (int j = 0; j < 2; ++j) {
             int afInput = j * 25 * 4;
-            byte[] board = anBoard.anBoard[j];
+            int[] board = anBoard.anBoard()[j];
 
             //* Points
             for (int i = 0; i < 24; i++) {
@@ -864,12 +863,12 @@ class GnuBgRepresentation implements InputRepresentation {
             for (int i = 0; i < 0x1000; i++) {
                 anEscapes1[i] = is.readInt();
             }
-        } catch (Exception e) {
+        } catch (final Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    private static int escapes(final byte[] anBoard, final int n) {
+    private static int escapes(final int[] anBoard, final int n) {
         int i, af = 0, m;
         m = (n < 12) ? n : 12;
 
@@ -880,7 +879,7 @@ class GnuBgRepresentation implements InputRepresentation {
         return anEscapes[af];
     }
 
-    private static int escapes1(final byte[] anBoard, final int n) {
+    private static int escapes1(final int[] anBoard, final int n) {
         int i, af = 0, m;
         m = (n < 12) ? n : 12;
 

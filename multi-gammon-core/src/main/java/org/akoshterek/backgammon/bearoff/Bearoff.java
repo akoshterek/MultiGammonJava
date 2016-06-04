@@ -19,7 +19,7 @@ public class Bearoff {
         int i, nOppBack, nBack;
         int n = 0, nOpp = 0;
 
-        byte[][] anBoard = board.anBoard;
+        int[][] anBoard = board.anBoard();
         for (nOppBack = 24; nOppBack > 0; nOppBack--) {
             if (anBoard[0][nOppBack] != 0)
                 break;
@@ -59,8 +59,8 @@ public class Bearoff {
     }
 
     private static Reward bearoffEvalTwoSided (BearoffContext pbc, Board anBoard) {
-        int nUs = PositionId.positionBearoff(anBoard.anBoard[1], pbc.getnPoints(), pbc.getnChequers());
-        int nThem = PositionId.positionBearoff(anBoard.anBoard[0], pbc.getnPoints(), pbc.getnChequers());
+        int nUs = PositionId.positionBearoff(anBoard.anBoard()[1], pbc.getnPoints(), pbc.getnChequers());
+        int nThem = PositionId.positionBearoff(anBoard.anBoard()[0], pbc.getnPoints(), pbc.getnChequers());
         int n = PositionId.combination(pbc.getnPoints() + pbc.getnChequers(), pbc.getnPoints());
         int iPos = nUs * n + nThem;
         float[] ar = new float[4];
@@ -100,7 +100,7 @@ public class Bearoff {
         // get bearoff probabilities
 
         for (i = 0; i < 2; ++i) {
-            an[i] = PositionId.positionBearoff(anBoard.anBoard[i], pbc.getnPoints(), pbc.getnChequers());
+            an[i] = PositionId.positionBearoff(anBoard.anBoard()[i], pbc.getnPoints(), pbc.getnChequers());
             bearoffDist(pbc, an[i], aarProb[i], aarGammonProb[i], ar[i], null, null);
         }
 
@@ -118,7 +118,7 @@ public class Bearoff {
         // calculate gammon chances
         for (i = 0; i < 2; ++i) {
             for (j = 0, anOn[i] = 0; j < 25; ++j) {
-                anOn[i] += anBoard.anBoard[i][j];
+                anOn[i] += anBoard.anBoard()[i][j];
             }
         }
 

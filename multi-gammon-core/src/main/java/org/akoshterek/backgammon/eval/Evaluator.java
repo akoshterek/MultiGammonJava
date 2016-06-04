@@ -57,13 +57,13 @@ public class Evaluator {
         int nOppBack, nBack;
 
         for (nOppBack = 24; nOppBack >= 0; --nOppBack) {
-            if (anBoard.anBoard[0][nOppBack] != 0) {
+            if (anBoard.anBoard()[0][nOppBack] != 0) {
                 break;
             }
         }
 
         for (nBack = 24; nBack >= 0; --nBack) {
-            if (anBoard.anBoard[1][nBack] != 0) {
+            if (anBoard.anBoard()[1][nBack] != 0) {
                 break;
             }
         }
@@ -81,10 +81,10 @@ public class Evaluator {
 
             for (side = 0; side < 2; ++side) {
                 int tot = 0;
-                byte[] board = anBoard.anBoard[side];
+                int[] board = anBoard.anBoard()[side];
 
                 for (i = 0; i < 25; ++i)
-                    tot += anBoard.anBoard[side][i];
+                    tot += anBoard.anBoard()[side][i];
 
                 if (tot <= N) {
                     return PositionClass.CLASS_CRASHED;
@@ -121,7 +121,7 @@ public class Evaluator {
     private int findFirstChequer(final Board anBoard, final int side) {
         int i;
         for (i = 0; i < 25; i++) {
-            if (anBoard.anBoard[side][i] != 0) {
+            if (anBoard.anBoard()[side][i] != 0) {
                 break;
             }
         }
@@ -130,27 +130,28 @@ public class Evaluator {
     }
 
     private int findOpponentChequer(final Board anBoard) {
-        return findFirstChequer(anBoard, Board.OPPONENT);
+        return findFirstChequer(anBoard, Board.OPPONENT());
     }
 
     private int findSelfChequer(final Board anBoard) {
-        return findFirstChequer(anBoard, Board.SELF);
+        return findFirstChequer(anBoard, Board.SELF());
     }
 
+    @Deprecated
     private int calculateChequers(final Board anBoard, final int side) {
         int count = 0;
         for (int i = 0; i < 25; i++) {
-            count += anBoard.anBoard[1][i];
+            count += anBoard.anBoard()[side][i];
         }
         return count;
     }
 
     private int calculateSelfChequers(final Board anBoard) {
-        return calculateChequers(anBoard, Board.SELF);
+        return calculateChequers(anBoard, Board.SELF());
     }
 
     private int calculateOpponentChequers(final Board anBoard) {
-        return calculateChequers(anBoard, Board.OPPONENT);
+        return calculateChequers(anBoard, Board.OPPONENT());
     }
 
     public Reward evalOver(final Board anBoard) {
@@ -167,7 +168,7 @@ public class Evaluator {
                 arOutput[OUTPUT_LOSEGAMMON] = 1.0f;
 
                 for (i = 18; i < 25; i++) {
-                    if (anBoard.anBoard[1][i] != 0) {
+                    if (anBoard.anBoard()[1][i] != 0) {
 					/* player still has pieces in opponent's home board;
 					loses backgammon */
                         arOutput[OUTPUT_LOSEBACKGAMMON] = 1.0f;
@@ -194,7 +195,7 @@ public class Evaluator {
                 arOutput[OUTPUT_WINGAMMON] = 1.0f;
 
                 for (i = 18; i < 25; i++) {
-                    if (anBoard.anBoard[0][i] != 0) {
+                    if (anBoard.anBoard()[0][i] != 0) {
 					/* opponent still has pieces in player's home board;
 					win backgammon */
                         arOutput[OUTPUT_WINBACKGAMMON] = 1.0f;
@@ -250,46 +251,46 @@ public class Evaluator {
 
         for (j = 0; j < 2; j++) {
             for (i = 0, nciq = 0; i < 6; i++)
-                if (board.anBoard[j][i] != 0) {
+                if (board.anBoard()[j][i] != 0) {
                     anBack[j] = i;
-                    nciq += board.anBoard[j][i];
+                    nciq += board.anBoard()[j][i];
                 }
             ac[j] = anCross[j] = nciq;
 
             for (i = 6, nciq = 0; i < 12; i++)
-                if (board.anBoard[j][i] != 0) {
+                if (board.anBoard()[j][i] != 0) {
                     anBack[j] = i;
-                    nciq += board.anBoard[j][i];
+                    nciq += board.anBoard()[j][i];
                 }
             ac[j] += nciq;
             anCross[j] += 2 * nciq;
             anGammonCross[j] += nciq;
 
             for (i = 12, nciq = 0; i < 18; i++)
-                if (board.anBoard[j][i] != 0) {
+                if (board.anBoard()[j][i] != 0) {
                     anBack[j] = i;
-                    nciq += board.anBoard[j][i];
+                    nciq += board.anBoard()[j][i];
                 }
             ac[j] += nciq;
             anCross[j] += 3 * nciq;
             anGammonCross[j] += 2 * nciq;
 
             for (i = 18, nciq = 0; i < 24; i++)
-                if (board.anBoard[j][i] != 0) {
+                if (board.anBoard()[j][i] != 0) {
                     anBack[j] = i;
-                    nciq += board.anBoard[j][i];
+                    nciq += board.anBoard()[j][i];
                 }
             ac[j] += nciq;
             anCross[j] += 4 * nciq;
             anGammonCross[j] += 3 * nciq;
             anBackgammonCross[j] = nciq;
 
-            if (board.anBoard[j][24] != 0) {
+            if (board.anBoard()[j][24] != 0) {
                 anBack[j] = 24;
-                ac[j] += board.anBoard[j][24];
-                anCross[j] += 5 * board.anBoard[j][24];
-                anGammonCross[j] += 4 * board.anBoard[j][24];
-                anBackgammonCross[j] += 2 * board.anBoard[j][24];
+                ac[j] += board.anBoard()[j][24];
+                anCross[j] += 5 * board.anBoard()[j][24];
+                anGammonCross[j] += 4 * board.anBoard()[j][24];
+                anBackgammonCross[j] += 2 * board.anBoard()[j][24];
             }
         }
 
@@ -299,7 +300,7 @@ public class Evaluator {
             for (i = 0; i < 2; i++) {
                 if (anBack[i] < 6) {
                     anMaxTurns[i] =
-                            maxTurns(PositionId.positionBearoff(board.anBoard[i], pbc1.getnPoints(), pbc1.getnChequers()));
+                            maxTurns(PositionId.positionBearoff(board.anBoard()[i], pbc1.getnPoints(), pbc1.getnChequers()));
                 } else {
                     anMaxTurns[i] = anCross[i] * 2;
                 }
@@ -402,25 +403,25 @@ public class Evaluator {
         int totPipsOp = 0;
 
         for (int i = 0; i < 6; ++i)
-            totMenHome += anBoard.anBoard[side][i];
+            totMenHome += anBoard.anBoard()[side][i];
 
         for (int i = 22; i >= 18; --i)
-            totPipsOp += anBoard.anBoard[1 - side][i] * (i - 17);
+            totPipsOp += anBoard.anBoard()[1 - side][i] * (i - 17);
 
 
         if (!((totMenHome + 3) / 4 - (side == 1 ? 1 : 0) <= (totPipsOp + 2) / 3))
             return 0.0f;
 
         Board dummy = new Board();
-        System.arraycopy(anBoard.anBoard[side], 0, dummy.anBoard[side], 0, 25);
-        System.arraycopy(anBoard.anBoard[1 - side], 18, dummy.anBoard[1 - side], 0, 6);
+        System.arraycopy(anBoard.anBoard()[side], 0, dummy.anBoard()[side], 0, 25);
+        System.arraycopy(anBoard.anBoard()[1 - side], 18, dummy.anBoard()[1 - side], 0, 6);
         for (int i = 6; i < 25; ++i)
-            dummy.anBoard[1 - side][i] = 0;
+            dummy.anBoard()[1 - side][i] = 0;
 
         {
-            long[] bgp = BearoffGammon.getRaceBGprobs(dummy.anBoard[1 - side]);
+            long[] bgp = BearoffGammon.getRaceBGprobs(dummy.anBoard()[1 - side]);
             if (bgp != null) {
-                int k = PositionId.positionBearoff(anBoard.anBoard[side], pbc1.getnPoints(), pbc1.getnChequers());
+                int k = PositionId.positionBearoff(anBoard.anBoard()[side], pbc1.getnPoints(), pbc1.getnChequers());
                 short[] aProb = new short[32];
                 float p = 0.0f;
                 long scale = (side == 0) ? 36 : 1;
@@ -438,8 +439,8 @@ public class Evaluator {
                 return p;
             } else {
                 Reward p;
-                if (PositionId.positionBearoff(dummy.anBoard[0], 6, 15) > 923 ||
-                        PositionId.positionBearoff(dummy.anBoard[1], 6, 15) > 923) {
+                if (PositionId.positionBearoff(dummy.anBoard()[0], 6, 15) > 923 ||
+                        PositionId.positionBearoff(dummy.anBoard()[1], 6, 15) > 923) {
                     p = evalBearoff1(dummy);
                 } else {
                     p = evalBearoff2(dummy);

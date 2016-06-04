@@ -22,7 +22,7 @@ public class GnubgAgent extends AbsAgent {
     private NeuralNet nnContact, nnRace, nnCrashed;
     private GnuBgRepresentation representation = new GnuBgRepresentation();
 
-    public GnubgAgent(Path path) {
+    public GnubgAgent(final Path path) {
         super(path);
         fullName = "Gnubg";
 
@@ -32,7 +32,7 @@ public class GnubgAgent extends AbsAgent {
     }
 
     @Override
-    public Reward evalRace(Board board) {
+    public Reward evalRace(final Board board) {
         double[] inputs = representation.calculateRaceInputs(board);
         Reward reward = new Reward();
         nnRace.evaluate(inputs, reward.data());
@@ -48,8 +48,8 @@ public class GnubgAgent extends AbsAgent {
         int any = 0, i;
 
         for (i = 23; i >= 0; --i) {
-            totMen0 += board.anBoard[0][i];
-            totMen1 += board.anBoard[1][i];
+            totMen0 += board.anBoard()[0][i];
+            totMen1 += board.anBoard()[1][i];
         }
 
         if (totMen1 == 15)
@@ -61,7 +61,7 @@ public class GnubgAgent extends AbsAgent {
         if (any != 0) {
             if ((any & OG_POSSIBLE) != 0) {
                 for (i = 23; i >= 18; --i) {
-                    if (board.anBoard[1][i] > 0) {
+                    if (board.anBoard()[1][i] > 0) {
                         break;
                     }
                 }
@@ -72,7 +72,7 @@ public class GnubgAgent extends AbsAgent {
 
             if ((any & G_POSSIBLE) != 0) {
                 for (i = 23; i >= 18; --i) {
-                    if (board.anBoard[0][i] > 0)
+                    if (board.anBoard()[0][i] > 0)
                         break;
                 }
 
@@ -111,7 +111,7 @@ public class GnubgAgent extends AbsAgent {
     }
 
     @Override
-    public Reward evalCrashed(Board board) {
+    public Reward evalCrashed(final Board board) {
         double[] inputs = representation.calculateCrashedInputs(board);
         Reward reward = new Reward();
         nnCrashed.evaluate(inputs, reward.data());
@@ -119,7 +119,7 @@ public class GnubgAgent extends AbsAgent {
     }
 
     @Override
-    public Reward evalContact(Board board) {
+    public Reward evalContact(final Board board) {
         double[] inputs = representation.calculateContactInputs(board);
         Reward reward = new Reward();
         nnContact.evaluate(inputs, reward.data());
@@ -134,12 +134,12 @@ public class GnubgAgent extends AbsAgent {
             nnContact = NeuralNet.loadBinary(is);
             nnRace = NeuralNet.loadBinary(is);
             nnCrashed = NeuralNet.loadBinary(is);
-        } catch (Exception e) {
+        } catch (final Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    private void checkBinaryWeights(DataInput is) throws IOException {
+    private void checkBinaryWeights(final DataInput is) throws IOException {
         float magic = is.readFloat();
         float version = is.readFloat();
 

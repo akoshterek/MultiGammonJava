@@ -566,7 +566,7 @@ public class BearoffGammon {
             y17, y18, y19, y20, y21, y22, y23, y24, y25, y26, y27, y28, y29, y30, y31
     };
 
-    public static long[] getRaceBGprobs(byte[] board) {
+    public static long[] getRaceBGprobs(final int[] board) {
         int tot = 0;
         int i;
         int group = 0;

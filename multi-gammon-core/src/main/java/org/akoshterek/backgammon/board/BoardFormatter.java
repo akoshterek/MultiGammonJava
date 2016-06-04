@@ -32,9 +32,9 @@ public class BoardFormatter {
     private static String drawBoardStd(final Board board, final int fRoll, final String[] asz) {
         String pch = "";
         int x, y;
-        int cOffO = Board.TOTAL_MEN, cOffX = Board.TOTAL_MEN;
+        int cOffO = Board.TOTAL_MEN(), cOffX = Board.TOTAL_MEN();
         Board an = new Board(board);
-        byte[][] anBoard = board.anBoard;
+        int[][] anBoard = board.anBoard();
 
         String achX = "     X6789ABCDEF";
         String achO = "     O6789ABCDEF";
@@ -261,7 +261,7 @@ public class BoardFormatter {
             pch += '/';
             pch += formatPointPlain(anMove.move()[i].to() + 1);
 
-            if (anMove.move()[i].to() >= 0 && anBoard.anBoard[0][23 - anMove.move()[i].to()] != 0) {
+            if (anMove.move()[i].to() >= 0 && anBoard.anBoard()[0][23 - anMove.move()[i].to()] != 0) {
                 for (j = 1; ; j += 2) {
                     if (j > i) {
                         pch += '*';
