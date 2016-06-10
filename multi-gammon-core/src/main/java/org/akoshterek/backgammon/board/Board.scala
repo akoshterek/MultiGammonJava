@@ -138,42 +138,27 @@ class Board {
     }
 
     def chequersCount: (Int, Int) = {
-        var opponent = 0
-        var self = 0
-
-        for (i <- 0 until 25) {
-            opponent += anBoard(Board.OPPONENT)(i)
-            self += anBoard(Board.SELF)(i)
-        }
-
+        val opponent = anBoard(Board.OPPONENT).sum
+        val self = anBoard(Board.SELF).sum
         (opponent, self)
     }
 
     private def calcBackChequer: Int = {
-        for (b <- 24 to 0 by -1) {
-            if (anBoard(Board.SELF)(b) > 0) {
-                return b
-            }
-        }
-
-        -1
+        anBoard(Board.SELF).lastIndexWhere(_ > 0)
     }
 
     def calcPositionKey: AuchKey = {
         var iBit: Int = 0
         val auchKey: AuchKey = new AuchKey
-        for (i <- 0 until 2) {
-            for (j <- 0 until 25) {
-                val nc: Int = anBoard(i)(j)
-                if (nc != 0) {
-                    Board.addBits(auchKey, iBit, nc)
-                    iBit += nc + 1
-                }
-                else {
-                    iBit += 1
-                }
+        anBoard.foreach(_.foreach(nc => {
+            if (nc != 0) {
+                Board.addBits(auchKey, iBit, nc)
+                iBit += nc + 1
             }
-        }
+            else {
+                iBit += 1
+            }
+        }))
 
         auchKey
     }
