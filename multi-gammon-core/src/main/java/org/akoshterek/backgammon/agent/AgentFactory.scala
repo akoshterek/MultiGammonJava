@@ -18,7 +18,7 @@ object AgentFactory {
             case "heuristic" =>
                 agent = new HeuristicAgent(Evaluator.getInstance.getBasePath)
             case "pubeval" =>
-                agent = new PubEvalAgent(Evaluator.getInstance.getBasePath)
+                agent =  PubEvalAgent.buildDefault(Evaluator.getInstance.getBasePath)
             case "gnubg" =>
                 agent = new GnubgAgent(Evaluator.getInstance.getBasePath)
             case "rawbatch40" =>

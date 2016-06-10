@@ -23,11 +23,10 @@ public class GnubgAgent extends AbsAgent {
     private GnuBgRepresentation representation = new GnuBgRepresentation();
 
     public GnubgAgent(final Path path) {
-        super(path);
-        fullName = "Gnubg";
+        super("Gnubg", path);
 
-        setSanityCheck(true);
-        setNeedsInvertedEval(true);
+        supportsSanityCheck_$eq(true);
+        needsInvertedEval_$eq(true);
         load();
     }
 

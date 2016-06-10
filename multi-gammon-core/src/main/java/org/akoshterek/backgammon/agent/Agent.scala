@@ -20,12 +20,10 @@ trait Agent {
     private var _playedGames: Int = 0
     def playedGames = _playedGames
 
-    protected var _fixed: Boolean = true
-    def isFixed = _fixed
+    protected var fixed: Boolean = true
 
     protected var needsInvertedEval: Boolean = false
-    protected var _supportsBearoff: Boolean = false
-    def supportsBearoff = _supportsBearoff
+    protected var supportsBearoff: Boolean = false
 
     protected var _currentBoard: Board = null
     protected var curPC: PositionClass = PositionClass.CLASS_OVER
@@ -80,7 +78,7 @@ trait Agent {
 
     def currentBoard = _currentBoard
 
-    def currentBoard_(board: Board) {
+    def currentBoard_=(board: Board): Unit = {
         _currentBoard = new Board(board)
         curPC = Evaluator.getInstance.classifyPosition(currentBoard)
     }

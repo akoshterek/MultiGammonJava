@@ -1,45 +1,42 @@
-package org.akoshterek.backgammon.agent.pubeval;
+package org.akoshterek.backgammon.agent.pubeval
 
-import java.util.Arrays;
+import java.util
 
-/**
- * @author Alex
- *         date 31.08.2015.
- */
 class PubEval {
-    private final double[] contactWeights = new double[122];
-    private final double[] raceWeights = new double[122];
+    private val _contactWeights: Array[Double] = new Array[Double](122)
+    private val _raceWeights: Array[Double] = new Array[Double](122)
 
-    private final double[] x = new double[122];
-
-    PubEval(final double[] contactWeights, final double[] raceWeights) {
-        System.arraycopy(contactWeights, 0, this.contactWeights, 0, this.contactWeights.length);
-        System.arraycopy(raceWeights, 0, this.raceWeights, 0, this.raceWeights.length);
+    def this(contactWeights: Array[Double], raceWeights: Array[Double]) {
+       this()
+        System.arraycopy(contactWeights, 0, this._contactWeights, 0, this._contactWeights.length)
+        System.arraycopy(raceWeights, 0, this._raceWeights, 0, this._raceWeights.length)
     }
 
-    /**
-     * sets input vector x[] given board position pos[]
-     */
-    private void setx(final int[] pos) {
-        // initialize
-        Arrays.fill(x, 0);
+    final private val x: Array[Double] = new Array[Double](122)
 
-        //* first encode board locations 24-1 */
-        for (int j = 1; j <= 24; ++j) {
-            int jm1 = j - 1;
-            int n = pos[25 - j];
+    /**
+      * sets input vector x[] given board position pos[]
+      */
+    private def setx(pos: Array[Int]) {
+        // initialize
+        util.Arrays.fill(x, 0)
+
+        // first encode board locations 24-1
+        for (j <- 1 to 24) {
+            val jm1: Int = j - 1
+            val n: Int = pos(25 - j)
             if (n != 0) {
-                if (n == -1) x[5 * jm1] = 1.0f;
-                if (n == 1) x[5 * jm1 + 1] = 1.0f;
-                if (n >= 2) x[5 * jm1 + 2] = 1.0f;
-                if (n == 3) x[5 * jm1 + 3] = 1.0f;
-                if (n >= 4) x[5 * jm1 + 4] = (n - 3) / 2.0f;
+                if (n == -1) x(5 * jm1) = 1.0f
+                if (n == 1) x(5 * jm1 + 1) = 1.0f
+                if (n >= 2) x(5 * jm1 + 2) = 1.0f
+                if (n == 3) x(5 * jm1 + 3) = 1.0f
+                if (n >= 4) x(5 * jm1 + 4) = (n - 3) / 2.0f
             }
         }
         // encode opponent barmen
-        x[120] = -(float) (pos[0]) / 2.0f;
+        x(120) = -pos(0).toDouble / 2.0
         // encode computer's menoff
-        x[121] = (float) (pos[26]) / 15.0f;
+        x(121) = pos(26).toDouble / 15.0
     }
 
     /* Backgammon move-selection evaluation function
@@ -77,25 +74,18 @@ class PubEval {
        computer's men off the board (positive integer), and
        element 27 represents opponent's men off the board
        (negative integer).                                  */
-    double evaluate(final int race, final int pos[]) {
-        int i;
-        double score;
-
-        if (pos[26] == 15) return (99999999.);
-        // all men off, best possible move
-
-        setx(pos); // sets input array x[]
-        score = 0.0f;
-        if (race != 0) {// use race weights
-            for (i = 0; i < 122; ++i) {
-                score += raceWeights[i] * x[i];
-            }
-        } else { // use contact weights
-            for (i = 0; i < 122; ++i) {
-                score += contactWeights[i] * x[i];
-            }
+    def evaluate(race: Int, pos: Array[Int]): Double = {
+        if (pos(26) == 15) {
+            // all men off, best possible move
+            99999999.0
+        } else {
+            setx(pos)
+            val score = (x, if(race != 0) raceWeights else contactWeights).zipped.map(_ * _).sum
+            score
         }
-
-        return (score);
     }
+
+    def contactWeights: Array[Double] = _contactWeights
+
+    def raceWeights: Array[Double] = _raceWeights
 }

@@ -18,8 +18,8 @@ class GameDispatcherMovesFinder(agents: Array[AgentEntry]) {
 
     private def findAndSaveBestMoves(currentMatch: MatchState, pml: MoveList, amMoves: Array[Move],
                                      nDice0: Int, nDice1: Int, anBoard: Board) {
-        MoveGenerator.generateMoves(anBoard, pml, amMoves, nDice0, nDice1, false)
-        agents(currentMatch.fMove).agent.setCurrentBoard(currentMatch.board)
+        MoveGenerator.generateMoves(anBoard, pml, amMoves, nDice0, nDice1, fPartial = false)
+        agents(currentMatch.fMove).agent.currentBoard = currentMatch.board
         if (pml.cMoves == 0) {
             pml.amMoves = null
             return

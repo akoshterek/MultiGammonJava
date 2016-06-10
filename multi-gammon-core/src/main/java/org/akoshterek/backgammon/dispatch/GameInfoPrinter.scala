@@ -23,19 +23,19 @@ object GameInfoPrinter {
 
         for (i <- agents.indices) {
             System.out.println("%c:%s: games %d/%d = %5.2f%%, points %d = %5.2f%%".format(
-                signs(i), agents(i).agent.getFullName,
+                signs(i), agents(i).agent.fullName,
                 agents(i).wonGames, numGames,
                 agents(i).wonGames.asInstanceOf[Float] / numGames * 100, agents(i).wonPoints,
                 agents(i).wonPoints.asInstanceOf[Float] / (agents(0).wonPoints + agents(1).wonPoints) * 100))
         }
 
         val pointDiff: Float = agents(0).wonPoints - agents(1).wonPoints
-        System.out.println("%c:%s: won %+5.3f ppg\n".format(signs(0), agents(0).agent.getFullName, pointDiff / numGames))
+        System.out.println("%c:%s: won %+5.3f ppg\n".format(signs(0), agents(0).agent.fullName, pointDiff / numGames))
 
-        val logPath: Path = Paths.get(agents(0).agent.getPath.toString, getLogFileName(agents))
+        val logPath: Path = Paths.get(agents(0).agent.path.toString, getLogFileName(agents))
         val writer: PrintWriter = new PrintWriter(Files.newBufferedWriter(logPath, StandardOpenOption.APPEND))
         try {
-            writer.println("%d;%f\n".format(agents(0).agent.getPlayedGames, pointDiff / numGames))
+            writer.println("%d;%f\n".format(agents(0).agent.playedGames, pointDiff / numGames))
         }
         catch {
             case ignored: IOException =>
@@ -45,7 +45,7 @@ object GameInfoPrinter {
     }
 
     def printRoll(agents: Array[AgentEntry], dice: Array[Int]) {
-        System.out.println("%s rolls %d, %s rolls %d.".format(agents(0).agent.getFullName, dice(0), agents(1).agent.getFullName, dice(1)))
+        System.out.println("%s rolls %d, %s rolls %d.".format(agents(0).agent.fullName, dice(0), agents(1).agent.fullName, dice(1)))
     }
 
     def printBoard(agents: Array[AgentEntry], matchState: MatchState, matchMoves: util.Deque[MatchMove]) {
@@ -56,8 +56,8 @@ object GameInfoPrinter {
             an.swapSides()
         }
 
-        apch(0) = "O: " + agents(0).agent.getFullName
-        apch(6) = "X: " + agents(1).agent.getFullName
+        apch(0) = "O: " + agents(0).agent.fullName
+        apch(6) = "X: " + agents(1).agent.fullName
         //apch[1] = String.format("%d point(s)", match.anScore[0]);
         //apch[5] = String.format("%d point(s)", match.anScore[1]);
         apch(if (matchState.fMove != 0) 4 else 2) = ""
@@ -83,7 +83,7 @@ object GameInfoPrinter {
     def printWin(agents: Array[AgentEntry], matchState: MatchState, fWinner: Int, nPoints: Int) {
         val n: Int = matchState.board.gameStatus
         System.out.println("%s wins a %s and %d point(s).\n".format(
-                agents(fWinner).agent.getFullName,
+                agents(fWinner).agent.fullName,
                 gameResult(n - 1), nPoints))
     }
 
@@ -91,8 +91,8 @@ object GameInfoPrinter {
         val template: String = if (playedGames == 1) "The score (after %d game) is: %s %d, %s %d"
         else "The score (after %d games) is: %s %d, %s %d"
         val str: String = template.format(
-            playedGames, agents(0).agent.getFullName, matchState.anScore(0),
-            agents(1).agent.getFullName, matchState.anScore(1))
+            playedGames, agents(0).agent.fullName, matchState.anScore(0),
+            agents(1).agent.fullName, matchState.anScore(1))
         System.out.println(str)
     }
 
@@ -101,11 +101,11 @@ object GameInfoPrinter {
         else 'O'
         if (anMove.move(0).from == -1) {
             System.out.println("%c:%s cannot move.\n".format(
-                symbol, agents(matchState.fTurn).agent.getFullName))
+                symbol, agents(matchState.fTurn).agent.fullName))
         }
         else {
             System.out.println("%c:%s moves %s.\n".format(
-                symbol, agents(matchState.fTurn).agent.getFullName,
+                symbol, agents(matchState.fTurn).agent.fullName,
                 BoardFormatter.formatMovePlain(anMove, matchState.board)))
         }
     }
@@ -113,10 +113,10 @@ object GameInfoPrinter {
     def printGameOver(agents: Array[AgentEntry], fWinner: Int, nPoints: Int, result: Int) {
         val sign: Char = if (fWinner != 0) 'X' else 'O'
         System.out.println("Game over.\n%c:%s wins a %s and %d point(s)\n".format(
-            sign, agents(fWinner).agent.getFullName, gameResult(result - 1), nPoints))
+            sign, agents(fWinner).agent.fullName, gameResult(result - 1), nPoints))
     }
 
     private def getLogFileName(agents: Array[AgentEntry]): String = {
-        agents(0).agent.getFullName + " vs " + agents(1).agent.getFullName + ".csv"
+        agents(0).agent.fullName + " vs " + agents(1).agent.fullName + ".csv"
     }
 }

@@ -19,7 +19,7 @@ class GameDispatcher(val agent1: Agent, val agent2: Agent) {
     agents(0).agent = agent1
     agents(1).agent = agent2
 
-    private var amMoves: Array[Move] = new Array[Move](MoveList.MAX_INCOMPLETE_MOVES)
+    private val amMoves: Array[Move] = new Array[Move](MoveList.MAX_INCOMPLETE_MOVES)
     for (i <- 0 until MoveList.MAX_INCOMPLETE_MOVES) {
         amMoves(i) = new Move
     }
@@ -34,8 +34,8 @@ class GameDispatcher(val agent1: Agent, val agent2: Agent) {
     private var pmrHint: MoveRecord = null
 
     def playGames(games: Int, learn: Boolean) {
-        agents(0).agent.setLearnMode(learn)
-        agents(1).agent.setLearnMode(learn)
+        agents(0).agent.isLearnMode = learn
+        agents(1).agent.isLearnMode = learn
         for (i <- numGames + 1 until numGames + games + 1) {
             playGame()
             if (i % 100 == 0) {

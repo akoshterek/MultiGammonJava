@@ -7,9 +7,16 @@ import org.akoshterek.backgammon.board.PositionClass
 import org.akoshterek.backgammon.eval.Reward
 import java.nio.file.Path
 
-class PubEvalAgent(val path: Path) extends AbsAgent(path) {
-    _fullName = "PubEval"
-    final private val eval: PubEval = new PubEval
+object PubEvalAgent {
+    def buildDefault(path: Path): PubEvalAgent = {
+        new PubEvalAgent(path, PubEvalDefaultWeights.contactWeights, PubEvalDefaultWeights.raceWeights)
+    }
+}
+
+class PubEvalAgent(override val path: Path, val contactWeights: Array[Double], val raceWeights: Array[Double])
+    extends AbsAgent("PubEval", path) with Cloneable {
+
+    private val eval: PubEval = new PubEval(contactWeights, raceWeights)
 
     def evalContact(board: Board): Reward = {
         val reward: Reward = new Reward
@@ -37,5 +44,9 @@ class PubEvalAgent(val path: Path) extends AbsAgent(path) {
         pos(0) = -tmpBoard.anBoard(Board.OPPONENT)(Board.BAR)
         pos(26) = 15 - self
         pos(27) = -(15 - opponent)
+    }
+
+    override def clone: PubEvalAgent = {
+        new PubEvalAgent(path, eval.contactWeights, eval.raceWeights)
     }
 }

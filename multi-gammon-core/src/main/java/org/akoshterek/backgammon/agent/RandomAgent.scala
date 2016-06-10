@@ -6,8 +6,7 @@ import org.akoshterek.backgammon.eval.Reward
 import java.nio.file.Path
 import java.util.Random
 
-class RandomAgent(val path: Path) extends AbsAgent(path) {
-    fullName = "Random"
+class RandomAgent(override val path: Path) extends AbsAgent("Random", path) {
     final private val random: Random = new Random
 
     def evalContact(board: Board): Reward = {

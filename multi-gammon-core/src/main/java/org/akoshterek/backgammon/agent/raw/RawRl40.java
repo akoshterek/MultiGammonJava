@@ -35,14 +35,13 @@ public class RawRl40 extends AbsAgent implements Cloneable {
     private static final double lambda = 0.7;
 
     public RawRl40(Path path) {
-        super(path);
-        fullName = "RawRl40";
-        fixed = false;
-        setSanityCheck(false);
+        super("RawRl40", path);
+        fixed_$eq(false);
+        supportsSanityCheck_$eq(false);
 
         BasicNetwork network = SimpleEncogFA.createNN(representation.getContactInputsCount(), 40);
         fa = new SimpleEncogFA(network);
-        supportsBearoff = false;
+        supportsBearoff_$eq(false);
         eligibilityTraces = new HashMap<>();
     }
 
@@ -113,9 +112,9 @@ public class RawRl40 extends AbsAgent implements Cloneable {
 
     @Override
     public void save() {
-        Path folder = getPath().resolve(fullName);
+        Path folder = path().resolve(fullName());
         folder.toFile().mkdirs();
-        Path nn = folder.resolve(fullName + ".eg");
+        Path nn = folder.resolve(fullName() + ".eg");
         fa.saveNN(nn);
     }
 
