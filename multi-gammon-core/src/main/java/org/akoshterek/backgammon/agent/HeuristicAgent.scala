@@ -9,8 +9,7 @@ import java.nio.file.Path
   * @author Alex
   *         date 03.08.2015.
   */
-class HeuristicAgent(val path: Path) extends AbsAgent(path) {
-    fullName = "Heuristic"
+class HeuristicAgent(override val path: Path) extends AbsAgent("Heuristic", path) {
 
     override def evalRace(board: Board): Reward = {
         evalContact(board)

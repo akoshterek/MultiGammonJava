@@ -8,13 +8,4 @@ abstract class AbsNeuralNetworkFA(val network: BasicNetwork) extends NeuralNetwo
 
 }
 
-object AbsNeuralNetworkFA {
-    def loadNN(file: File): BasicNetwork = {
-        return EncogDirectoryPersistence.loadObject(file).asInstanceOf[BasicNetwork]
-    }
-
-    def loadNNFromResource(resource: String): BasicNetwork = {
-        return EncogDirectoryPersistence.loadResourceObject(resource).asInstanceOf[BasicNetwork]
-    }
-}
 

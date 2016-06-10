@@ -8,7 +8,7 @@ import org.akoshterek.backgammon.eval.Reward
 import java.nio.file.Path
 
 class PubEvalAgent(val path: Path) extends AbsAgent(path) {
-    fullName = "PubEval"
+    _fullName = "PubEval"
     final private val eval: PubEval = new PubEval
 
     def evalContact(board: Board): Reward = {
@@ -17,7 +17,7 @@ class PubEvalAgent(val path: Path) extends AbsAgent(path) {
         preparePos(board, pos)
 
         val race: Int = if (curPC.getValue <= PositionClass.CLASS_RACE.getValue) 1 else 0
-        reward.data(Constants.OUTPUT_WIN) = eval.pubeval(race, pos)
+        reward.data(Constants.OUTPUT_WIN) = eval.evaluate(race, pos)
         reward
     }
 

@@ -1,5 +1,7 @@
 package org.akoshterek.backgammon.agent.fa
 
+import java.io.File
+
 import org.akoshterek.backgammon.Constants
 import org.akoshterek.backgammon.eval.Reward
 import org.akoshterek.backgammon.util.Normalizer
@@ -25,6 +27,14 @@ object SimpleEncogFA {
         new RangeRandomizer(-0.1, 0.1).randomize(network)
         network.reset()
         network
+    }
+
+    def loadNN(file: File): BasicNetwork = {
+        EncogDirectoryPersistence.loadObject(file).asInstanceOf[BasicNetwork]
+    }
+
+    def loadNNFromResource(resource: String): BasicNetwork = {
+        EncogDirectoryPersistence.loadResourceObject(resource).asInstanceOf[BasicNetwork]
     }
 }
 

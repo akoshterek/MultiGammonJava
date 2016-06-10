@@ -8,17 +8,37 @@ import org.akoshterek.backgammon.move.Move
 import java.nio.file.Path
 
 trait Agent {
-    def getFullName: String
+    protected val _fullName: String
+    def fullName = _fullName
 
-    def getPath: Path
+    protected val _path: Path
+    def path = _path
 
-    def getPlayedGames: Int
+    var isLearnMode: Boolean = false
+    protected var supportsSanityCheck: Boolean = false
 
-    def startGame()
+    private var _playedGames: Int = 0
+    def playedGames = _playedGames
 
-    def endGame()
+    protected var _fixed: Boolean = true
+    def isFixed = _fixed
 
-    def doMove(move: Move)
+    protected var needsInvertedEval: Boolean = false
+    protected var _supportsBearoff: Boolean = false
+    def supportsBearoff = _supportsBearoff
+
+    protected var _currentBoard: Board = null
+    protected var curPC: PositionClass = PositionClass.CLASS_OVER
+
+    def startGame() {}
+
+    def endGame(): Unit = {
+        if (isLearnMode) {
+            _playedGames += 1
+        }
+    }
+
+    def doMove(move: Move) {}
 
     def evaluatePosition(board: Board, pc: PositionClass): Reward = {
         val effectivePc: PositionClass = if (PositionClass.isBearoff(pc) && !supportsBearoff) PositionClass.CLASS_RACE else pc
@@ -58,24 +78,12 @@ trait Agent {
 
     def evalContact(board: Board): Reward
 
-    def isLearnMode: Boolean
+    def currentBoard = _currentBoard
 
-    def setLearnMode(learn: Boolean)
-
-    //fixed means it's unable to learn
-    def isFixed: Boolean
-
-    def needsInvertedEval: Boolean
-
-    def setNeedsInvertedEval(needsInvertedEval: Boolean)
-
-    def supportsSanityCheck: Boolean
-
-    def setSanityCheck(sc: Boolean)
-
-    def supportsBearoff: Boolean
-
-    def setCurrentBoard(board: Board)
+    def currentBoard_(board: Board) {
+        _currentBoard = new Board(board)
+        curPC = Evaluator.getInstance.classifyPosition(currentBoard)
+    }
 
     def load() {
     }
