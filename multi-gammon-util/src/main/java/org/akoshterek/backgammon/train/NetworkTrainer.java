@@ -132,8 +132,7 @@ public class NetworkTrainer {
 //                min = Math.min(min, input.getData()[i]);
 //                max = Math.max(max, input.getData()[i]);
 //            }
-            Normalizer.toSmallerSigmoid(e.reward());
-            MLData ideal = new BasicMLData(e.reward());
+            MLData ideal = new BasicMLData(Normalizer.toSmallerSigmoid(e.reward()));
             MLDataPair pair = new BasicMLDataPair(input, ideal);
             trainingSet.add(pair);
         }

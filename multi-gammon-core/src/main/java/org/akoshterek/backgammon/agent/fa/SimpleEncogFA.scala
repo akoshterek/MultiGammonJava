@@ -15,7 +15,6 @@ import org.encog.neural.networks.training.propagation.Propagation
 import org.encog.neural.networks.training.propagation.back.Backpropagation
 import org.encog.persist.EncogDirectoryPersistence
 import java.nio.file.Path
-import java.util
 
 object SimpleEncogFA {
     def createNN(inputNeurons: Int, hiddenNeurons: Int): BasicNetwork = {
@@ -53,13 +52,12 @@ class SimpleEncogFA(override val network: BasicNetwork) extends AbsNeuralNetwork
     override def calculateReward(input: Array[Double]): Reward = {
         val reward: Reward = new Reward
         network.compute(input, reward.data)
-        Normalizer.fromSmallerSigmoid(reward.data, 1)
+        reward.data(0) = Normalizer.fromSmallerSigmoid(reward.data, 1)(0)
         reward
     }
 
     override def setReward(input: Array[Double], reward: Reward) {
-        val output: Array[Double] = util.Arrays.copyOf(reward.data, Constants.NUM_OUTPUTS)
-        Normalizer.toSmallerSigmoid(output)
+        val output = Normalizer.toSmallerSigmoid(reward.data, Constants.NUM_OUTPUTS)
         trainingSet.get(0).getInput.setData(input)
         trainingSet.get(0).getIdeal.setData(output)
         propagation.iteration()
