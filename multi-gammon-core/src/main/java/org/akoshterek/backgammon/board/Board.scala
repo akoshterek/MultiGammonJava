@@ -287,7 +287,7 @@ class Board {
         pm.backChequer = calcBackChequer
         //pm->cmark = CMARK_NONE;
 
-        pm.arEvalMove.reset()
+        pm.arEvalMove = new Reward()
         pml.cMoves += 1
         assert(pml.cMoves < MoveList.MAX_INCOMPLETE_MOVES)
     }

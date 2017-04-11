@@ -75,8 +75,7 @@ public class DataPrepare {
             board.swapSides();
             String posRev = board.positionID();
             if(!data.containsKey(posRev)) {
-                Reward reward = data.get(key);
-                reward.invert();
+                Reward reward = data.get(key).invert();
                 missed.put(posRev, reward);
             }
         }

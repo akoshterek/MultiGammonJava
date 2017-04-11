@@ -29,9 +29,9 @@ class GameDispatcher(val agent1: Agent, val agent2: Agent) {
     var showLog: Boolean = false
     private var numGames: Int = 0
     private var playedGames: Int = 0
-    private var currentMatch: MatchState = null
+    private var currentMatch: MatchState = _
     private val lMatch: util.Deque[MatchMove] = new util.LinkedList[MatchMove]
-    private var pmrHint: MoveRecord = null
+    private var pmrHint: MoveRecord = _
 
     def playGames(games: Int, learn: Boolean) {
         agents(0).agent.isLearnMode = learn
@@ -408,7 +408,7 @@ class GameDispatcher(val agent1: Agent, val agent2: Agent) {
         val board: Board = Board.positionFromKey(endMove.auch)
         board.swapSides()
         endMove.auch = board.calcPositionKey
-        endMove.arEvalMove.invert()
+        endMove.arEvalMove = endMove.arEvalMove.invert
         currentAgent.doMove(endMove)
     }
 }

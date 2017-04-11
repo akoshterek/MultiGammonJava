@@ -1,7 +1,5 @@
 package org.akoshterek.backgammon.eval
 
-import java.util
-
 import org.akoshterek.backgammon.Constants._
 
 /**
@@ -24,10 +22,6 @@ final class Reward {
         this(reward.data)
     }
 
-    def reset() {
-        util.Arrays.fill(data, 0)
-    }
-
     /**
       * Move evaluation
       * let's keep things simple as I don't want to go into cube handling
@@ -41,15 +35,17 @@ final class Reward {
             + (data(OUTPUT_WINBACKGAMMON) - data(OUTPUT_LOSEBACKGAMMON))
     }
 
-    def invert() {
+    def invert: Reward = {
+        val res = new Reward()
         var r: Double = .0
-        data(OUTPUT_WIN) = 1.0 - data(OUTPUT_WIN)
+        res.data(OUTPUT_WIN) = 1.0 - data(OUTPUT_WIN)
         r = data(OUTPUT_WINGAMMON)
-        data(OUTPUT_WINGAMMON) = data(OUTPUT_LOSEGAMMON)
-        data(OUTPUT_LOSEGAMMON) = r
+        res.data(OUTPUT_WINGAMMON) = data(OUTPUT_LOSEGAMMON)
+        res.data(OUTPUT_LOSEGAMMON) = r
         r = data(OUTPUT_WINBACKGAMMON)
-        data(OUTPUT_WINBACKGAMMON) = data(OUTPUT_LOSEBACKGAMMON)
-        data(OUTPUT_LOSEBACKGAMMON) = r
+        res.data(OUTPUT_WINBACKGAMMON) = data(OUTPUT_LOSEBACKGAMMON)
+        res.data(OUTPUT_LOSEBACKGAMMON) = r
+        res
     }
 
     def clamp(): Reward = {
@@ -70,6 +66,6 @@ final class Reward {
     }
 
     override def toString: String = {
-        util.Arrays.toString(data)
+        data.mkString(", ")
     }
 }
