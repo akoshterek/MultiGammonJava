@@ -1,7 +1,5 @@
 package org.akoshterek.backgammon.board
 
-import java.util
-
 import org.akoshterek.backgammon.Constants.OUTPUT_LOSEBACKGAMMON
 import org.akoshterek.backgammon.Constants.OUTPUT_LOSEGAMMON
 import org.akoshterek.backgammon.Constants.OUTPUT_WINBACKGAMMON
@@ -22,6 +20,7 @@ object Board {
 
     val BAR: Int = 24
     val TOTAL_MEN: Int = 15
+    val HALF_BOARD_SIZE = 25
 
     def positionFromKey(auch: AuchKey): Board = {
         var i: Int = 0
@@ -340,38 +339,23 @@ class Board {
 
         // Check for both players on the bar against closed boards
         for (i <- 0 until 6) {
-            if (anBoard(0)(i) < 2 || anBoard(1)(i) < 2)
+            if (anBoard(Board.OPPONENT)(i) < 2 || anBoard(Board.SELF)(i) < 2)
                 return true
         }
 
         anBoard(0)(Board.BAR) == 0 || anBoard(1)(Board.BAR) == 0
     }
 
-    override def equals(other: Any): Boolean = {
-        if(canEqual(other)) {
-            val that: Board = other.asInstanceOf[Board]
+    private def canEqual(a: Any) = a.isInstanceOf[Board]
 
-            if (that eq null) return false
-            if (that eq this) return true
-
-            for (i <- 0 until 2) {
-                if (!util.Arrays.equals(anBoard(i), that.anBoard(i))) {
-                    return false
-                }
-            }
-
-            true
-        } else {
-            false
-        }
+    override def equals(that: Any): Boolean = {
+      that match {
+        case that: Board => that.canEqual(this) && anBoard.deep == that.anBoard.deep
+        case _ => false
+      }
     }
 
-    private def canEqual(other: Any): Boolean = {
-        other.isInstanceOf[Board]
-    }
-
-    private def clearBoard() {
-        util.Arrays.fill(anBoard(0), 0.toByte)
-        util.Arrays.fill(anBoard(1), 0.toByte)
-    }
+  private def clearBoard() {
+      anBoard.transform(x => Array.fill[Int](Board.HALF_BOARD_SIZE)(0))
+  }
 }

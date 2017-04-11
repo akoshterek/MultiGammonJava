@@ -15,7 +15,9 @@ final class Reward {
 
     def this(data: Array[Double]) {
         this()
-        System.arraycopy(data, 0, this.data, 0, this.data.length)
+
+        require(data.length == NUM_OUTPUTS)
+        Array.copy(data, 0, this.data, 0, this.data.length)
     }
 
     def this(reward: Reward) {
@@ -52,31 +54,19 @@ final class Reward {
 
     def clamp(): Reward = {
         def crop(minVal: Double, maxVal: Double, value: Double): Double = {
-            if(minVal > maxVal) throw new IllegalArgumentException ("min is greater than max")
+            require (minVal <= maxVal, "min is greater than max")
             maxVal.min(minVal.max(value))
         }
 
-        val res: Reward = new Reward
-        for (i <- res.data.indices) {
-            res.data(i) = crop(0, 1, res.data(i))
-        }
-        res
+        new Reward (data.map(x => crop(0, 1, x)))
     }
 
     def *(value: Double): Reward = {
-        val res: Reward = new Reward
-        for (i <- res.data.indices) {
-            res.data(i) = this.data(i) * value
-        }
-        res
+        new Reward(data.map(_ * value))
     }
 
     def +(that: Reward): Reward = {
-        val res: Reward = new Reward
-        for (i <- res.data.indices) {
-            res.data(i) = this.data(i) + that.data(i)
-        }
-        res
+        new Reward(data.zip(that.data).map( {case (x, y) => x + y}))
     }
 
     override def toString: String = {
