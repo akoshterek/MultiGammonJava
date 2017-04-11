@@ -6,9 +6,7 @@ import scala.util.control.Breaks._
 import org.akoshterek.backgammon.agent.Agent
 import org.akoshterek.backgammon.board.Board
 import org.akoshterek.backgammon.board.PositionClass
-import org.akoshterek.backgammon.matchstate.GameState
-import org.akoshterek.backgammon.matchstate.MatchMove
-import org.akoshterek.backgammon.matchstate.MatchState
+import org.akoshterek.backgammon.matchstate.{GameState, MatchMove, MatchState}
 import org.akoshterek.backgammon.move._
 
 class GameDispatcher(val agent1: Agent, val agent2: Agent) {
