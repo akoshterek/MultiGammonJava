@@ -1,8 +1,8 @@
 package org.akoshterek.backgammon.dispatch
 
 import java.util
-import scala.util.control.Breaks._
 
+import scala.util.control.Breaks._
 import org.akoshterek.backgammon.agent.Agent
 import org.akoshterek.backgammon.board.Board
 import org.akoshterek.backgammon.board.PositionClass
@@ -51,18 +51,14 @@ class GameDispatcher(val agent1: Agent, val agent2: Agent) {
     }
 
     def playGame() {
-        for (i <- 0 until 2) {
-            agents(i).agent.startGame()
-        }
+        agents.foreach(a => a.agent.startGame())
         startGame()
 
         do {
             nextTurn()
         } while (currentMatch.gs == GameState.GAME_PLAYING)
 
-        for (i <- 0 until 2) {
-            agents(i).agent.endGame()
-        }
+        agents.foreach(a => a.agent.endGame())
 
         for (i <- 0 until 2) {
             if (currentMatch.anScore(i) != 0) {
@@ -72,9 +68,7 @@ class GameDispatcher(val agent1: Agent, val agent2: Agent) {
         }
     }
 
-    def printStatistics() {
-        GameInfoPrinter.printStatistics(agents, numGames)
-    }
+    def printStatistics() = GameInfoPrinter.printStatistics(agents, numGames)
 
     private def startGame() {
         currentMatch = new MatchState
