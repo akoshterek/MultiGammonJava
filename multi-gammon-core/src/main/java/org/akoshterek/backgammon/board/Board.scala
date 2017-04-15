@@ -31,9 +31,7 @@ object Board {
             var cur: Byte = auch.key(a)
             for (k <- 0 until 8) {
                 if ((cur & 0x1) != 0) {
-                    if (i >= 2 || j >= 25) {
-                        throw new RuntimeException("Invalid key")
-                    }
+                    require(i < 2 && j < Board.HALF_BOARD_SIZE, "Invalid key")
                     newBoard.anBoard(i)(j) = (newBoard.anBoard(i)(j)+ 1).toByte
                 }
                 else {

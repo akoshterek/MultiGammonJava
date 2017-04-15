@@ -13,8 +13,8 @@ object AbsAgent {
 }
 
 abstract class AbsAgent(override val fullName: String, override val path: Path) extends Agent {
-    protected val _path = Paths.get(path.toString, AbsAgent.AGENTS_SUBFOLDER)
-    protected val _fullName = fullName
+    protected val _path: Path = Paths.get(path.toString, AbsAgent.AGENTS_SUBFOLDER)
+    protected val _fullName: String = fullName
 
     override def clone: AbsAgent = {
         try {

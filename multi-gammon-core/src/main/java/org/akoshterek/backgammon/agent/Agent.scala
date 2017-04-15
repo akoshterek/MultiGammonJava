@@ -9,23 +9,23 @@ import java.nio.file.Path
 
 trait Agent {
     protected val _fullName: String
-    def fullName = _fullName
+    def fullName: String = _fullName
 
     protected val _path: Path
-    def path = _path
+    def path: Path = _path
 
     var isLearnMode: Boolean = false
     protected var supportsSanityCheck: Boolean = false
 
     private var _playedGames: Int = 0
-    def playedGames = _playedGames
+    def playedGames: Int = _playedGames
 
     protected var fixed: Boolean = true
 
     protected var needsInvertedEval: Boolean = false
     protected var supportsBearoff: Boolean = false
 
-    protected var _currentBoard: Board = null
+    protected var _currentBoard: Board = _
     protected var curPC: PositionClass = PositionClass.CLASS_OVER
 
     def startGame() {}
@@ -76,7 +76,7 @@ trait Agent {
 
     def evalContact(board: Board): Reward
 
-    def currentBoard = _currentBoard
+    def currentBoard: Board = _currentBoard
 
     def currentBoard_=(board: Board): Unit = {
         _currentBoard = new Board(board)
