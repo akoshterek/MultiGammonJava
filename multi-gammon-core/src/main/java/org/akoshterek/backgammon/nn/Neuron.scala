@@ -10,5 +10,5 @@ trait Neuron extends Serializable {
    * Recomputes the value of this hidden unit, querying it's
    * prior inputs.
    */
-  def recompute(): Double
+  def recompute(): Unit = {}
 }

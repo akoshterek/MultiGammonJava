@@ -64,9 +64,9 @@ class HiddenUnit(var units: Vector[Neuron], var activationFunction: Double => Do
     * @param random The rng
     */
   def randomizeWeights(random: Random): Unit = {
-    for (i <- _weights.indices) {
-      _weights(i) = (random.nextDouble() * (HiddenUnit.MAX_INITIAL_WEIGHT - HiddenUnit.MIN_INITIAL_WEIGHT)) + HiddenUnit.MIN_INITIAL_WEIGHT
-    }
+    _weights.transform(
+      _ => (random.nextDouble() * (HiddenUnit.MAX_INITIAL_WEIGHT - HiddenUnit.MIN_INITIAL_WEIGHT)) + HiddenUnit.MIN_INITIAL_WEIGHT
+    )
   }
 
   /**
@@ -82,9 +82,8 @@ class HiddenUnit(var units: Vector[Neuron], var activationFunction: Double => Do
     * Recomputes the value of this hidden unit, querying it's
     * prior inputs.
     */
-  def recompute(): Double = {
+  override def recompute(): Unit = {
     _value = _activationFunction(sum)
-    _value
   }
 
   def gradient: Double = value * (1.0 - value)

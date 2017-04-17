@@ -87,7 +87,7 @@ class NeuralNetwork(input: Int, hidden: Array[Int]) extends Serializable with Cl
     * @param input The input to check
     * @return The network value from this input
     */
-  def value(input: Array[Double]): Array[Double] = {
+  def calculate(input: Array[Double]): Array[Double] = {
     require(_input.length == input.length, "Wrong input size")
 
     Array.copy(input, 0, _input, 0, input.length)
@@ -97,9 +97,11 @@ class NeuralNetwork(input: Int, hidden: Array[Int]) extends Serializable with Cl
       l => l.foreach(h => h.recompute())
     )
 
-    for (j <- _hidden.last.indices.toArray) yield {
-      _hidden.last(j).value
-    }
+    {
+      for (j <- _hidden.last.indices) yield {
+        _hidden.last(j).value
+      }
+    }.toArray
   }
 
   /**
