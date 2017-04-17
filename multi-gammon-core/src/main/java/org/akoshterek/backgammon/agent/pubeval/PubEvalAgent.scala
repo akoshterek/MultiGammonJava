@@ -19,13 +19,13 @@ class PubEvalAgent(override val path: Path, val contactWeights: Array[Double], v
     private val eval: PubEval = new PubEval(contactWeights, raceWeights)
 
     def evalContact(board: Board): Reward = {
-        val reward: Reward = new Reward
+        val reward = Reward.rewardArray
         val pos: Array[Int] = new Array[Int](28)
         preparePos(board, pos)
 
         val race: Int = if (curPC.getValue <= PositionClass.CLASS_RACE.getValue) 1 else 0
-        reward.data(Constants.OUTPUT_WIN) = eval.evaluate(race, pos)
-        reward
+        reward(Constants.OUTPUT_WIN) = eval.evaluate(race, pos)
+        new Reward(reward)
     }
 
     private def preparePos(board: Board, pos: Array[Int]) {

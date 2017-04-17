@@ -20,14 +20,14 @@ class RawBatch40(override val path: Path) extends AbsFlexAgent("RawBatch40", pat
   crashedFa = new SimpleEncogFA(SimpleEncogFA.loadNNFromResource("org/akoshterek/backgammon/agent/raw/Raw-GnuBg-40-crashed.eg"))
 
   override def evalContact(board: Board): Reward = {
-    new Reward(Normalizer.fromSmallerSigmoid(super.evalContact(board).data, Constants.NUM_OUTPUTS))
+    new Reward(Normalizer.fromSmallerSigmoid(super.evalContact(board).data.toArray, Constants.NUM_OUTPUTS))
   }
 
   override def evalRace(board: Board): Reward = {
-    new Reward(Normalizer.fromSmallerSigmoid(super.evalRace(board).data, Constants.NUM_OUTPUTS))
+    new Reward(Normalizer.fromSmallerSigmoid(super.evalRace(board).data.toArray, Constants.NUM_OUTPUTS))
   }
 
   override def evalCrashed(board: Board): Reward = {
-    new Reward(Normalizer.fromSmallerSigmoid(super.evalCrashed(board).data, Constants.NUM_OUTPUTS))
+    new Reward(Normalizer.fromSmallerSigmoid(super.evalCrashed(board).data.toArray, Constants.NUM_OUTPUTS))
   }
 }

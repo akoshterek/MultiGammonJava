@@ -17,12 +17,7 @@ abstract class AbsAgent(override val fullName: String, override val path: Path) 
     protected val _fullName: String = fullName
 
     override def clone: AbsAgent = {
-        try {
-            super.clone.asInstanceOf[AbsAgent]
-        }
-        catch {
-            case e: CloneNotSupportedException => throw new RuntimeException(e)
-        }
+        super.clone.asInstanceOf[AbsAgent]
     }
 
     def scoreMoves(moves: Array[Move], count: Int) {

@@ -1,6 +1,5 @@
 package org.akoshterek.backgammon.agent.raw;
 
-import org.akoshterek.backgammon.Constants;
 import org.akoshterek.backgammon.agent.AbsAgent;
 import org.akoshterek.backgammon.agent.ETraceEntry;
 import org.akoshterek.backgammon.agent.fa.NeuralNetworkFA;
@@ -128,9 +127,6 @@ public class RawRl40 extends AbsAgent implements Cloneable {
                 reward = evalContact(board);
         }
 
-        for(int i = 1; i < Constants.NUM_OUTPUTS; i++) {
-            reward.data()[i] = 0;
-        }
         return reward;
     }
 
@@ -157,17 +153,17 @@ public class RawRl40 extends AbsAgent implements Cloneable {
     private Reward calcDeltaReward(final Move move) {
         //prev reward
         Board prevBoard = Board.positionFromKey(prevEntry.auch);
-        Reward prevQValue = evaluatePosition(prevBoard, prevEntry.pc);
+        double prevQValue[] = evaluatePosition(prevBoard, prevEntry.pc).toArray();
 
         //Predicted greedy reward
-        Reward predictedGreedyReward = move.arEvalMove;
-        Reward deltaReward = new Reward();
+        double predictedGreedyReward[] = move.arEvalMove.toArray();
+        double deltaReward[] = Reward.rewardArray();
         for(int i = 0; i < 1/*Constants.NUM_OUTPUTS*/; i++) {
-            deltaReward.data()[i] = /*reward.data[i] +*/ predictedGreedyReward.data()[i] * gamma - prevQValue.data()[i];
+            deltaReward[i] = /*reward.data[i] +*/ predictedGreedyReward[i] * gamma - prevQValue[i];
             //deltaReward.data[i] *= 0.3;
         }
 
-        return deltaReward;
+        return new Reward(deltaReward);
     }
 
     private void prepareStep0() {

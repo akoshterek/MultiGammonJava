@@ -50,14 +50,14 @@ class SimpleEncogFA(override val network: BasicNetwork) extends AbsNeuralNetwork
     }
 
     override def calculateReward(input: Array[Double]): Reward = {
-        val reward: Reward = new Reward
-        network.compute(input, reward.data)
-        reward.data(0) = Normalizer.fromSmallerSigmoid(reward.data, 1)(0)
-        reward
+        val reward = Reward.rewardArray
+        network.compute(input, reward)
+        reward(0) = Normalizer.fromSmallerSigmoid(reward)(0)
+        new Reward(reward)
     }
 
     override def setReward(input: Array[Double], reward: Reward) {
-        val output = Normalizer.toSmallerSigmoid(reward.data, Constants.NUM_OUTPUTS)
+        val output = Normalizer.toSmallerSigmoid(reward.data.toArray, Constants.NUM_OUTPUTS)
         trainingSet.get(0).getInput.setData(input)
         trainingSet.get(0).getIdeal.setData(output)
         propagation.iteration()

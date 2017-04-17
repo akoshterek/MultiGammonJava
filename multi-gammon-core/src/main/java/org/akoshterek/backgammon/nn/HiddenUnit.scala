@@ -1,6 +1,6 @@
 package org.akoshterek.backgammon.nn
 
-import scala.util.Random
+import java.util.concurrent.ThreadLocalRandom
 
 object HiddenUnit {
   // the minimal and maximal initial values
@@ -14,7 +14,7 @@ object HiddenUnit {
     * 1 / (1 + e&#94;-x)
     *
     */
-  val sigmoid : Double => Double = {
+  private val sigmoid : Double => Double = {
     x => 1 / (1 + Math.exp(-x))
   }
 }
@@ -24,26 +24,12 @@ object HiddenUnit {
   * inputs.
   *
   * @param units  The input units to this unit
-  * @param activationFunction The activation function
   */
-class HiddenUnit(var units: Vector[Neuron], var activationFunction: Double => Double) extends Neuron {
+class HiddenUnit(var units: Vector[Neuron]) extends Neuron {
   // the array of input weights
   private val _weights: Array[Double] = Array[Double](units.length)
   def weights: Array[Double] = _weights
-  private val _activationFunction: Double => Double = activationFunction
-
-  /**
-    * Builds a hidden unit taking the provided number of
-    * inputs.  Sets the initial weights to be random
-    * values to be 0.
-    *
-    * @param units  The input units to this unit
-    * @param random The random number generator
-    */
-  def this(units: Vector[Neuron], random: Random, activationFunction: Double => Double) {
-    this(units, activationFunction)
-    randomizeWeights(random)
-  }
+  randomizeWeights()
 
   /**
     * Builds a hidden unit taking the provided number of
@@ -53,19 +39,18 @@ class HiddenUnit(var units: Vector[Neuron], var activationFunction: Double => Do
     * @param units   The input units to this unit
     * @param weights The weights to use
     */
-  def this(units: Vector[Neuron], weights: Vector[Double], activationFunction: Double => Double) {
-    this(units, activationFunction)
+  def this(units: Vector[Neuron], weights: Vector[Double]) {
+    this(units)
     Array.copy(weights, 0, this._weights, 0, weights.length)
   }
 
   /**
     * Generates a new weight
-    *
-    * @param random The rng
     */
-  def randomizeWeights(random: Random): Unit = {
+  def randomizeWeights(): Unit = {
+    ThreadLocalRandom.current().nextDouble(HiddenUnit.MIN_INITIAL_WEIGHT, HiddenUnit.MAX_INITIAL_WEIGHT)
     _weights.transform(
-      _ => (random.nextDouble() * (HiddenUnit.MAX_INITIAL_WEIGHT - HiddenUnit.MIN_INITIAL_WEIGHT)) + HiddenUnit.MIN_INITIAL_WEIGHT
+      _ => ThreadLocalRandom.current().nextDouble(HiddenUnit.MIN_INITIAL_WEIGHT, HiddenUnit.MAX_INITIAL_WEIGHT)
     )
   }
 
@@ -83,7 +68,7 @@ class HiddenUnit(var units: Vector[Neuron], var activationFunction: Double => Do
     * prior inputs.
     */
   override def recompute(): Unit = {
-    _value = _activationFunction(sum)
+    _value = HiddenUnit.sigmoid(sum)
   }
 
   def gradient: Double = value * (1.0 - value)

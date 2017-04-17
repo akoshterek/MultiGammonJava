@@ -36,7 +36,7 @@ object NeuralNetwork {
   * @param input  The number of input units
   * @param hidden The number of hidden units, as well as the number of layers
   */
-class NeuralNetwork(input: Int, hidden: Array[Int]) extends Serializable with Cloneable {
+class NeuralNetwork(input: Int, hidden: Int, output: Int) extends Serializable with Cloneable {
   val alpha = 0.1
   val beta = 0.1
   val lambda = 0.7
@@ -46,14 +46,11 @@ class NeuralNetwork(input: Int, hidden: Array[Int]) extends Serializable with Cl
   val _input: Array[InputUnit] = Array.fill[InputUnit](input)(new InputUnit)
 
   // Hidden layers
-  val _hidden: Array[Array[HiddenUnit]] = Array.ofDim[Array[HiddenUnit]](hidden.length)
-  for (layer <- hidden.indices) {
-    val count = hidden(layer)
-    this._hidden(layer) = layer match {
-      case 0 => Array.fill[HiddenUnit](count)(new HiddenUnit(this._input.toVector, NeuralNetwork.random, HiddenUnit.sigmoid))
-      case _ => Array.fill[HiddenUnit](count)(new HiddenUnit(this._hidden(layer - 1).toVector, NeuralNetwork.random, HiddenUnit.sigmoid))
-    }
-  }
+  val _hidden: Array[Array[HiddenUnit]] = Array.ofDim[Array[HiddenUnit]](2)
+  Array.fill[HiddenUnit](hidden)(new HiddenUnit(this._input.toVector))
+
+  //Output
+  Array.fill[HiddenUnit](output)(new HiddenUnit(this._hidden(0).toVector))
 
   /**
     * Builds a neural network based on the provided network and
@@ -62,19 +59,17 @@ class NeuralNetwork(input: Int, hidden: Array[Int]) extends Serializable with Cl
     * @param net The network to base it off of
     */
   def this(net: NeuralNetwork) {
-    this(net._input.length, for (layer <- net._hidden) yield layer.length)
+    this(net._input.length, net._hidden(0).length, net._hidden(1).length)
 
     for (i <- net._hidden.indices;
          j <- net._hidden.indices) {
       j match {
         case 0 => this._hidden(i)(j) = new HiddenUnit(
           this._input.toVector,
-          net._hidden(i)(j).weights.toVector,
-          HiddenUnit.sigmoid)
+          net._hidden(i)(j).weights.toVector)
         case _ => this._hidden(i)(j) = new HiddenUnit(
           this._hidden(i - 1).toVector,
-          net._hidden(i)(j).weights.toVector,
-          HiddenUnit.sigmoid)
+          net._hidden(i)(j).weights.toVector)
       }
     }
   }
@@ -116,5 +111,14 @@ class NeuralNetwork(input: Int, hidden: Array[Int]) extends Serializable with Cl
         stream.writeObject(this)
         stream.flush()
       })
+  }
+
+  def createEligibilityTrace: EligibilityTrace = {
+    new EligibilityTrace(_input.length, _hidden(0).length, _hidden(1).length)
+  }
+
+  final class EligibilityTrace(input: Int, hidden: Int, output: Int){
+    val Ew: Array[Array[Double]] = Array.fill[Double](hidden, output)(0)
+    var Ev: Array[Array[Array[Double]]] = Array.fill[Double](input, hidden, output)(0)
   }
 }

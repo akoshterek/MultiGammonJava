@@ -8,64 +8,73 @@ import org.akoshterek.backgammon.Constants._
   *
   *         backgammon reward
   */
-final class Reward {
-    val data: Array[Double] = new Array[Double](NUM_OUTPUTS)
+final class Reward(input: Vector[Double]) {
+  def data: Vector[Double] = input
 
-    def this(data: Array[Double]) {
-        this()
+  require(data.length == NUM_OUTPUTS)
 
-        require(data.length == NUM_OUTPUTS)
-        Array.copy(data, 0, this.data, 0, this.data.length)
+  def this(reward: Reward) {
+    this(reward.data)
+  }
+
+  def this(reward: Array[Double]) {
+    this(reward.toVector)
+  }
+
+  def this() {
+    this(Vector.fill[Double](NUM_OUTPUTS)(0))
+  }
+
+  /**
+    * Move evaluation
+    * let's keep things simple as I don't want to go into cube handling
+    * At least for now
+    *
+    * @return money equity
+    */
+  def equity: Double = {
+    data(OUTPUT_WIN) * 2.0 - 1.0
+    +(data(OUTPUT_WINGAMMON) - data(OUTPUT_LOSEGAMMON))
+    +(data(OUTPUT_WINBACKGAMMON) - data(OUTPUT_LOSEBACKGAMMON))
+  }
+
+  def invert: Reward = {
+    val res = Reward.rewardArray
+    var r: Double = .0
+    res(OUTPUT_WIN) = 1.0 - data(OUTPUT_WIN)
+    r = data(OUTPUT_WINGAMMON)
+    res(OUTPUT_WINGAMMON) = data(OUTPUT_LOSEGAMMON)
+    res(OUTPUT_LOSEGAMMON) = r
+    r = data(OUTPUT_WINBACKGAMMON)
+    res(OUTPUT_WINBACKGAMMON) = data(OUTPUT_LOSEBACKGAMMON)
+    res(OUTPUT_LOSEBACKGAMMON) = r
+    new Reward(res.toVector)
+  }
+
+  def clamp(): Reward = {
+    def crop(minVal: Double, maxVal: Double, value: Double): Double = {
+      require(minVal <= maxVal, "min is greater than max")
+      maxVal.min(minVal.max(value))
     }
 
-    def this(reward: Reward) {
-        this(reward.data)
-    }
+    new Reward(data.map(x => crop(0, 1, x)))
+  }
 
-    /**
-      * Move evaluation
-      * let's keep things simple as I don't want to go into cube handling
-      * At least for now
-      *
-      * @return money equity
-      */
-    def equity: Double = {
-        data(OUTPUT_WIN) * 2.0 - 1.0
-            + (data(OUTPUT_WINGAMMON) - data(OUTPUT_LOSEGAMMON))
-            + (data(OUTPUT_WINBACKGAMMON) - data(OUTPUT_LOSEBACKGAMMON))
-    }
+  def *(value: Double): Reward = {
+    new Reward(data.map(_ * value))
+  }
 
-    def invert: Reward = {
-        val res = new Reward()
-        var r: Double = .0
-        res.data(OUTPUT_WIN) = 1.0 - data(OUTPUT_WIN)
-        r = data(OUTPUT_WINGAMMON)
-        res.data(OUTPUT_WINGAMMON) = data(OUTPUT_LOSEGAMMON)
-        res.data(OUTPUT_LOSEGAMMON) = r
-        r = data(OUTPUT_WINBACKGAMMON)
-        res.data(OUTPUT_WINBACKGAMMON) = data(OUTPUT_LOSEBACKGAMMON)
-        res.data(OUTPUT_LOSEBACKGAMMON) = r
-        res
-    }
+  def +(that: Reward): Reward = {
+    new Reward(data.zip(that.data).map({ case (x, y) => x + y }))
+  }
 
-    def clamp(): Reward = {
-        def crop(minVal: Double, maxVal: Double, value: Double): Double = {
-            require (minVal <= maxVal, "min is greater than max")
-            maxVal.min(minVal.max(value))
-        }
+  override def toString: String = {
+    data.mkString(", ")
+  }
 
-        new Reward (data.map(x => crop(0, 1, x)))
-    }
+  def toArray : Array[Double] = data.toArray
+}
 
-    def *(value: Double): Reward = {
-        new Reward(data.map(_ * value))
-    }
-
-    def +(that: Reward): Reward = {
-        new Reward(data.zip(that.data).map( {case (x, y) => x + y}))
-    }
-
-    override def toString: String = {
-        data.mkString(", ")
-    }
+object Reward {
+  def rewardArray: Array[Double] = Array.ofDim[Double](NUM_OUTPUTS)
 }

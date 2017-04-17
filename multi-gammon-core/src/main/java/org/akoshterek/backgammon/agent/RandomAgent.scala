@@ -10,9 +10,9 @@ class RandomAgent(override val path: Path) extends AbsAgent("Random", path) {
     final private val random: Random = new Random
 
     def evalContact(board: Board): Reward = {
-        val reward: Reward = new Reward
-        reward.data(Constants.OUTPUT_WIN) = random.nextDouble
-        reward
+        val reward = Reward.rewardArray
+        reward(Constants.OUTPUT_WIN) = random.nextDouble
+        new Reward(reward)
     }
 
     override def evalRace(board: Board): Reward = {
