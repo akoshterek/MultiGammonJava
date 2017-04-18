@@ -65,7 +65,7 @@ final class Reward(input: Vector[Double]) {
   }
 
   def +(that: Reward): Reward = {
-    new Reward(data.zip(that.data).map({ case (x, y) => x + y }))
+    new Reward(Vector.tabulate[Double](NUM_OUTPUTS)(i => data(i) + that.data(i)))
   }
 
   override def toString: String = {

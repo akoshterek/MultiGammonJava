@@ -6,7 +6,7 @@ package org.akoshterek.backgammon.agent.gnubg;
  */
 public interface InputConstants {
     interface RaceInputs {
-        /** In a race position, bar and the 24 points are always empty, so only
+        /* In a race position, bar and the 24 points are always empty, so only
          *  23*4 (92) are needed */
 
         /** (0 <= k < 14), RI_OFF + k =

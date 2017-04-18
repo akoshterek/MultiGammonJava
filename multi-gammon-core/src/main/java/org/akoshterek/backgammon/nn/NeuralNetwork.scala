@@ -117,6 +117,40 @@ class NeuralNetwork(input: Int, hidden: Int, output: Int) extends Serializable w
     new EligibilityTrace(_input.length, _hidden(0).length, _hidden(1).length)
   }
 
+  def backpropWithEtraces(in: Array[Double], out: Array[Double], expected: Array[Double], et: EligibilityTrace): Unit = {
+    require(this.input == in.length && this.output == out.length && this.output == expected.length, "Wrong dimensions")
+
+    computeEligibilityTraces(in, _hidden(0).length, _hidden(1).length, et)
+    val error = Array.tabulate[Double](output)(k => expected(k) - out(k))
+
+    for (j <- _hidden(0).indices;
+         k <- out.indices) {
+      // weight from j to k, shown with learning parameter BETA
+      _hidden(1)(k).weights(j) += beta * error(k) * et.Ew(j)(k)
+
+      for (i <- in.indices) {
+        // weight from i to j, shown with learning parameter ALPHA
+        _hidden(0)(j).weights(i) += alpha * error(k) * et.Ev(i)(j)(k)
+      }
+    }
+  }
+
+  private def computeEligibilityTraces(in: Array[Double], hidden: Int, output: Int, et: EligibilityTrace): Unit = {
+    for (j <- 0 until hidden;
+         k <- 0 until output) {
+      // ew[j][k] = (lambda * ew[j][k]) + (gradient(k) * hidden[0][j])
+      et.Ew(j)(k) = (lambda * et.Ew(j)(k)) + (_hidden(1)(k).gradient * _hidden(0)(j).value)
+
+      for (i <- in.indices) {
+        // ev[i][j][k] = (lambda * ev[i][j][k]) +
+        // (gradient(k) * w[j][k] * gradient(j) * input[i])
+        et.Ev(i)(j)(k) = (lambda * et.Ev(i)(j)(k)) +
+          (_hidden(1)(k).gradient * _hidden(1)(k).weights(j)) *
+            _hidden(0)(j).gradient * in(i)
+      }
+    }
+  }
+
   final class EligibilityTrace(input: Int, hidden: Int, output: Int){
     val Ew: Array[Array[Double]] = Array.fill[Double](hidden, output)(0)
     var Ev: Array[Array[Array[Double]]] = Array.fill[Double](input, hidden, output)(0)
