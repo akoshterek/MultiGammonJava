@@ -44,9 +44,9 @@ abstract class AbsAgent(override val fullName: String, override val path: Path) 
     }
 
     private def evaluatePositionFull(anBoard: Board, pc: PositionClass): Reward = {
-        val reward: Reward = new Reward(evaluatePosition(anBoard, pc))
+        var reward: Reward = new Reward(evaluatePosition(anBoard, pc))
         if (!PositionClass.isExact(pc) && supportsSanityCheck && !isLearnMode) {
-            Evaluator.getInstance.sanityCheck(anBoard, reward)
+            reward = Evaluator.getInstance.sanityCheck(anBoard, reward)
         }
         reward
     }

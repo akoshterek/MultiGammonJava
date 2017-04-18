@@ -66,9 +66,9 @@ public class Bearoff {
         float[] ar = new float[4];
 
         ReadTwoSidedBearoff(pbc, iPos, ar);
-        Reward reward = new Reward();
-        reward.data()[OUTPUT_WIN ] = ar[ 0 ] / 2.0 + 0.5;
-        return reward;
+        double reward[] = Reward.rewardArray();
+        reward[OUTPUT_WIN ] = ar[ 0 ] / 2.0 + 0.5;
+        return new Reward(reward);
     }
 
     /**
@@ -101,7 +101,7 @@ public class Bearoff {
 
         for (i = 0; i < 2; ++i) {
             an[i] = PositionId.positionBearoff(anBoard.anBoard()[i], pbc.getnPoints(), pbc.getnChequers());
-            bearoffDist(pbc, an[i], aarProb[i], aarGammonProb[i], ar[i], null, null);
+            bearoffDist(pbc, an[i], aarProb[i], aarGammonProb[i], ar[i], null);
         }
 
         // calculate winning chance
@@ -112,8 +112,8 @@ public class Bearoff {
             }
         }
 
-        Reward arOutput = new Reward();
-        arOutput.data()[OUTPUT_WIN] = r;
+        double arOutput[] = Reward.rewardArray();
+        arOutput[OUTPUT_WIN] = r;
 
         // calculate gammon chances
         for (i = 0; i < 2; ++i) {
@@ -133,7 +133,7 @@ public class Bearoff {
                     }
                 }
 
-                arOutput.data()[OUTPUT_WINGAMMON] = r;
+                arOutput[OUTPUT_WINGAMMON] = r;
 
                 // opp gammon chance
                 r = 0;
@@ -143,7 +143,7 @@ public class Bearoff {
                     }
                 }
 
-                arOutput.data()[OUTPUT_LOSEGAMMON] = r;
+                arOutput[OUTPUT_LOSEGAMMON] = r;
             } else {
                 throw new IllegalArgumentException("Invalid bearoff database");
 //                MutableFloat g0 = new MutableFloat();
@@ -154,28 +154,28 @@ public class Bearoff {
             }
         } else {
             // no gammons possible
-            arOutput.data()[OUTPUT_WINGAMMON] = 0;
-            arOutput.data()[OUTPUT_LOSEGAMMON] = 0;
+            arOutput[OUTPUT_WINGAMMON] = 0;
+            arOutput[OUTPUT_LOSEGAMMON] = 0;
         }
 
         // no backgammons possible
-        arOutput.data()[OUTPUT_LOSEBACKGAMMON] = 0;
-        arOutput.data()[OUTPUT_WINBACKGAMMON] = 0;
-        return arOutput;
+        arOutput[OUTPUT_LOSEBACKGAMMON] = 0;
+        arOutput[OUTPUT_WINBACKGAMMON] = 0;
+        return new Reward(arOutput);
     }
 
     public static void bearoffDist(BearoffContext pbc, int nPosID,
                              float[] arProb, float[] arGammonProb,
                              float[] ar,
-                             short[] ausProb, short[] ausGammonProb) {
+                             short[] ausProb) {
         if (pbc.isTwoSided()) {
             throw new IllegalArgumentException("Invalid bearoff database");
         }
 
         if (pbc.isfND()) {
-            readBearoffOneSidedND(pbc, nPosID, arProb, arGammonProb, ar, ausProb, ausGammonProb);
+            readBearoffOneSidedND(pbc, nPosID, arProb, arGammonProb, ar, ausProb);
         } else {
-            readBearoffOneSidedExact(pbc, nPosID, arProb, arGammonProb, ar, ausProb, ausGammonProb);
+            readBearoffOneSidedExact(pbc, nPosID, arProb, arGammonProb, ar, ausProb);
         }
     }
 
@@ -194,8 +194,7 @@ public class Bearoff {
                                               int nPosID,
                                               float[] arProb, float[] arGammonProb,
                                               float[] ar,
-                                              short[] ausProb,
-                                              short[] ausGammonProb) {
+                                              short[] ausProb) {
 
         byte[] ac = new byte[16];
         int i;
@@ -218,15 +217,10 @@ public class Bearoff {
             }
         }
 
-        if ( arGammonProb != null || ausGammonProb != null) {
+        if ( arGammonProb != null) {
             for (i = 0; i < 32; ++i) {
                 r = fnd(1.0f * i, arx[2], arx[3]);
-                if(arGammonProb != null) {
-                    arGammonProb[i] = r;
-                }
-                if(ausGammonProb != null) {
-                    ausGammonProb[i] = (short)((int)(r * 65535.0f) & 0xffff);
-                }
+                arGammonProb[i] = r;
             }
         }
 
@@ -239,8 +233,7 @@ public class Bearoff {
                                                  int nPosID,
                                                  float[] arProb, float[] arGammonProb,
                                                  float[] ar,
-                                                 short[] ausProb,
-                                                 short[] ausGammonProb) {
+                                                 short[] ausProb) {
         short[] aus = new short[64];
     	// get distribution
         if (pbc.isfCompressed()) {
@@ -249,13 +242,12 @@ public class Bearoff {
             getDistUncompressed(aus, pbc, nPosID);
         }
 
-        assignOneSided(arProb, arGammonProb, ar, ausProb, ausGammonProb, aus, 32);
+        assignOneSided(arProb, arGammonProb, ar, ausProb, aus, 32);
     }
 
     private static void assignOneSided(float[] arProb, float[] arGammonProb,
                                        float[] ar,
                                        short[] ausProb,
-                                       short[] ausGammonProb,
                                        short[] ausProbx,
                                        int ausGammonProbxOffset) {
 
@@ -263,9 +255,6 @@ public class Bearoff {
 
         if ( ausProb != null)
             System.arraycopy(ausProbx, 0, ausProb, 0, 32);
-
-        if ( ausGammonProb != null)
-            System.arraycopy(ausProbx, ausGammonProbxOffset, ausGammonProb, 0, 32);
 
         if (ar != null || arProb != null || arGammonProb != null) {
             for (int i = 0; i < 32; ++i)

@@ -1,6 +1,6 @@
 package org.akoshterek.backgammon.agent.gnubg.nn;
 
-public class Sigmoid {
+class Sigmoid {
     /* e[k] = exp(k/10) / 10 */
     private static float[] e = new float[]{
         0.10000000000000001f,
@@ -117,7 +117,7 @@ public class Sigmoid {
      *  The Intel x87's `f2xm1' instruction makes calculating accurate
      *  exponentials comparatively fast, but still about 30% slower than
      *  the lookup table used here. */
-    static public float sigmoid(float xin) {
+    static float sigmoid(float xin) {
         // signbit() can be faster than a compare to 0.0
         if (xin >= 0) {
             //xin is almost always positive; we place this branch of the `if'

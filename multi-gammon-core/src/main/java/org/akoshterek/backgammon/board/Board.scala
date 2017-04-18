@@ -134,7 +134,7 @@ class Board {
         anBoard(1)(23) = 2
     }
 
-    def chequersCount: (Int, Int) = {
+    def chequersCount: Tuple2[Int, Int] = {
         val opponent = anBoard(Board.OPPONENT).sum
         val self = anBoard(Board.SELF).sum
         (opponent, self)

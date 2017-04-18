@@ -15,7 +15,7 @@ public class NeuralNet {
     private float []arHiddenThreshold;
     private float []arOutputThreshold;
 
-    public NeuralNet(int cInput, int cHidden, int cOutput, float rBetaHidden, float rBetaOutput) {
+    private NeuralNet(int cInput, int cHidden, int cOutput, float rBetaHidden, float rBetaOutput) {
         this.cInput = cInput;
         this.cHidden = cHidden;
         this.cOutput = cOutput;

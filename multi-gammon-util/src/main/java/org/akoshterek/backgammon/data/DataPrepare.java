@@ -36,12 +36,12 @@ public class DataPrepare {
 
                 String[] tokens = line.split("\\s");
                 String positionId = PositionId.positionIDFromKey(AuchKey.fromNnPosition(tokens[0]));
-                Reward reward = new Reward();
+                double reward[] = Reward.rewardArray();
                 for(int i = 0; i < Constants.NUM_OUTPUTS; i++) {
-                    reward.data()[i] = Double.parseDouble(tokens[i + 1]);
+                    reward[i] = Double.parseDouble(tokens[i + 1]);
                 }
 
-                data.put(positionId, reward);
+                data.put(positionId, new Reward(reward));
             }
 
             addMissedInversions(data);
@@ -54,12 +54,13 @@ public class DataPrepare {
     private static void saveTrainingData(final Map<String, Reward> data, final String outputFileName) {
         try(PrintWriter writer = new PrintWriter(new GZIPOutputStream(new FileOutputStream(outputFileName)))) {
             data.forEach((positionId, reward) -> {
+                double r[] = reward.toArray();
                 String s = String.format(Locale.US, "%s %f %f %f %f %f", positionId,
-                        reward.data()[0],
-                        reward.data()[1],
-                        reward.data()[2],
-                        reward.data()[3],
-                        reward.data()[4]);
+                        r[0],
+                        r[1],
+                        r[2],
+                        r[3],
+                        r[4]);
                 writer.println(s);
             });
         } catch (final Exception e) {

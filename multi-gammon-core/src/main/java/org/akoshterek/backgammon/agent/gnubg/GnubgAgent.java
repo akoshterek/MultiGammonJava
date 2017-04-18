@@ -33,8 +33,8 @@ public class GnubgAgent extends AbsAgent {
     @Override
     public Reward evalRace(final Board board) {
         double[] inputs = representation.calculateRaceInputs(board);
-        Reward reward = new Reward();
-        nnRace.evaluate(inputs, reward.data());
+        double reward[] = Reward.rewardArray();
+        nnRace.evaluate(inputs, reward);
 
         // anBoard[1] is on roll
         // total men for side not on roll
@@ -58,7 +58,7 @@ public class GnubgAgent extends AbsAgent {
         any = calculateBackgammonPossibility(board, any);
         evaluatePossibleBackgammon(board, any, reward);
         // sanity check will take care of rest
-        return reward;
+        return new Reward(reward);
     }
 
     private static int calculateBackgammonPossibility(final Board board, final int gammonsFlag) {
@@ -89,7 +89,7 @@ public class GnubgAgent extends AbsAgent {
         return any;
     }
 
-    private static void evaluatePossibleBackgammon(final Board board, final int gammonsFlag, final Reward reward) {
+    private static void evaluatePossibleBackgammon(final Board board, final int gammonsFlag, final double reward[]) {
         if ((gammonsFlag & (BG_POSSIBLE | OBG_POSSIBLE)) != 0) {
         /* side that can have the backgammon */
             int side = (gammonsFlag & BG_POSSIBLE) != 0 ? 1 : 0;
@@ -97,21 +97,21 @@ public class GnubgAgent extends AbsAgent {
 
             if (pr > 0.0) {
                 if (side == 1) {
-                    reward.data()[OUTPUT_WINBACKGAMMON] = pr;
+                    reward[OUTPUT_WINBACKGAMMON] = pr;
 
-                    if (reward.data()[OUTPUT_WINGAMMON] < reward.data()[OUTPUT_WINBACKGAMMON])
-                        reward.data()[OUTPUT_WINGAMMON] = reward.data()[OUTPUT_WINBACKGAMMON];
+                    if (reward[OUTPUT_WINGAMMON] < reward[OUTPUT_WINBACKGAMMON])
+                        reward[OUTPUT_WINGAMMON] = reward[OUTPUT_WINBACKGAMMON];
                 } else {
-                    reward.data()[OUTPUT_LOSEBACKGAMMON] = pr;
+                    reward[OUTPUT_LOSEBACKGAMMON] = pr;
 
-                    if (reward.data()[OUTPUT_LOSEGAMMON] < reward.data()[OUTPUT_LOSEBACKGAMMON])
-                        reward.data()[OUTPUT_LOSEGAMMON] = reward.data()[OUTPUT_LOSEBACKGAMMON];
+                    if (reward[OUTPUT_LOSEGAMMON] < reward[OUTPUT_LOSEBACKGAMMON])
+                        reward[OUTPUT_LOSEGAMMON] = reward[OUTPUT_LOSEBACKGAMMON];
                 }
             } else {
                 if (side == 1)
-                    reward.data()[OUTPUT_WINBACKGAMMON] = 0.0;
+                    reward[OUTPUT_WINBACKGAMMON] = 0.0;
                 else
-                    reward.data()[OUTPUT_LOSEBACKGAMMON] = 0.0;
+                    reward[OUTPUT_LOSEBACKGAMMON] = 0.0;
             }
         }
     }
@@ -119,17 +119,17 @@ public class GnubgAgent extends AbsAgent {
     @Override
     public Reward evalCrashed(final Board board) {
         double[] inputs = representation.calculateCrashedInputs(board);
-        Reward reward = new Reward();
-        nnCrashed.evaluate(inputs, reward.data());
-        return reward;
+        double[] reward = Reward.rewardArray();
+        nnCrashed.evaluate(inputs, reward);
+        return new Reward(reward);
     }
 
     @Override
     public Reward evalContact(final Board board) {
         double[] inputs = representation.calculateContactInputs(board);
-        Reward reward = new Reward();
-        nnContact.evaluate(inputs, reward.data());
-        return reward;
+        double[] reward = Reward.rewardArray();
+        nnContact.evaluate(inputs, reward);
+        return new Reward(reward);
     }
 
     @Override
