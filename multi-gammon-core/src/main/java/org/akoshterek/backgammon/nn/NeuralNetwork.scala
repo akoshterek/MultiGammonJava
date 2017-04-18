@@ -145,8 +145,7 @@ class NeuralNetwork(input: Int, hidden: Int, output: Int) extends Serializable w
         // ev[i][j][k] = (lambda * ev[i][j][k]) +
         // (gradient(k) * w[j][k] * gradient(j) * input[i])
         et.Ev(i)(j)(k) = (lambda * et.Ev(i)(j)(k)) +
-          (_hidden(1)(k).gradient * _hidden(1)(k).weights(j)) *
-            _hidden(0)(j).gradient * in(i)
+          (_hidden(1)(k).gradient * _hidden(1)(k).weights(j) * _hidden(0)(j).gradient) * in(i)
       }
     }
   }
