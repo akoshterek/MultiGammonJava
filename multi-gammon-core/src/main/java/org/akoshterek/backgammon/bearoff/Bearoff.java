@@ -146,11 +146,6 @@ public class Bearoff {
                 arOutput[OUTPUT_LOSEGAMMON] = r;
             } else {
                 throw new IllegalArgumentException("Invalid bearoff database");
-//                MutableFloat g0 = new MutableFloat();
-//                MutableFloat g1 = new MutableFloat();
-//                setGammonProb(pbc, anBoard, an[0], an[1], g0, g1);
-//                arOutput.data[OUTPUT_LOSEGAMMON] = g0.getValue();
-//                arOutput.data[OUTPUT_WINGAMMON] = g1.getValue();
             }
         } else {
             // no gammons possible
