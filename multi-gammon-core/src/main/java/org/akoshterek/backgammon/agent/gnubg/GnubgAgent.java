@@ -97,21 +97,21 @@ public class GnubgAgent extends AbsAgent {
 
             if (pr > 0.0) {
                 if (side == 1) {
-                    reward[OUTPUT_WINBACKGAMMON] = pr;
+                    reward[OUTPUT_WINBACKGAMMON()] = pr;
 
-                    if (reward[OUTPUT_WINGAMMON] < reward[OUTPUT_WINBACKGAMMON])
-                        reward[OUTPUT_WINGAMMON] = reward[OUTPUT_WINBACKGAMMON];
+                    if (reward[OUTPUT_WINGAMMON()] < reward[OUTPUT_WINBACKGAMMON()])
+                        reward[OUTPUT_WINGAMMON()] = reward[OUTPUT_WINBACKGAMMON()];
                 } else {
-                    reward[OUTPUT_LOSEBACKGAMMON] = pr;
+                    reward[OUTPUT_LOSEBACKGAMMON()] = pr;
 
-                    if (reward[OUTPUT_LOSEGAMMON] < reward[OUTPUT_LOSEBACKGAMMON])
-                        reward[OUTPUT_LOSEGAMMON] = reward[OUTPUT_LOSEBACKGAMMON];
+                    if (reward[OUTPUT_LOSEGAMMON()] < reward[OUTPUT_LOSEBACKGAMMON()])
+                        reward[OUTPUT_LOSEGAMMON()] = reward[OUTPUT_LOSEBACKGAMMON()];
                 }
             } else {
                 if (side == 1)
-                    reward[OUTPUT_WINBACKGAMMON] = 0.0;
+                    reward[OUTPUT_WINBACKGAMMON()] = 0.0;
                 else
-                    reward[OUTPUT_LOSEBACKGAMMON] = 0.0;
+                    reward[OUTPUT_LOSEBACKGAMMON()] = 0.0;
             }
         }
     }
