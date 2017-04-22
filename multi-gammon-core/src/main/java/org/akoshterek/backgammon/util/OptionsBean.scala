@@ -4,8 +4,8 @@ class OptionsBean {
   var isHelp: Boolean = false
   var isWarranty: Boolean = false
   var isLicense: Boolean = false
-  var agentNames: Array[String] = null
-  var benchmarkAgentName: String = null
+  var agentNames: Array[String] = _
+  var benchmarkAgentName: String = _
   var trainingGames: Int = 0
   var benchmarkGames: Int = 0
   var benchmarkPeriod: Int = 0

@@ -40,7 +40,7 @@ object SimpleEncogFA {
 class SimpleEncogFA(override val network: BasicNetwork) extends AbsNeuralNetworkFA(network) {
     private val trainingSet: MLDataSet = new BasicNeuralDataSet(
         Array[Array[Double]](new Array[Double](network.getInputCount)),
-        Array[Array[Double]](new Array[Double](1/*network.getOutputCount()*/))
+        Array[Array[Double]](new Array[Double](network.getOutputCount))
     )
 
     private val propagation: Propagation = new Backpropagation(network, trainingSet, 0.05, 0)

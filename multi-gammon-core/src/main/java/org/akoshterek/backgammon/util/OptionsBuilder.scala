@@ -39,7 +39,7 @@ object OptionsBuilder {
       bean.isVerbose  = commandLine.hasOption(VERBOSE_OPTION)
       bean.agentNames = commandLine.getOptionValues(AGENT_OPTION)
       bean.benchmarkAgentName = commandLine.getOptionValue(BENCH_AGENT_OPTION, DEFAULT_BENCH_AGENT)
-      bean.trainingGames = getIntOption(TRAIN_GAMES_OPTION, 10000)
+      bean.trainingGames = getIntOption(TRAIN_GAMES_OPTION, 0)
       bean.benchmarkGames = getIntOption(BENCH_GAMES_OPTION, 1000)
       bean.benchmarkPeriod = getIntOption(BENCH_PERIOD_OPTION, 10000)
     }

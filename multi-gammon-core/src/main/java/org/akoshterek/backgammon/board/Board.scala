@@ -90,8 +90,8 @@ object Board {
 }
 
 class Board {
-    clearBoard()
     val anBoard: Array[Array[Int]] = Array.ofDim[Int](2, 25)
+    clearBoard()
 
     def this(board: Board) {
         this()

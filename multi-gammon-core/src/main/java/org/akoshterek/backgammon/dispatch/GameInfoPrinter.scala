@@ -33,7 +33,7 @@ object GameInfoPrinter {
         System.out.println("%c:%s: won %+5.3f ppg\n".format(signs(0), agents(0).agent.fullName, pointDiff / numGames))
 
         val logPath: Path = Paths.get(agents(0).agent.path.toString, getLogFileName(agents))
-        val writer: PrintWriter = new PrintWriter(Files.newBufferedWriter(logPath, StandardOpenOption.APPEND))
+        val writer: PrintWriter = new PrintWriter(Files.newBufferedWriter(logPath, StandardOpenOption.APPEND, StandardOpenOption.CREATE))
         try {
             writer.println("%d;%f\n".format(agents(0).agent.playedGames, pointDiff / numGames))
         }
