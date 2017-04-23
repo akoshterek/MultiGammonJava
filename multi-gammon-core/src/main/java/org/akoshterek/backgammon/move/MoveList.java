@@ -23,7 +23,7 @@ public class MoveList {
     public double rBestScore;
     public Move[] amMoves = null;
 
-    public MoveList() {}
+    MoveList() {}
 
     public MoveList(MoveList src) {
         if (this == src) {

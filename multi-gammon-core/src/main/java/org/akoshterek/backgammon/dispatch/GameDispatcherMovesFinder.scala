@@ -27,7 +27,7 @@ class GameDispatcherMovesFinder(agents: Array[AgentEntry]) {
         val pm: Array[Move] = pml.amMoves.take(pml.cMoves)
         pml.amMoves = pm
         scoreMoves(currentMatch, pml)
-        util.Arrays.sort(pml.amMoves, 0, pml.cMoves, Move.moveComparator)
+        scala.util.Sorting.stableSort(pml.amMoves, Move.gt _)
         pml.iMoveBest = 0
     }
 
