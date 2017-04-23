@@ -20,10 +20,6 @@ abstract class AbsAgent(override val fullName: String, override val path: Path) 
         super.clone.asInstanceOf[AbsAgent]
     }
 
-    def scoreMoves(moves: Array[Move], count: Int) {
-        moves.slice(0, count).foreach(scoreMove)
-    }
-
     def scoreMove(pm: Move): Reward = {
         val anBoardTemp: Board = Board.positionFromKey(pm.auch)
         anBoardTemp.swapSides()

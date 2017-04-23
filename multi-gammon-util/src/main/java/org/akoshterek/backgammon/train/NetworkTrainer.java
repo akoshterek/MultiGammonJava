@@ -9,7 +9,9 @@ import org.akoshterek.backgammon.board.PositionClass;
 import org.akoshterek.backgammon.data.TrainDataLoader;
 import org.akoshterek.backgammon.data.TrainEntry;
 import org.akoshterek.backgammon.util.Normalizer;
-import org.encog.engine.network.activation.ActivationSigmoid;
+import org.encog.engine.network.activation.ActivationClippedLinear;
+import org.encog.engine.network.activation.ActivationLinear;
+import org.encog.engine.network.activation.ActivationRamp;
 import org.encog.mathutil.randomize.RangeRandomizer;
 import org.encog.ml.data.MLData;
 import org.encog.ml.data.MLDataPair;
@@ -68,7 +70,9 @@ public class NetworkTrainer {
 
     private NetworkHolder createLoadNetwork() {
         NetworkHolder holder = new NetworkHolder(
-                createNetwork(getInputNeuronsCount(), settings.hiddenNeuronCount(), Constants.NUM_OUTPUTS()),
+                createNetwork(getInputNeuronsCount(),
+                        settings.hiddenNeuronCount(),
+                        Constants.NUM_OUTPUTS()),
                 networkType
         );
         NetworkHolder loadedHolder = NetworkHolder.deserialize(holder, settings);
@@ -95,9 +99,9 @@ public class NetworkTrainer {
 
     private static BasicNetwork createNetwork(int inputNeurons, int hiddenNeurons, int outputNeurons) {
         BasicNetwork network = new BasicNetwork();
-        network.addLayer(new BasicLayer(null, false, inputNeurons));
-        network.addLayer(new BasicLayer(new ActivationSigmoid(), false, hiddenNeurons));
-        network.addLayer(new BasicLayer(new ActivationSigmoid(), false, outputNeurons));
+        network.addLayer(new BasicLayer(new ActivationLinear(), false, inputNeurons));
+        network.addLayer(new BasicLayer(new ActivationRamp(10, 0, 10, 0), false, hiddenNeurons));
+        network.addLayer(new BasicLayer(new ActivationClippedLinear(), false, outputNeurons));
         network.getStructure().finalizeStructure();
         (new RangeRandomizer(-0.5,0.5)).randomize(network);
         network.reset();
@@ -107,7 +111,7 @@ public class NetworkTrainer {
     private static Propagation createPropagation(NetworkHolder holder, MLDataSet trainingSet) {
         ResilientPropagation train = new ResilientPropagation(holder.getNetwork(), trainingSet);
         train.setRPROPType(RPROPType.iRPROPp);
-        StopTrainingStrategy stop = new StopTrainingStrategy(0.00001, 100);
+        StopTrainingStrategy stop = new StopTrainingStrategy(0.0001, 100);
         train.addStrategy(new SimpleEarlyStoppingStrategy(trainingSet, 10));
         train.addStrategy(stop);
 

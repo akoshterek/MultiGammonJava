@@ -24,8 +24,7 @@ class GameDispatcherMovesFinder(agents: Array[AgentEntry]) {
             pml.amMoves = null
             return
         }
-        val pm: Array[Move] = new Array[Move](pml.cMoves)
-        System.arraycopy(pml.amMoves, 0, pm, 0, pml.cMoves)
+        val pm: Array[Move] = pml.amMoves.take(pml.cMoves)
         pml.amMoves = pm
         scoreMoves(currentMatch, pml)
         util.Arrays.sort(pml.amMoves, 0, pml.cMoves, Move.moveComparator)
@@ -44,7 +43,7 @@ class GameDispatcherMovesFinder(agents: Array[AgentEntry]) {
 
     private def scoreMoves(currentMatch: MatchState, pml: MoveList) {
         val agent: Agent = agents(currentMatch.fMove).agent
-        agent.scoreMoves(pml.amMoves, pml.cMoves)
+        agent.scoreMoves(pml.amMoves)
         findBestMove(currentMatch, pml)
     }
 }

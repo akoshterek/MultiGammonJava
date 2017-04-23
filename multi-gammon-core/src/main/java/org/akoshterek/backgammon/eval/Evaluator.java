@@ -9,7 +9,6 @@ import org.akoshterek.backgammon.board.PositionId;
 import org.apache.commons.math3.distribution.UniformIntegerDistribution;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.commons.math3.random.Well19937c;
-import scala.Tuple2;
 import scala.collection.immutable.Vector;
 
 import java.nio.file.Path;
@@ -27,8 +26,6 @@ public class Evaluator {
     private final UniformIntegerDistribution distribution;
     private Path basePath;
 
-    //private BearoffContext pbcOS;
-    //private BearoffContext pbcTS;
     private BearoffContext pbc1;
     private BearoffContext pbc2;
 
@@ -107,60 +104,22 @@ public class Evaluator {
             if (Bearoff.isBearoff(pbc2, anBoard))
                 return PositionClass.CLASS_BEAROFF2;
 
-            //if (Bearoff.isBearoff(pbcTS, anBoard))
-            //    return PositionClass.CLASS_BEAROFF_TS;
-
             if (Bearoff.isBearoff(pbc1, anBoard))
                 return PositionClass.CLASS_BEAROFF1;
 
-            //if (Bearoff.isBearoff(pbcOS, anBoard))
-            //    return PositionClass.CLASS_BEAROFF_OS;
-
             return PositionClass.CLASS_RACE;
         }
-    }
-
-    private int findFirstChequer(final Board anBoard, final int side) {
-        int i;
-        for (i = 0; i < 25; i++) {
-            if (anBoard.anBoard()[side][i] != 0) {
-                break;
-            }
-        }
-
-        return i;
-    }
-
-    private int findOpponentChequer(final Board anBoard) {
-        return findFirstChequer(anBoard, Board.OPPONENT());
-    }
-
-    private int findSelfChequer(final Board anBoard) {
-        return findFirstChequer(anBoard, Board.SELF());
-    }
-
-    private int calculateChequers(final Board anBoard, final int side) {
-        Tuple2 count = anBoard.chequersCount();
-        return (int)(side == Board.SELF() ? count._2() : count._1());
-    }
-
-    private int calculateSelfChequers(final Board anBoard) {
-        return calculateChequers(anBoard, Board.SELF());
-    }
-
-    private int calculateOpponentChequers(final Board anBoard) {
-        return calculateChequers(anBoard, Board.OPPONENT());
     }
 
     public Reward evalOver(final Board anBoard) {
         final double[] arOutput = Reward.rewardArray();
         final int CHEQUERS = 15;
 
-        int i = findOpponentChequer(anBoard);
+        int i = anBoard.firstChequerIndex(Board.OPPONENT());
         if (i == 25) {
             // opponent has no pieces on board; player has lost
             arOutput[OUTPUT_WIN()] = arOutput[OUTPUT_WINGAMMON()] = arOutput[OUTPUT_WINBACKGAMMON()] = 0.0f;
-            if (CHEQUERS == calculateSelfChequers(anBoard)) {
+            if (CHEQUERS == anBoard.chequersCount(Board.SELF())) {
 			    // player still has all pieces on board; loses gammon
                 arOutput[OUTPUT_LOSEGAMMON()] = 1.0f;
 
@@ -181,13 +140,13 @@ public class Evaluator {
             return new Reward(arOutput);
         }
 
-        i = findSelfChequer(anBoard);
+        i = anBoard.firstChequerIndex(Board.SELF());
         if (i == 25) {
 		    // player has no pieces on board; wins
             arOutput[OUTPUT_WIN()] = 1.0f;
             arOutput[OUTPUT_LOSEGAMMON()] = arOutput[OUTPUT_LOSEBACKGAMMON()] = 0.0f;
 
-            if (CHEQUERS == calculateOpponentChequers(anBoard)) {
+            if (CHEQUERS == anBoard.chequersCount(Board.OPPONENT())) {
 			    // opponent still has all pieces on board; win gammon
                 arOutput[OUTPUT_WINGAMMON()] = 1.0f;
 
@@ -217,14 +176,6 @@ public class Evaluator {
     public Reward evalBearoff1(final Board anBoard) {
         return Bearoff.bearoffEval(pbc1, anBoard);
     }
-
-//    public Reward evalBearoffTS(Board anBoard) {
-//        return Bearoff.bearoffEval(pbcTS, anBoard);
-//    }
-//
-//    public Reward evalBearoffOS(Board anBoard) {
-//        return Bearoff.bearoffEval(pbcOS, anBoard);
-//    }
 
     public Reward sanityCheck(final Board board, final Reward reward) {
         int i, j, nciq;
@@ -420,7 +371,7 @@ public class Evaluator {
         }
 
         Vector<Object> bgp = BearoffGammon.getRaceBGprobs(dummy.anBoard()[1 - side]);
-        if (bgp != null) {
+        if (bgp.nonEmpty()) {
             int k = PositionId.positionBearoff(anBoard.anBoard()[side], pbc1.getnPoints(), pbc1.getnChequers());
             short[] aProb = new short[32];
             float p = 0.0f;
@@ -432,7 +383,7 @@ public class Evaluator {
                 scale *= 36;
                 for (int i = 1; i <= j + side; ++i)
                     sum += aProb[i];
-                p += ((float) bgp.apply(j)) / scale * sum;
+                p += ((float)((Long)(bgp.apply(j)))) / scale * sum;
             }
 
             p /= 65535.0;
@@ -463,7 +414,5 @@ public class Evaluator {
     private void loadBearoff() {
         pbc1 = BearoffContext.bearoffInit("/org/akoshterek/backgammon/gnu/gnubg_os0.bd");
         pbc2 = BearoffContext.bearoffInit("/org/akoshterek/backgammon/gnu/gnubg_ts0.bd");
-        //pbcOS = BearoffContext.bearoffInit("/org/akoshterek/backgammon/gnu/gnubg_os0.bd");
-        //pbcTS = BearoffContext.bearoffInit("/org/akoshterek/backgammon/gnu/gnubg_ts0.bd");
     }
 }

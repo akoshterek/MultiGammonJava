@@ -29,7 +29,7 @@ object Board {
 
         for (a <- auch.key.indices) {
             var cur: Byte = auch.key(a)
-            for (k <- 0 until 8) {
+            for (_ <- 0 until 8) {
                 if ((cur & 0x1) != 0) {
                     require(i < 2 && j < Board.HALF_BOARD_SIZE, "Invalid key")
                     newBoard.anBoard(i)(j) = (newBoard.anBoard(i)(j)+ 1).toByte
@@ -57,7 +57,7 @@ object Board {
             ach(pch + i) = Base64.base64(pchEnc.charAt(i).toByte)
         }
 
-        for (i <- 0 until 3) {
+        for (_ <- 0 until 3) {
             auchKey.key({puch += 1; puch - 1}) = ((ach(pch) << 2) | (ach(pch + 1) >> 4)).toByte
             auchKey.key({puch += 1; puch - 1}) = ((ach(pch + 1) << 4) | (ach(pch + 2) >> 2)).toByte
             auchKey.key({puch += 1; puch - 1}) = ((ach(pch + 2) << 6) | ach(pch + 3)).toByte
@@ -134,14 +134,18 @@ class Board {
         anBoard(1)(23) = 2
     }
 
-    def chequersCount: Tuple2[Int, Int] = {
-        val opponent = anBoard(Board.OPPONENT).sum
-        val self = anBoard(Board.SELF).sum
-        (opponent, self)
+    def chequersCount(side: Int): Int = anBoard(side).sum
+
+    def chequersCount: (Int, Int) = {
+        (chequersCount(Board.OPPONENT), chequersCount(Board.SELF))
     }
 
-    private def calcBackChequer: Int = {
-        anBoard(Board.SELF).lastIndexWhere(_ > 0)
+    def backChequerIndex(side: Int): Int = {
+        anBoard(side).lastIndexWhere(_ > 0)
+    }
+
+    def firstChequerIndex(side: Int): Int = {
+        anBoard(side).indexWhere(_ > 0)
     }
 
     def calcPositionKey: AuchKey = {
@@ -282,8 +286,7 @@ class Board {
 
         pm.cMoves = cMoves
         pm.cPips = cPip
-        pm.backChequer = calcBackChequer
-        //pm->cmark = CMARK_NONE;
+        pm.backChequer = backChequerIndex(Board.SELF)
 
         pm.arEvalMove = new Reward()
         pml.cMoves += 1
@@ -354,6 +357,6 @@ class Board {
     }
 
   private def clearBoard() {
-      anBoard.transform(x => Array.fill[Int](Board.HALF_BOARD_SIZE)(0))
+      anBoard.transform(_ => Array.fill[Int](Board.HALF_BOARD_SIZE)(0))
   }
 }
