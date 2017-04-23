@@ -68,7 +68,7 @@ class GameDispatcher(val agent1: Agent, val agent2: Agent) {
         }
     }
 
-    def printStatistics() = GameInfoPrinter.printStatistics(agents, numGames)
+    def printStatistics(): Unit = GameInfoPrinter.printStatistics(agents, numGames)
 
     private def startGame() {
         currentMatch = new MatchState

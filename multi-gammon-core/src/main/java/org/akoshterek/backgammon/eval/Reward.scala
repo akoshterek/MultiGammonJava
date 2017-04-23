@@ -33,9 +33,9 @@ final class Reward(input: Vector[Double]) {
     * @return money equity
     */
   def equity: Double = {
-    data(OUTPUT_WIN) * 2.0 - 1.0
-    +(data(OUTPUT_WINGAMMON) - data(OUTPUT_LOSEGAMMON))
-    +(data(OUTPUT_WINBACKGAMMON) - data(OUTPUT_LOSEBACKGAMMON))
+    (data(OUTPUT_WIN) * 2.0 - 1.0
+      +(data(OUTPUT_WINGAMMON) - data(OUTPUT_LOSEGAMMON))
+      +(data(OUTPUT_WINBACKGAMMON) - data(OUTPUT_LOSEBACKGAMMON)))
   }
 
   def invert: Reward = {
