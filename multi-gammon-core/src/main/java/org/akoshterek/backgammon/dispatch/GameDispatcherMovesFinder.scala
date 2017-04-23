@@ -1,7 +1,5 @@
 package org.akoshterek.backgammon.dispatch
 
-import java.util
-
 import org.akoshterek.backgammon.agent.Agent
 import org.akoshterek.backgammon.board.Board
 import org.akoshterek.backgammon.move.{FindData, Move, MoveGenerator, MoveList}
