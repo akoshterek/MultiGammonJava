@@ -64,8 +64,7 @@ public class BoardFormatter {
         pch.append('\n');
 
         for (y = 0; y < 4; y++) {
-            pch.append(' ');
-            pch.append('|');
+            pch.append(" |");
 
             for (x = 12; x < 18; x++) {
                 pch.append(' ');
@@ -74,11 +73,9 @@ public class BoardFormatter {
                 pch.append(' ');
             }
 
-            pch.append('|');
-            pch.append(' ');
+            pch.append("| ");
             pch.append(anBoard[0][24] > y ? 'O' : ' ');
-            pch.append(' ');
-            pch.append('|');
+            pch.append(" |");
 
             for (; x < 24; x++) {
                 pch.append(' ');
@@ -87,8 +84,7 @@ public class BoardFormatter {
                 pch.append(' ');
             }
 
-            pch.append('|');
-            pch.append(' ');
+            pch.append("| ");
 
             for (x = 0; x < 3; x++) {
                 pch.append((cOffO > 5 * x + y) ? 'O' : ' ');
@@ -102,8 +98,7 @@ public class BoardFormatter {
             pch.append('\n');
         }
 
-        pch.append(' ');
-        pch.append('|');
+        pch.append(" |");
 
         for (x = 12; x < 18; x++) {
             pch.append(' ');
@@ -111,11 +106,9 @@ public class BoardFormatter {
             pch.append(' ');
         }
 
-        pch.append('|');
-        pch.append(' ');
+        pch.append("| ");
         pch.append(achO.charAt(anBoard[0][24]));
-        pch.append(' ');
-        pch.append('|');
+        pch.append(" |");
 
         for (; x < 24; x++) {
             pch.append(' ');
@@ -124,8 +117,7 @@ public class BoardFormatter {
             pch.append(' ');
         }
 
-        pch.append('|');
-        pch.append(' ');
+        pch.append("| ");
 
         for (x = 0; x < 3; x++) {
             pch.append((cOffO > 5 * x + 4) ? 'O' : ' ');
@@ -142,8 +134,7 @@ public class BoardFormatter {
         }
         pch.append('\n');
 
-        pch.append(' ');
-        pch.append('|');
+        pch.append(" |");
 
         for (x = 11; x > 5; x--) {
             pch.append(' ');
@@ -152,11 +143,9 @@ public class BoardFormatter {
             pch.append(' ');
         }
 
-        pch.append('|');
-        pch.append(' ');
+        pch.append("| ");
         pch.append(achX.charAt(anBoard[1][24]));
-        pch.append(' ');
-        pch.append('|');
+        pch.append(" |");
 
         for (; x >= 0; x--) {
             pch.append(' ');
@@ -165,8 +154,7 @@ public class BoardFormatter {
             pch.append(' ');
         }
 
-        pch.append('|');
-        pch.append(' ');
+        pch.append("| ");
 
         for (x = 0; x < 3; x++) {
             pch.append((cOffX > 5 * x + 4) ? 'X' : ' ');
@@ -174,8 +162,7 @@ public class BoardFormatter {
         pch.append('\n');
 
         for (y = 3; y >= 0; y--) {
-            pch.append(' ');
-            pch.append('|');
+            pch.append(" |");
 
             for (x = 11; x > 5; x--) {
                 pch.append(' ');
@@ -184,11 +171,9 @@ public class BoardFormatter {
                 pch.append(' ');
             }
 
-            pch.append('|');
-            pch.append(' ');
+            pch.append("| ");
             pch.append(anBoard[1][24] > y ? 'X' : ' ');
-            pch.append(' ');
-            pch.append('|');
+            pch.append(" |");
 
             for (; x >= 0; x--) {
                 pch.append(' ');
@@ -197,8 +182,7 @@ public class BoardFormatter {
                 pch.append(' ');
             }
 
-            pch.append('|');
-            pch.append(' ');
+            pch.append("| ");
 
             for (x = 0; x < 3; x++)
                 pch.append((cOffX > 5 * x + y) ? 'X' : ' ');
