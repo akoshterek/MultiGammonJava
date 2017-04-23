@@ -30,7 +30,7 @@ public class BoardFormatter {
      *
      */
     private static String drawBoardStd(final Board board, final int fRoll, final String[] asz) {
-        String pch = "";
+        StringBuilder pch = new StringBuilder();
         int x, y;
         int cOffO = Board.TOTAL_MEN(), cOffX = Board.TOTAL_MEN();
         Board an = new Board(board);
@@ -44,183 +44,183 @@ public class BoardFormatter {
             cOffX -= anBoard[1][x];
         }
 
-        pch += String.format(" %-15s %s: ", "MultiGammon", "Position ID");
+        pch.append(String.format(" %-15s %s: ", "MultiGammon", "Position ID"));
 
         if (fRoll != 0) {
-            pch += board.positionID();
+            pch.append(board.positionID());
         } else {
             an.swapSides();
-            pch += an.positionID();
+            pch.append(an.positionID());
         }
-        pch += "              \n";
+        pch.append("              \n");
 
-        pch += fRoll != 0 ? " +13-14-15-16-17-18------19-20-21-22-23-24-+     " :
-                " +12-11-10--9--8--7-------6--5--4--3--2--1-+     ";
-        pch += "                    ";
+        pch.append(fRoll != 0 ? " +13-14-15-16-17-18------19-20-21-22-23-24-+     " :
+                " +12-11-10--9--8--7-------6--5--4--3--2--1-+     ");
+        pch.append("                    ");
 
         if (asz[0] != null) {
-            pch += asz[0];
+            pch.append(asz[0]);
         }
-        pch += '\n';
+        pch.append('\n');
 
         for (y = 0; y < 4; y++) {
-            pch += ' ';
-            pch += '|';
+            pch.append(' ');
+            pch.append('|');
 
             for (x = 12; x < 18; x++) {
-                pch += ' ';
-                pch += anBoard[1][x] > y ? 'X' :
-                        anBoard[0][23 - x] > y ? 'O' : ' ';
-                pch += ' ';
+                pch.append(' ');
+                pch.append(anBoard[1][x] > y ? 'X' :
+                        anBoard[0][23 - x] > y ? 'O' : ' ');
+                pch.append(' ');
             }
 
-            pch += '|';
-            pch += ' ';
-            pch += anBoard[0][24] > y ? 'O' : ' ';
-            pch += ' ';
-            pch += '|';
+            pch.append('|');
+            pch.append(' ');
+            pch.append(anBoard[0][24] > y ? 'O' : ' ');
+            pch.append(' ');
+            pch.append('|');
 
             for (; x < 24; x++) {
-                pch += ' ';
-                pch += anBoard[1][x] > y ? 'X' :
-                        anBoard[0][23 - x] > y ? 'O' : ' ';
-                pch += ' ';
+                pch.append(' ');
+                pch.append(anBoard[1][x] > y ? 'X' :
+                        anBoard[0][23 - x] > y ? 'O' : ' ');
+                pch.append(' ');
             }
 
-            pch += '|';
-            pch += ' ';
+            pch.append('|');
+            pch.append(' ');
 
             for (x = 0; x < 3; x++) {
-                pch += (cOffO > 5 * x + y) ? 'O' : ' ';
+                pch.append((cOffO > 5 * x + y) ? 'O' : ' ');
             }
 
-            pch += ' ';
+            pch.append(' ');
 
             if (y < 2 && asz[y + 1] != null) {
-                pch += asz[y + 1];
+                pch.append(asz[y + 1]);
             }
-            pch += '\n';
+            pch.append('\n');
         }
 
-        pch += ' ';
-        pch += '|';
+        pch.append(' ');
+        pch.append('|');
 
         for (x = 12; x < 18; x++) {
-            pch += ' ';
-            pch += anBoard[1][x] != 0 ? achX.charAt(anBoard[1][x]) : achO.charAt(anBoard[0][23 - x]);
-            pch += ' ';
+            pch.append(' ');
+            pch.append(anBoard[1][x] != 0 ? achX.charAt(anBoard[1][x]) : achO.charAt(anBoard[0][23 - x]));
+            pch.append(' ');
         }
 
-        pch += '|';
-        pch += ' ';
-        pch += achO.charAt(anBoard[0][24]);
-        pch += ' ';
-        pch += '|';
+        pch.append('|');
+        pch.append(' ');
+        pch.append(achO.charAt(anBoard[0][24]));
+        pch.append(' ');
+        pch.append('|');
 
         for (; x < 24; x++) {
-            pch += ' ';
-            pch += anBoard[1][x] != 0 ? achX.charAt(anBoard[1][x]) :
-                    achO.charAt(anBoard[0][23 - x]);
-            pch += ' ';
+            pch.append(' ');
+            pch.append(anBoard[1][x] != 0 ? achX.charAt(anBoard[1][x]) :
+                    achO.charAt(anBoard[0][23 - x]));
+            pch.append(' ');
         }
 
-        pch += '|';
-        pch += ' ';
+        pch.append('|');
+        pch.append(' ');
 
         for (x = 0; x < 3; x++) {
-            pch += (cOffO > 5 * x + 4) ? 'O' : ' ';
+            pch.append((cOffO > 5 * x + 4) ? 'O' : ' ');
         }
 
-        pch += '\n';
+        pch.append('\n');
 
-        pch += fRoll != 0 ? 'v' : '^';
-        pch += "|                  |BAR|                  |     ";
+        pch.append(fRoll != 0 ? 'v' : '^');
+        pch.append("|                  |BAR|                  |     ");
         //pch = strchr ( pch, 0 );
 
         if (asz[3] != null) {
-            pch += asz[3];
+            pch.append(asz[3]);
         }
-        pch += '\n';
+        pch.append('\n');
 
-        pch += ' ';
-        pch += '|';
+        pch.append(' ');
+        pch.append('|');
 
         for (x = 11; x > 5; x--) {
-            pch += ' ';
-            pch += anBoard[1][x] != 0 ? achX.charAt(anBoard[1][x]) :
-                    achO.charAt(anBoard[0][23 - x]);
-            pch += ' ';
+            pch.append(' ');
+            pch.append(anBoard[1][x] != 0 ? achX.charAt(anBoard[1][x]) :
+                    achO.charAt(anBoard[0][23 - x]));
+            pch.append(' ');
         }
 
-        pch += '|';
-        pch += ' ';
-        pch += achX.charAt(anBoard[1][24]);
-        pch += ' ';
-        pch += '|';
+        pch.append('|');
+        pch.append(' ');
+        pch.append(achX.charAt(anBoard[1][24]));
+        pch.append(' ');
+        pch.append('|');
 
         for (; x >= 0; x--) {
-            pch += ' ';
-            pch += anBoard[1][x] != 0 ? achX.charAt(anBoard[1][x]) :
-                    achO.charAt(anBoard[0][23 - x]);
-            pch += ' ';
+            pch.append(' ');
+            pch.append(anBoard[1][x] != 0 ? achX.charAt(anBoard[1][x]) :
+                    achO.charAt(anBoard[0][23 - x]));
+            pch.append(' ');
         }
 
-        pch += '|';
-        pch += ' ';
+        pch.append('|');
+        pch.append(' ');
 
         for (x = 0; x < 3; x++) {
-            pch += (cOffX > 5 * x + 4) ? 'X' : ' ';
+            pch.append((cOffX > 5 * x + 4) ? 'X' : ' ');
         }
-        pch += '\n';
+        pch.append('\n');
 
         for (y = 3; y >= 0; y--) {
-            pch += ' ';
-            pch += '|';
+            pch.append(' ');
+            pch.append('|');
 
             for (x = 11; x > 5; x--) {
-                pch += ' ';
-                pch += anBoard[1][x] > y ? 'X' :
-                        anBoard[0][23 - x] > y ? 'O' : ' ';
-                pch += ' ';
+                pch.append(' ');
+                pch.append(anBoard[1][x] > y ? 'X' :
+                        anBoard[0][23 - x] > y ? 'O' : ' ');
+                pch.append(' ');
             }
 
-            pch += '|';
-            pch += ' ';
-            pch += anBoard[1][24] > y ? 'X' : ' ';
-            pch += ' ';
-            pch += '|';
+            pch.append('|');
+            pch.append(' ');
+            pch.append(anBoard[1][24] > y ? 'X' : ' ');
+            pch.append(' ');
+            pch.append('|');
 
             for (; x >= 0; x--) {
-                pch += ' ';
-                pch += anBoard[1][x] > y ? 'X' :
-                        anBoard[0][23 - x] > y ? 'O' : ' ';
-                pch += ' ';
+                pch.append(' ');
+                pch.append(anBoard[1][x] > y ? 'X' :
+                        anBoard[0][23 - x] > y ? 'O' : ' ');
+                pch.append(' ');
             }
 
-            pch += '|';
-            pch += ' ';
+            pch.append('|');
+            pch.append(' ');
 
             for (x = 0; x < 3; x++)
-                pch += (cOffX > 5 * x + y) ? 'X' : ' ';
+                pch.append((cOffX > 5 * x + y) ? 'X' : ' ');
 
-            pch += ' ';
+            pch.append(' ');
 
             if (y < 2 && asz[5 - y] != null) {
-                pch += asz[5 - y];
+                pch.append(asz[5 - y]);
             }
 
-            pch += '\n';
+            pch.append('\n');
         }
 
-        pch += fRoll != 0 ? " +12-11-10--9--8--7-------6--5--4--3--2--1-+     " :
-                " +13-14-15-16-17-18------19-20-21-22-23-24-+     ";
-        pch += "                    ";
+        pch.append(fRoll != 0 ? " +12-11-10--9--8--7-------6--5--4--3--2--1-+     " :
+                " +13-14-15-16-17-18------19-20-21-22-23-24-+     ");
+        pch.append("                    ");
 
         if (asz[6] != null) {
-            pch += asz[6];
+            pch.append(asz[6]);
         }
 
-        return pch;
+        return pch.toString();
     }
 
 //    public static String fibsBoardShort(Board board) {
@@ -253,18 +253,16 @@ public class BoardFormatter {
 //    }
 
     public static String formatMovePlain(final ChequersMove anMove, final Board anBoard)  {
-        String pch = "";
+        StringBuilder pch = new StringBuilder();
         int i, j;
 
         for (i = 0; i < 4 && anMove.move()[i].from() >= 0; i++) {
-            pch += formatPointPlain(anMove.move()[i].from() + 1);
-            pch += '/';
-            pch += formatPointPlain(anMove.move()[i].to() + 1);
+            pch.append(anMove.move()[i].toString());
 
             if (anMove.move()[i].to() >= 0 && anBoard.anBoard()[0][23 - anMove.move()[i].to()] != 0) {
                 for (j = 1; ; j += 2) {
                     if (j > i) {
-                        pch += '*';
+                        pch.append('*');
                         break;
                     } else if (anMove.move()[i + 1] == anMove.move()[j]) {
                         break;
@@ -273,11 +271,11 @@ public class BoardFormatter {
             }
 
             if( i < 6 ) {
-                pch += ' ';
+                pch.append(' ');
             }
         }
 
-        return pch;
+        return pch.toString();
     }
 
     public static String formatPointPlain(final int n) {
