@@ -26,8 +26,7 @@ class HeuristicAgent(override val path: Path) extends AbsAgent("Heuristic", path
     tmpBoard.swapSides()
     val points: Array[Int] = tmpBoard.anBoard(Board.SELF)
 
-    val (_, self) = tmpBoard.chequersCount
-    val atHome: Int = 15 - self
+    val atHome: Int = 15 - tmpBoard.chequersCount(Board.SELF)
 
     // 1/15th of a point per man home
     value += atHome / 15.0
