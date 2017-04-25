@@ -50,10 +50,10 @@ public class GnubgAgent extends AbsAgent {
         totMen1 = (Integer)mens._2();
 
         if (totMen1 == 15)
-            any |= OG_POSSIBLE;
+            any |= OG_POSSIBLE();
 
         if (totMen0 == 15)
-            any |= G_POSSIBLE;
+            any |= G_POSSIBLE();
 
         any = calculateBackgammonPossibility(board, any);
         evaluatePossibleBackgammon(board, any, reward);
@@ -65,7 +65,7 @@ public class GnubgAgent extends AbsAgent {
         int any = gammonsFlag;
         int i;
 
-        if ((any & OG_POSSIBLE) != 0) {
+        if ((any & OG_POSSIBLE()) != 0) {
             for (i = 23; i >= 18; --i) {
                 if (board.anBoard()[Board.SELF()][i] > 0) {
                     break;
@@ -73,26 +73,26 @@ public class GnubgAgent extends AbsAgent {
             }
 
             if (i >= 18)
-                any |= OBG_POSSIBLE;
+                any |= OBG_POSSIBLE();
         }
 
-        if ((any & G_POSSIBLE) != 0) {
+        if ((any & G_POSSIBLE()) != 0) {
             for (i = 23; i >= 18; --i) {
                 if (board.anBoard()[Board.OPPONENT()][i] > 0)
                     break;
             }
 
             if (i >= 18)
-                any |= BG_POSSIBLE;
+                any |= BG_POSSIBLE();
         }
 
         return any;
     }
 
     private static void evaluatePossibleBackgammon(final Board board, final int gammonsFlag, final double reward[]) {
-        if ((gammonsFlag & (BG_POSSIBLE | OBG_POSSIBLE)) != 0) {
+        if ((gammonsFlag & (BG_POSSIBLE() | OBG_POSSIBLE())) != 0) {
         /* side that can have the backgammon */
-            int side = (gammonsFlag & BG_POSSIBLE) != 0 ? 1 : 0;
+            int side = (gammonsFlag & BG_POSSIBLE()) != 0 ? 1 : 0;
             float pr = Evaluator.getInstance().raceBGprob(board, side);
 
             if (pr > 0.0) {
