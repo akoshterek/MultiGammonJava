@@ -13,7 +13,7 @@ import java.nio.file.Paths
 
 class Dispatcher {
     OptionsBuilder.build()
-    private var options: OptionsBean = null
+    private var options: OptionsBean = _
 
     def init(args: Array[String]): Boolean = {
         License.printBanner()
@@ -39,7 +39,7 @@ class Dispatcher {
 
     def run() {
         val elapsedTime: Long = time {
-            val agentNames: Vector[String] = options.agentNames.toVector
+            val agentNames: Vector[String] = options.agentNames
             val benchAgenName: String = options.benchmarkAgentName
 
             agentNames.par.foreach { agentName => runAgentIteration(agentName,
