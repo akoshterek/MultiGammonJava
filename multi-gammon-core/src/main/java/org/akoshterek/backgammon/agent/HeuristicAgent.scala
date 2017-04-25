@@ -20,37 +20,38 @@ class HeuristicAgent(override val path: Path) extends AbsAgent("Heuristic", path
   }
 
   def evalContact(board: Board): Reward = {
+    val tmpBoard: Board = board.clone().swapSides()
     val reward = Reward.rewardArray
-    var value: Double = 0
-    val tmpBoard: Board = new Board(board)
-    tmpBoard.swapSides()
-    val points: Array[Int] = tmpBoard.anBoard(Board.SELF)
+    reward(Constants.OUTPUT_WIN) = evaluate(tmpBoard.anBoard(Board.SELF).toVector)
+    new Reward(reward)
+  }
 
-    val atHome: Int = 15 - tmpBoard.chequersCount(Board.SELF)
+  private def evaluate(points: Vector[Int]): Double = {
+    var equity: Double = 0.0
+    val atHome: Int = 15 - points.sum
 
     // 1/15th of a point per man home
-    value += atHome / 15.0
+    equity += atHome / 15.0
 
     // -1/5th of a point per man on the bar
-    value -= points(Board.BAR) / 5.0
+    equity -= points(Board.BAR) / 5.0
 
     for (i <- 0 until Board.HALF_BOARD_SIZE - 1) {
       // -1/10th of a point for each blot
-      // +1/20th for contiguous points
       if (points(i) == 1) {
-        value -= 0.10
+        equity -= 0.10
       }
+      // +1/20th for contiguous points
       else if (i > 0 && points(i) >= 2 && points(i - 1) >= 2) {
-        value += 0.05
+        equity += 0.05
       }
 
       val dist: Int = 25 - i
 
       // value based on closeness to home
-      value += (12.5 - dist) * points(i).toDouble / 225.0
+      equity += (12.5 - dist) * points(i).toDouble / 225.0
     }
-    reward(Constants.OUTPUT_WIN) = value
 
-    new Reward(reward)
+    equity
   }
 }

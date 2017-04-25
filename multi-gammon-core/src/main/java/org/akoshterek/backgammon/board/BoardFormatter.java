@@ -33,7 +33,7 @@ public class BoardFormatter {
         StringBuilder pch = new StringBuilder();
         int x, y;
         int cOffO = Board.TOTAL_MEN(), cOffX = Board.TOTAL_MEN();
-        Board an = new Board(board);
+        Board an = board.clone();
         int[][] anBoard = board.anBoard();
 
         String achX = "     X6789ABCDEF";
