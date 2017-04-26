@@ -16,7 +16,7 @@
     <properties>
         <skipTests>true</skipTests>
         <version>0.1</version>
-        <scala.version>2.12.1</scala.version>
+        <scala.version>2.12.2</scala.version>
     </properties>
 
     <dependencyManagement>
