@@ -79,7 +79,7 @@ trait Agent {
     def currentBoard: Board = _currentBoard
 
     def currentBoard_=(board: Board): Unit = {
-        _currentBoard = new Board(board)
+        _currentBoard = board.clone()
         curPC = Evaluator.getInstance.classifyPosition(currentBoard)
     }
 

@@ -47,7 +47,7 @@ object MoveGenerator {
                 anMoves.move(nMoveDepth).from = 24
                 anMoves.move(nMoveDepth).to = 24 - anRoll(nMoveDepth)
 
-                val anBoardNew: Board = new Board(board)
+                val anBoardNew: Board = board.clone()
                 anBoardNew.applySubMove(24, anRoll(nMoveDepth), fCheckLegal = true)
 
                 if (generateMovesSub(anBoardNew, pml, anRoll, nMoveDepth + 1, 23, cPip + anRoll(nMoveDepth), anMoves, fPartial)) {
@@ -63,7 +63,7 @@ object MoveGenerator {
                     anMoves.move(nMoveDepth).from = i
                     anMoves.move(nMoveDepth).to = i - anRoll(nMoveDepth)
 
-                    val anBoardNew: Board = new Board(board)
+                    val anBoardNew: Board = board.clone()
                     anBoardNew.applySubMove(i, anRoll(nMoveDepth), fCheckLegal = true)
 
                     if (generateMovesSub(anBoardNew, pml, anRoll, nMoveDepth + 1,

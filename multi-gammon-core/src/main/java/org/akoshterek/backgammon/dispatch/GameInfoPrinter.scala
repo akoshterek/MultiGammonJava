@@ -46,7 +46,7 @@ object GameInfoPrinter {
   def printBoard(agents: Array[AgentEntry], matchState: MatchState, matchMoves: util.Deque[MatchMove]) {
     val apch: Array[String] = new Array[String](7)
 
-    val an: Board = new Board(matchState.board)
+    val an: Board = matchState.board.clone()
     if (matchState.fMove == 0) {
       an.swapSides()
     }
