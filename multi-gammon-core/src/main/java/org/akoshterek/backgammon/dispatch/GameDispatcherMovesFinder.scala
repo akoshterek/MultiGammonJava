@@ -5,18 +5,18 @@ import org.akoshterek.backgammon.board.Board
 import org.akoshterek.backgammon.move.{FindData, Move, MoveGenerator, MoveList}
 import org.akoshterek.backgammon.matchstate.MatchState
 /**
-  * @author oleksii.koshterek
+  * @author Alex
   *         On: 22.05.16
   */
 class GameDispatcherMovesFinder(agents: Array[AgentEntry]) {
 
     def findMove(currentMatch: MatchState, pfd: FindData, amMoves: Array[Move]) {
-        findAndSaveBestMoves(currentMatch, pfd.ml, amMoves, currentMatch.anDice(0), currentMatch.anDice(1), pfd.board)
+        findAndSaveBestMoves(currentMatch, pfd.ml, amMoves, currentMatch.anDice, pfd.board)
     }
 
     private def findAndSaveBestMoves(currentMatch: MatchState, pml: MoveList, amMoves: Array[Move],
-                                     nDice0: Int, nDice1: Int, anBoard: Board) {
-        MoveGenerator.generateMoves(anBoard, pml, amMoves, nDice0, nDice1, fPartial = false)
+                                     dice: (Int, Int), anBoard: Board) {
+        MoveGenerator.generateMoves(anBoard, pml, amMoves, dice)
         agents(currentMatch.fMove).agent.currentBoard = currentMatch.board
         if (pml.cMoves == 0) {
             pml.amMoves = null

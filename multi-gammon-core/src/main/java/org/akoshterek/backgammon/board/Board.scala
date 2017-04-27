@@ -248,24 +248,10 @@ class Board extends Cloneable {
     nBack <= 5 && (iSrc == nBack || iDest == -1)
   }
 
-  def saveMoves(pml: MoveList, cMoves: Int, cPip: Int, anMoves: ChequersMove, fPartial: Boolean) {
-    var pm: Move = null
-
-    if (fPartial) {
-      //Save all moves, even incomplete ones
-      if (cMoves > pml.cMaxMoves) {
-        pml.cMaxMoves = cMoves
-      }
-
-      if (cPip > pml.cMaxPips) {
-        pml.cMaxPips = cPip
-      }
-    }
-    else {
+  def saveMoves(pml: MoveList, cMoves: Int, cPip: Int, anMoves: ChequersMove) {
       //Save only legal moves: if the current move moves plays less
       //chequers or pips than those already found, it is illegal; if
       //it plays more, the old moves are illegal.
-
       if (cMoves < pml.cMaxMoves || cPip < pml.cMaxPips)
         return
 
@@ -274,9 +260,8 @@ class Board extends Cloneable {
 
       pml.cMaxMoves = cMoves
       pml.cMaxPips = cPip
-    }
 
-    pm = pml.amMoves(pml.cMoves)
+    val pm: Move = pml.amMoves(pml.cMoves)
     val auch: AuchKey = calcPositionKey
 
     for (i <- 0 until pml.cMoves) {
@@ -300,24 +285,11 @@ class Board extends Cloneable {
 
     pm.arEvalMove = new Reward()
     pml.cMoves += 1
-    assert(pml.cMoves < MoveList.MAX_INCOMPLETE_MOVES)
+    require(pml.cMoves < MoveList.MAX_INCOMPLETE_MOVES)
   }
 
   def locateMove(anMove: ChequersMove, pml: MoveList): Int = {
-    val key: AuchKey = calcMoveKey(anMove)
-    var result = 0
-
-    breakable {
-      for (i <- 0 until pml.cMoves) {
-        val auch: AuchKey = calcMoveKey(pml.amMoves(i).anMove)
-        if (auch == key) {
-          result = i
-          break
-        }
-      }
-    }
-
-    result
+    pml.amMoves.take(pml.cMoves).indexWhere(m => calcMoveKey(anMove) == calcMoveKey(m.anMove))
   }
 
   private def calcMoveKey(anMove: ChequersMove): AuchKey = {
