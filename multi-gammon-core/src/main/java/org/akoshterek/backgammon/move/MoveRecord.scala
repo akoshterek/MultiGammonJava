@@ -15,7 +15,7 @@ class MoveRecord {
 
   // luck analysis (shared between MOVE_SETDICE and MOVE_NORMAL)
   // dice rolled
-  val anDice: Array[Int] = Array[Int](0, 0)
+  var anDice: (Int, Int) = (0, 0)
   // evaluation of the moves
   var ml: MoveList = new MoveList
 

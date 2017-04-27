@@ -39,8 +39,8 @@ object GameInfoPrinter {
     })
   }
 
-  def printRoll(agents: Array[AgentEntry], dice: Array[Int]) {
-    System.out.println("%s rolls %d, %s rolls %d.".format(agents(0).agent.fullName, dice(0), agents(1).agent.fullName, dice(1)))
+  def printRoll(agents: Array[AgentEntry], dice: (Int, Int)) {
+    System.out.println("%s rolls %d, %s rolls %d.".format(agents(0).agent.fullName, dice._1, agents(1).agent.fullName, dice._2))
   }
 
   def printBoard(agents: Array[AgentEntry], matchState: MatchState, matchMoves: util.Deque[MatchMove]) {
@@ -57,9 +57,9 @@ object GameInfoPrinter {
     //apch[5] = String.format("%d point(s)", match.anScore[1]);
     apch(if (matchState.fMove != 0) 4 else 2) = ""
 
-    if (matchState.anDice(0) != 0) {
+    if (matchState.anDice._1 != 0) {
       val agentName = if (matchState.fTurn == 0) apch(0) else apch(6)
-      System.out.println("%s rolled %d %d".format(agentName, matchState.anDice(0), matchState.anDice(1)))
+      System.out.println("%s rolled %d %d".format(agentName, matchState.anDice._1, matchState.anDice._2))
     }
     else {
       System.out.println(if (matchState.board.gameStatus != 0) "On roll" else "")
