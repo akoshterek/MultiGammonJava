@@ -12,8 +12,6 @@ import org.akoshterek.backgammon.move.Move
 import org.akoshterek.backgammon.move.MoveList
 import org.akoshterek.backgammon.util.Base64
 
-import scala.util.control.Breaks._
-
 object Board {
   val OPPONENT: Int = 0
   val SELF: Int = 1
@@ -179,10 +177,10 @@ class Board extends Cloneable {
     PositionId.positionIDFromKey(auch)
   }
 
-  private def applyMove(anMove: ChequersMove, fCheckLegal: Boolean): Boolean = {
+  private def applyMove(anMove: ChequersMove): Boolean = {
     var i: Int = 0
     while (i < anMove.move.length && anMove.move(i).from >= 0) {
-      if (!applySubMove(anMove.move(i).from, anMove.move(i).to - anMove.move(i).from, fCheckLegal)) {
+      if (!applySubMove(anMove.move(i).from, anMove.move(i).to - anMove.move(i).from, fCheckLegal = false)) {
         return false
       }
       i += 1
@@ -289,12 +287,13 @@ class Board extends Cloneable {
   }
 
   def locateMove(anMove: ChequersMove, pml: MoveList): Int = {
+    //TODO: add equals
     pml.amMoves.take(pml.cMoves).indexWhere(m => calcMoveKey(anMove) == calcMoveKey(m.anMove))
   }
 
   private def calcMoveKey(anMove: ChequersMove): AuchKey = {
     val anBoardMove: Board = new Board(this)
-    anBoardMove.applyMove(anMove, fCheckLegal = false)
+    anBoardMove.applyMove(anMove)
     anBoardMove.calcPositionKey
   }
 
