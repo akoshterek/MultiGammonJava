@@ -177,15 +177,9 @@ class Board extends Cloneable {
   }
 
   private def applyMove(anMove: ChequersMove): Boolean = {
-    var i: Int = 0
-    while (i < anMove.move.length && anMove.move(i).from >= 0) {
-      if (!applySubMove(anMove.move(i).from, anMove.move(i).to - anMove.move(i).from, fCheckLegal = false)) {
-        return false
-      }
-      i += 1
-    }
-
-    true
+    !anMove.move.exists(m => {
+      m.from >= 0 && !applySubMove(m.from, m.to - m.from, fCheckLegal = false)
+    })
   }
 
   def applySubMove(iSrc: Int, nRoll: Int, fCheckLegal: Boolean): Boolean = {
