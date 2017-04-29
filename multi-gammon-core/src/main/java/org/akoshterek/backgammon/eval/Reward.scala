@@ -25,6 +25,8 @@ final class Reward(input: Vector[Double]) {
     this(Vector.fill[Double](NUM_OUTPUTS)(0))
   }
 
+  def apply(index: Int): Double = data.apply(index)
+
   /**
     * Move evaluation
     * let's keep things simple as I don't want to go into cube handling
