@@ -2,8 +2,7 @@ package org.akoshterek.backgammon.dispatch
 
 import org.akoshterek.backgammon.board.Board
 import org.akoshterek.backgammon.board.BoardFormatter
-import org.akoshterek.backgammon.matchstate.MatchMove
-import org.akoshterek.backgammon.matchstate.MatchState
+import org.akoshterek.backgammon.matchstate.{GameResult, MatchMove, MatchState}
 import org.akoshterek.backgammon.move.ChequersMove
 import org.akoshterek.backgammon.move.MoveRecord
 import java.io.PrintWriter
@@ -13,6 +12,7 @@ import java.nio.file.Paths
 import java.nio.file.StandardOpenOption
 import java.util
 
+import org.apache.commons.lang3.StringUtils
 import resource.managed
 
 object GameInfoPrinter {
@@ -62,21 +62,21 @@ object GameInfoPrinter {
       System.out.println("%s rolled %d %d".format(agentName, matchState.anDice._1, matchState.anDice._2))
     }
     else {
-      System.out.println(if (matchState.board.gameStatus != 0) "On roll" else "")
+      System.out.println(if (matchState.board.gameResult != GameResult.PLAYING) "On roll" else "")
     }
 
     System.out.println(BoardFormatter.drawBoard(an, matchState.fMove, apch))
 
-    if (!matchMoves.isEmpty && !matchMoves.getLast.moveRecords.isEmpty) {
-      val pmr: MoveRecord = matchMoves.getLast.moveRecords.getLast
-      if (pmr.sz != null && !pmr.sz.isEmpty) {
+    if (!matchMoves.isEmpty && matchMoves.getLast.moveRecords.nonEmpty) {
+      val pmr: MoveRecord = matchMoves.getLast.moveRecords.last
+      if (!StringUtils.isEmpty(pmr.sz)) {
         System.out.println(pmr.sz)
       }
     }
   }
 
   def printWin(agents: Array[AgentEntry], matchState: MatchState, fWinner: Int, nPoints: Int) {
-    val n: Int = matchState.board.gameStatus
+    val n: Int = matchState.board.gameResult.value
     System.out.println("%s wins a %s and %d point(s).\n".format(
       agents(fWinner).agent.fullName,
       gameResult(n - 1), nPoints))
@@ -105,10 +105,10 @@ object GameInfoPrinter {
     }
   }
 
-  def printGameOver(agents: Array[AgentEntry], fWinner: Int, nPoints: Int, result: Int) {
+  def printGameOver(agents: Array[AgentEntry], fWinner: Int, nPoints: Int, result: GameResult) {
     val sign: Char = if (fWinner != 0) 'X' else 'O'
     System.out.println("Game over.\n%c:%s wins a %s and %d point(s)\n".format(
-      sign, agents(fWinner).agent.fullName, gameResult(result - 1), nPoints))
+      sign, agents(fWinner).agent.fullName, gameResult(result.value - 1), nPoints))
   }
 
   private def getLogFileName(agents: Array[AgentEntry]): String = {

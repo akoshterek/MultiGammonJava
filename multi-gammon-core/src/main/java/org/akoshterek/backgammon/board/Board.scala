@@ -6,6 +6,7 @@ import org.akoshterek.backgammon.Constants.OUTPUT_WINBACKGAMMON
 import org.akoshterek.backgammon.Constants.OUTPUT_WINGAMMON
 import org.akoshterek.backgammon.eval.Reward
 import org.akoshterek.backgammon.eval.Evaluator
+import org.akoshterek.backgammon.matchstate.GameResult
 import org.akoshterek.backgammon.move.AuchKey
 import org.akoshterek.backgammon.move.ChequersMove
 import org.akoshterek.backgammon.move.Move
@@ -96,14 +97,12 @@ object Board {
 class Board extends Cloneable {
   val anBoard: Array[Array[Int]] = Array.ofDim[Int](2, 25)
 
-  private def this(board: Board) {
-    this()
-    System.arraycopy(board.anBoard(0), 0, this.anBoard(0), 0, this.anBoard(0).length)
-    System.arraycopy(board.anBoard(1), 0, this.anBoard(1), 0, this.anBoard(1).length)
-  }
-
   override def clone(): Board = {
-    new Board(this)
+    val board = new Board
+    for (i <- this.anBoard.indices) {
+      Array.copy(this.anBoard(i), 0, board.anBoard(i), 0, Board.HALF_BOARD_SIZE)
+    }
+    board
   }
 
   def swapSides(): Board = {
@@ -113,20 +112,20 @@ class Board extends Cloneable {
     this
   }
 
-  def gameStatus: Int = {
-    if (Evaluator.getInstance.classifyPosition(this) ne PositionClass.CLASS_OVER) {
-      return 0
-    }
-
-    val ar: Reward = Evaluator.getInstance.evalOver(this)
-    if (ar.data(OUTPUT_WINBACKGAMMON) != 0 || ar.data(OUTPUT_LOSEBACKGAMMON) != 0) {
-      3
-    }
-    else if (ar.data(OUTPUT_WINGAMMON) != 0 || ar.data(OUTPUT_LOSEGAMMON) != 0) {
-      2
-    }
-    else {
-      1
+  def gameResult: GameResult = {
+    if (Evaluator.getInstance.classifyPosition(this) != PositionClass.CLASS_OVER) {
+      GameResult.PLAYING
+    } else {
+      val ar: Reward = Evaluator.getInstance.evalOver(this)
+      if (ar(OUTPUT_WINBACKGAMMON) != 0 || ar(OUTPUT_LOSEBACKGAMMON) != 0) {
+        GameResult.BACKGAMMON
+      }
+      else if (ar(OUTPUT_WINGAMMON) != 0 || ar(OUTPUT_LOSEGAMMON) != 0) {
+        GameResult.GAMMON
+      }
+      else {
+        GameResult.SINGLE
+      }
     }
   }
 
@@ -287,12 +286,12 @@ class Board extends Cloneable {
   }
 
   def locateMove(anMove: ChequersMove, pml: MoveList): Int = {
-    //TODO: add equals
-    pml.amMoves.take(pml.cMoves).indexWhere(m => calcMoveKey(anMove) == calcMoveKey(m.anMove))
+    val moveKey = calcMoveKey(anMove)
+    pml.amMoves.take(pml.cMoves).indexWhere(m => moveKey == calcMoveKey(m.anMove))
   }
 
   private def calcMoveKey(anMove: ChequersMove): AuchKey = {
-    val anBoardMove: Board = new Board(this)
+    val anBoardMove: Board = clone()
     anBoardMove.applyMove(anMove)
     anBoardMove.calcPositionKey
   }
