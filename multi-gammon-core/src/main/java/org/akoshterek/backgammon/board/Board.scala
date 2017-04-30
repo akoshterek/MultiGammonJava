@@ -72,10 +72,7 @@ object Board {
 
     auchKey.key(puch) = ((ach(pch) << 2) | (ach(pch + 1) >> 4)).toByte
     val anBoard: Board = positionFromKey(auchKey)
-    if (!anBoard.checkPosition) {
-      throw new IllegalArgumentException("Invalid PositionID")
-    }
-
+    require(anBoard.checkPosition, "Invalid PositionID")
     anBoard
   }
 
