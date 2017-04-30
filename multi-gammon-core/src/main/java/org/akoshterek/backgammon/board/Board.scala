@@ -287,13 +287,8 @@ class Board extends Cloneable {
   }
 
   private def checkSamePoint: Boolean = {
-    for (i <- 0 until 24) {
-      if (anBoard(0)(i) != 0 && anBoard(1)(23 - i) != 0) {
-        return false
-      }
-    }
-
-    true
+    !(0 until 24)
+      .exists(i => anBoard(Board.OPPONENT)(i) != 0 && anBoard(Board.SELF)(23 - i) != 0)
   }
 
   private def checkPosition: Boolean = {
