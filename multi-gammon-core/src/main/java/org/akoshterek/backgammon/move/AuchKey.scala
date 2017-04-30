@@ -38,13 +38,15 @@ class AuchKey() {
     }
   }
 
-  private def canEqual(that: Any) = that.isInstanceOf[AuchKey]
-
   override def equals(that: Any): Boolean = {
     that match {
-      case that: AuchKey => that.canEqual(this) && this.key.sameElements(that.key)
+      case that: AuchKey => this.key.sameElements(that.key)
       case _ => false
     }
+  }
+
+  override def hashCode: Int = {
+    31 + key.toSeq.hashCode()
   }
 
   override def toString: String = {
