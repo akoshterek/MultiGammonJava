@@ -269,8 +269,9 @@ class Board extends Cloneable {
 
           pm.arEvalMove = new Reward()
           pml.cMoves += 1
-          require(pml.cMoves < MoveList.MAX_INCOMPLETE_MOVES)
       }
+
+      require(pml.cMoves < MoveList.MAX_INCOMPLETE_MOVES)
     }
   }
 
