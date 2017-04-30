@@ -248,9 +248,8 @@ class Board extends Cloneable {
       pml.cMaxMoves = cMoves
       pml.cMaxPips = cPip
 
-      val pm: Move = pml.amMoves(pml.cMoves)
       val auch: AuchKey = calcPositionKey
-
+      //TODO: refactor to ListBuffer
       pml.amMoves
         .take(pml.cMoves)
         .filter(m => auch == m.auch && (cMoves > m.cMoves || cPip > m.cPips))
@@ -260,6 +259,7 @@ class Board extends Cloneable {
           m.cMoves = cMoves
           m.cPips = cPip
         case null =>
+          val pm: Move = pml.amMoves(pml.cMoves)
           pm.anMove.copyFrom(anMoves)
           pm.auch = auch
 
