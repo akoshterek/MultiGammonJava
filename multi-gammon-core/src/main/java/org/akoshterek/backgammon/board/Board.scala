@@ -72,10 +72,7 @@ object Board {
 
     auchKey.key(puch) = ((ach(pch) << 2) | (ach(pch + 1) >> 4)).toByte
     val anBoard: Board = positionFromKey(auchKey)
-    if (!anBoard.checkPosition) {
-      throw new IllegalArgumentException("Invalid PositionID")
-    }
-
+    require(anBoard.checkPosition, "Invalid PositionID")
     anBoard
   }
 
@@ -292,24 +289,21 @@ class Board extends Cloneable {
   }
 
   private def checkPosition: Boolean = {
-    // Check for a player with over 15 chequers
     val (opponent, self) = chequersCount
     if (opponent > 15 || self > 15) {
-      return false
+      // Check for a player with over 15 chequers
+      false
+    } else if (!checkSamePoint) {
+      // Check for both players having chequers on the same point
+      false
+    } else {
+      // Check for both players on the bar against closed boards
+      if ((0 until 6).exists(i => anBoard(Board.OPPONENT)(i) < 2 || anBoard(Board.SELF)(i) < 2)) {
+        true
+      } else {
+        anBoard(Board.OPPONENT)(Board.BAR) == 0 || anBoard(Board.SELF)(Board.BAR) == 0
+      }
     }
-
-    // Check for both players having chequers on the same point
-    if (!checkSamePoint) {
-      return false
-    }
-
-    // Check for both players on the bar against closed boards
-    for (i <- 0 until 6) {
-      if (anBoard(Board.OPPONENT)(i) < 2 || anBoard(Board.SELF)(i) < 2)
-        return true
-    }
-
-    anBoard(0)(Board.BAR) == 0 || anBoard(1)(Board.BAR) == 0
   }
 
   override def equals(that: Any): Boolean = {
