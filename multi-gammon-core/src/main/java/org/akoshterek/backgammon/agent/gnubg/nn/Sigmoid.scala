@@ -1,8 +1,8 @@
-package org.akoshterek.backgammon.agent.gnubg.nn;
+package org.akoshterek.backgammon.agent.gnubg.nn
 
-class Sigmoid {
-    /* e[k] = exp(k/10) / 10 */
-    private static float[] e = new float[]{
+object Sigmoid {
+    // e[k] = exp(k/10) / 10
+    private val e: Vector[Float]  = Vector(
         0.10000000000000001f,
         0.11051709180756478f,
         0.12214027581601698f,
@@ -103,10 +103,10 @@ class Sigmoid {
         1631.7607198015421f,
         1803.3744927828525f,
         1993.0370438230298f,
-        1993.0370438230298f /* one extra :-) */
-    };
+        1993.0370438230298f // one extra :-)
+    )
 
-    /** Calculate an approximation to the sigmoid function 1 / ( 1 + e^x ).
+    /** Calculate an approximation to the sigmoid function 1 / ( 1 + e&#94;x ).
      *  This is executed very frequently during neural net evaluation, so
      *  careful optimisation here pays off.
      *
@@ -114,32 +114,31 @@ class Sigmoid {
      *  * >99% of the time, x is positive.
      *  *  82% of the time, 3 < abs(x) < 8.
      *
-     *  The Intel x87's `f2xm1' instruction makes calculating accurate
+     *  The Intel x87's f2xm1 instruction makes calculating accurate
      *  exponentials comparatively fast, but still about 30% slower than
      *  the lookup table used here. */
-    static float sigmoid(float xin) {
-        // signbit() can be faster than a compare to 0.0
+    def sigmoid(xin: Float): Float = {
         if (xin >= 0) {
             //xin is almost always positive; we place this branch of the `if'
             //first, in the hope that the compiler/processor will predict the
             //conditional branch will not be taken.
             if (xin < 10.0f) {
                 // again, predict the branch not to be taken
-                float x1 = 10.0f * xin;
-                int i = (int) x1;
+                val x1 = 10.0f * xin
+                val i = x1.toInt
 
-                return 1 / (1 + e[i] * ((10 - i) + x1));
+                1 / (1 + e(i) * ((10 - i) + x1))
             } else {
-                return 1.0f / 19931.370438230298f;
+                1.0f / 19931.370438230298f
             }
         } else {
             if (xin > -10.0f) {
-                float x1 = -10.0f * xin;
-                int i = (int) x1;
+                val x1 = -10.0f * xin
+                val i = x1.toInt
 
-                return 1 - 1 / (1 + e[i] * ((10 - i) + x1));
+                1 - 1 / (1 + e(i) * ((10 - i) + x1))
             } else {
-                return 19930.370438230298f / 19931.370438230298f;
+                19930.370438230298f / 19931.370438230298f
             }
         }
     }
