@@ -12,14 +12,9 @@ class ChequersMove {
     move = for (e <- o.move) yield e.clone()
   }
 
-  private def sort() {
-    scala.util.Sorting.quickSort(move)
-  }
-
   override def toString: String = {
-    sort()
     val builder: StringBuilder = new StringBuilder
-    move.foreach(aMove => builder.append(aMove.toString))
+    move.sorted.foreach(aMove => builder.append(aMove.toString))
     builder.toString
   }
 }
