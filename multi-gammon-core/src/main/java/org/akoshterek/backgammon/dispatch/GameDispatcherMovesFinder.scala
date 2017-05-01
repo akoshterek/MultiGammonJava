@@ -31,6 +31,7 @@ class GameDispatcherMovesFinder(agents: Array[AgentEntry]) {
   }
 
   private def findBestMove(currentMatch: MatchState, pml: MoveList) {
+    // TODO: remove this useless shit
     pml.rBestScore = Integer.MIN_VALUE
     for (i <- 0 until pml.cMoves) {
       if (pml.amMoves(i).rScore > pml.rBestScore) {
