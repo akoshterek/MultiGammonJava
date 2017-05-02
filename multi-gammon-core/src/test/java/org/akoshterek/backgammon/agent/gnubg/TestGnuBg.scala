@@ -1,14 +1,11 @@
 package org.akoshterek.backgammon.agent.gnubg
 
-import org.akoshterek.backgammon.agent.Agent
 import org.akoshterek.backgammon.board.Board
 import org.akoshterek.backgammon.board.PositionClass
 import org.akoshterek.backgammon.eval.Evaluator
-import org.akoshterek.backgammon.eval.Reward
 import org.junit.Assert
 import org.junit.BeforeClass
 import org.junit.Test
-import java.nio.file.Path
 import java.nio.file.Paths
 
 /**
