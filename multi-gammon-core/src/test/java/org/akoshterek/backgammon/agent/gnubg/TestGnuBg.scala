@@ -30,7 +30,7 @@ class TestGnuBg {
     System.out.println(positionId)
     val board = Board.positionFromID(positionId)
     val pc = Evaluator.getInstance.classifyPosition(board)
-    Assert.assertTrue(pc eq PositionClass.CLASS_CONTACT)
+    Assert.assertTrue(pc == PositionClass.CLASS_CONTACT)
     val reward = agent.evaluatePosition(board, pc)
     System.out.println("Reward: " + reward.toString)
   }
