@@ -23,7 +23,7 @@ object MoveList {
 class MoveList {
   var cMaxMoves: Int = 0
   var cMaxPips: Int = 0
-  var amMoves: ArrayBuffer[Move] = ArrayBuffer()
+  var amMoves: ArrayBuffer[Move] = ArrayBuffer[Move]()
   def cMoves = amMoves.length
 
   def this(src: MoveList) {
