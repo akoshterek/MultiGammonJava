@@ -35,7 +35,6 @@ abstract class AbsAgent(override val fullName: String, override val path: Path) 
             }
         }
         pm.arEvalMove = arEval
-        pm.rScore = arEval.equity
         arEval
     }
 

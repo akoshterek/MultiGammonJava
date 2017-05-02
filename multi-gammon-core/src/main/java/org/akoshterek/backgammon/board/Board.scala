@@ -240,36 +240,29 @@ class Board extends Cloneable {
     //it plays more, the old moves are illegal.
     if (cMoves >= pml.cMaxMoves && cPip >= pml.cMaxPips) {
       if (cMoves > pml.cMaxMoves || cPip > pml.cMaxPips)
-        pml.cMoves = 0
+        pml.amMoves.clear()
 
       pml.cMaxMoves = cMoves
       pml.cMaxPips = cPip
 
       val auch: AuchKey = calcPositionKey
-      //TODO: refactor to ListBuffer
-      pml.amMoves
-        .take(pml.cMoves)
-        .filter(m => auch == m.auch && (cMoves > m.cMoves || cPip > m.cPips))
-        .take(1).head match {
-        case m: Move =>
-          m.anMove.copyFrom(anMoves)
-          m.cMoves = cMoves
-          m.cPips = cPip
-        case null =>
-          val pm: Move = pml.amMoves(pml.cMoves)
-          pm.anMove.copyFrom(anMoves)
-          pm.auch = auch
-
-          pm.cMoves = cMoves
-          pm.cPips = cPip
-          pm.backChequer = backChequerIndex(Board.SELF)
-
-          pm.arEvalMove = new Reward()
-          pml.cMoves += 1
-      }
+      val filteredMoves = pml.amMoves.takeWhile(m => !(auch == m.auch && (cMoves > m.cMoves || cPip > m.cPips)))
+      filteredMoves :+ copyMove(cMoves, cPip, auch, anMoves)
+      pml.amMoves = filteredMoves
 
       require(pml.cMoves < MoveList.MAX_INCOMPLETE_MOVES)
     }
+  }
+
+  private def copyMove(cMoves: Int, cPip: Int, auch: AuchKey, anMoves: ChequersMove): Move = {
+    val pm: Move = new Move
+    pm.anMove.copyFrom(anMoves)
+    pm.auch = auch
+    pm.cMoves = cMoves
+    pm.cPips = cPip
+    pm.backChequer = backChequerIndex(Board.SELF)
+    pm.arEvalMove = new Reward()
+    pm
   }
 
   def locateMove(anMove: ChequersMove, pml: MoveList): Int = {

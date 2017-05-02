@@ -2,81 +2,79 @@ package org.akoshterek.backgammon.move
 
 import org.akoshterek.backgammon.board.Board
 
+import scala.collection.mutable.ArrayBuffer
+
 /**
   * @author Alex
   *         date 29.07.2015.
   */
 object MoveGenerator {
-    def generateMoves(board: Board, pml: MoveList, amMoves: Array[Move], dice: (Int, Int)): Int = {
-        val anRoll: Array[Int] = makeAnRoll(dice)
-        val anMoves: ChequersMove = new ChequersMove
+  def generateMoves(board: Board, pml: MoveList, dice: (Int, Int)): Int = {
+    val anRoll: Array[Int] = makeAnRoll(dice)
+    val anMoves: ChequersMove = new ChequersMove
 
-        pml.cMoves = 0
-        pml.cMaxMoves = 0
-        pml.cMaxPips = 0
-        pml.iMoveBest = 0
-        pml.amMoves = amMoves
-        generateMovesSub(board, pml, anRoll, 0, 23, 0, anMoves)
+    pml.deleteMoves()
+    generateMovesSub(board, pml, anRoll, 0, 23, 0, anMoves)
 
-        if (anRoll(0) != anRoll(1)) {
-            val tmp: Int = anRoll(1)
-            anRoll(1) = anRoll(0)
-            anRoll(1) = tmp
-            generateMovesSub(board, pml, anRoll, 0, 23, 0, anMoves)
-        }
-
-        pml.cMoves
+    if (anRoll(0) != anRoll(1)) {
+      val tmp: Int = anRoll(1)
+      anRoll(1) = anRoll(0)
+      anRoll(1) = tmp
+      generateMovesSub(board, pml, anRoll, 0, 23, 0, anMoves)
     }
 
-    private def makeAnRoll(dice: (Int, Int)): Array[Int] = Array[Int](
-        dice._1,
-        dice._2,
-        if (dice._1 == dice._2) dice._1 else 0,
-        if (dice._1 == dice._2) dice._1 else 0)
+    pml.cMoves
+  }
 
-    private def generateMovesSub(board: Board, pml: MoveList, anRoll: Array[Int], nMoveDepth: Int,
-                                       iPip: Int, cPip: Int, anMoves: ChequersMove): Boolean = {
-        var fUsed: Boolean = false
-        val anBoard: Array[Array[Int]] = board.anBoard
+  private def makeAnRoll(dice: (Int, Int)): Array[Int] = Array[Int](
+    dice._1,
+    dice._2,
+    if (dice._1 == dice._2) dice._1 else 0,
+    if (dice._1 == dice._2) dice._1 else 0)
 
-        if (nMoveDepth > 3 || anRoll(nMoveDepth) == 0) {
-            true
-        } else if (anBoard(Board.SELF)(Board.BAR) != 0) {
-            if (anBoard(Board.OPPONENT)(anRoll(nMoveDepth) - 1) >= 2) {
-                true
-            } else {
-                anMoves.move(nMoveDepth).from = 24
-                anMoves.move(nMoveDepth).to = 24 - anRoll(nMoveDepth)
+  private def generateMovesSub(board: Board, pml: MoveList, anRoll: Array[Int], nMoveDepth: Int,
+                               iPip: Int, cPip: Int, anMoves: ChequersMove): Boolean = {
+    var fUsed: Boolean = false
+    val anBoard: Array[Array[Int]] = board.anBoard
 
-                val anBoardNew: Board = board.clone()
-                anBoardNew.applySubMove(24, anRoll(nMoveDepth), fCheckLegal = true)
+    if (nMoveDepth > 3 || anRoll(nMoveDepth) == 0) {
+      true
+    } else if (anBoard(Board.SELF)(Board.BAR) != 0) {
+      if (anBoard(Board.OPPONENT)(anRoll(nMoveDepth) - 1) >= 2) {
+        true
+      } else {
+        anMoves.move(nMoveDepth).from = 24
+        anMoves.move(nMoveDepth).to = 24 - anRoll(nMoveDepth)
 
-                if (generateMovesSub(anBoardNew, pml, anRoll, nMoveDepth + 1, 23, cPip + anRoll(nMoveDepth), anMoves)) {
-                    anBoardNew.saveMoves(pml, nMoveDepth + 1, cPip + anRoll(nMoveDepth), anMoves)
-                }
+        val anBoardNew: Board = board.clone()
+        anBoardNew.applySubMove(24, anRoll(nMoveDepth), fCheckLegal = true)
 
-                false
-            }
+        if (generateMovesSub(anBoardNew, pml, anRoll, nMoveDepth + 1, 23, cPip + anRoll(nMoveDepth), anMoves)) {
+          anBoardNew.saveMoves(pml, nMoveDepth + 1, cPip + anRoll(nMoveDepth), anMoves)
         }
-        else {
-            for (i <- iPip to 0 by -1) {
-                if (anBoard(Board.SELF)(i) != 0 && board.isLegalMove(i, anRoll(nMoveDepth))) {
-                    anMoves.move(nMoveDepth).from = i
-                    anMoves.move(nMoveDepth).to = i - anRoll(nMoveDepth)
 
-                    val anBoardNew: Board = board.clone()
-                    anBoardNew.applySubMove(i, anRoll(nMoveDepth), fCheckLegal = true)
-
-                    if (generateMovesSub(anBoardNew, pml, anRoll, nMoveDepth + 1,
-                        if (anRoll(0) == anRoll(1)) i else 23,
-                        cPip + anRoll(nMoveDepth), anMoves)) {
-                        anBoardNew.saveMoves(pml, nMoveDepth + 1, cPip + anRoll(nMoveDepth), anMoves)
-                    }
-                    fUsed = true
-                }
-            }
-
-            !fUsed
-        }
+        false
+      }
     }
+    else {
+      for (i <- iPip to 0 by -1) {
+        if (anBoard(Board.SELF)(i) != 0 && board.isLegalMove(i, anRoll(nMoveDepth))) {
+          anMoves.move(nMoveDepth).from = i
+          anMoves.move(nMoveDepth).to = i - anRoll(nMoveDepth)
+
+          val anBoardNew: Board = board.clone()
+          anBoardNew.applySubMove(i, anRoll(nMoveDepth), fCheckLegal = true)
+
+          if (generateMovesSub(anBoardNew, pml, anRoll, nMoveDepth + 1,
+            if (anRoll(0) == anRoll(1)) i else 23,
+            cPip + anRoll(nMoveDepth), anMoves)) {
+            anBoardNew.saveMoves(pml, nMoveDepth + 1, cPip + anRoll(nMoveDepth), anMoves)
+          }
+          fUsed = true
+        }
+      }
+
+      !fUsed
+    }
+  }
 }

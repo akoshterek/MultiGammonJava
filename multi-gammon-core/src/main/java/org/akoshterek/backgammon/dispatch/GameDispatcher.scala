@@ -15,11 +15,6 @@ class GameDispatcher(val agent1: Agent, val agent2: Agent) {
     new AgentEntry(agent2)
   )
 
-  private val amMoves: Array[Move] = new Array[Move](MoveList.MAX_INCOMPLETE_MOVES)
-  for (i <- 0 until MoveList.MAX_INCOMPLETE_MOVES) {
-    amMoves(i) = new Move
-  }
-
   private val movesHelper: GameDispatcherMovesFinder = new GameDispatcherMovesFinder(agents)
 
   var showLog: Boolean = false
@@ -325,7 +320,6 @@ class GameDispatcher(val agent1: Agent, val agent2: Agent) {
   private def computerTurn() {
     val ms: MatchState = currentMatch
     if (ms.gs == GameState.GAME_PLAYING) {
-      val fd: FindData = new FindData
 
       //Don't use the global board for this call, to avoid
       //race conditions with updating the board and aborting the
@@ -343,10 +337,8 @@ class GameDispatcher(val agent1: Agent, val agent2: Agent) {
       ms.anDice = pmr.anDice.copy()
       pmr.fPlayer = ms.fTurn
 
-      fd.ml = pmr.ml
-      fd.board = anBoardMove
-      fd.auchMove = null
-      movesHelper.findMove(currentMatch, fd, amMoves)
+      val fd: FindData = new FindData(pmr.ml, anBoardMove)
+      movesHelper.findMove(currentMatch, fd)
 
       // make the move found above
       if (pmr.ml.cMoves != 0) {

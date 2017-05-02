@@ -58,7 +58,7 @@ trait Agent {
         }
     }
 
-    def scoreMoves(moves: Array[Move]): Unit = moves.foreach(scoreMove)
+    def scoreMoves(moves: Seq[Move]): Unit = moves.foreach(scoreMove)
 
     def scoreMove(pm: Move): Reward
 
