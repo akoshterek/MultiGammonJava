@@ -101,7 +101,7 @@ object PositionId {
 
     for (i <- 1 until MAX_N;
          j <- 1 until MAX_R) {
-      combination(i)(j) = anCombination(i - 1)(j - 1) + anCombination(i - 1)(j)
+      combination(i)(j) = combination(i - 1)(j - 1) + combination(i - 1)(j)
     }
 
     combination.toVector.map(row => row.toVector)

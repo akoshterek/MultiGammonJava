@@ -10,10 +10,11 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.nio.file.StandardOpenOption
-import java.util
 
 import org.apache.commons.lang3.StringUtils
 import resource.managed
+
+import scala.collection.mutable.ArrayBuffer
 
 object GameInfoPrinter {
   private val signs: Array[Char] = Array[Char]('O', 'X')
@@ -43,7 +44,7 @@ object GameInfoPrinter {
     System.out.println("%s rolls %d, %s rolls %d.".format(agents(0).agent.fullName, dice._1, agents(1).agent.fullName, dice._2))
   }
 
-  def printBoard(agents: Array[AgentEntry], matchState: MatchState, matchMoves: util.Deque[MatchMove]) {
+  def printBoard(agents: Array[AgentEntry], matchState: MatchState, matchMoves: ArrayBuffer[MatchMove]) {
     val apch: Array[String] = new Array[String](7)
 
     val an: Board = matchState.board.clone()
@@ -67,8 +68,8 @@ object GameInfoPrinter {
 
     System.out.println(BoardFormatter.drawBoard(an, matchState.fMove, apch))
 
-    if (!matchMoves.isEmpty && matchMoves.getLast.moveRecords.nonEmpty) {
-      val pmr: MoveRecord = matchMoves.getLast.moveRecords.last
+    if (matchMoves.nonEmpty && matchMoves.last.moveRecords.nonEmpty) {
+      val pmr: MoveRecord = matchMoves.last.moveRecords.last
       if (!StringUtils.isEmpty(pmr.sz)) {
         System.out.println(pmr.sz)
       }
