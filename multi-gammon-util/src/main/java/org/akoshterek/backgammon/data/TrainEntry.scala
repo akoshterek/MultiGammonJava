@@ -1,6 +1,4 @@
 package org.akoshterek.backgammon.data
 
-class TrainEntry {
-  var positionId: String = null
-  var reward: Array[Double] = new Array[Double](5)
+class TrainEntry (val positionId: String, val reward: Vector[Double]) {
 }
