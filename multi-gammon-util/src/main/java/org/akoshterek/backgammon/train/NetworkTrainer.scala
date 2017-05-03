@@ -7,7 +7,6 @@ import org.akoshterek.backgammon.agent.raw.RawRepresentation
 import org.akoshterek.backgammon.board.Board
 import org.akoshterek.backgammon.board.PositionClass
 import org.akoshterek.backgammon.data.TrainDataLoader
-import org.akoshterek.backgammon.data.TrainEntry
 import org.akoshterek.backgammon.util.Normalizer
 import org.encog.engine.network.activation.ActivationClippedLinear
 import org.encog.engine.network.activation.ActivationLinear
@@ -26,7 +25,8 @@ import org.encog.neural.networks.layers.BasicLayer
 import org.encog.neural.networks.training.propagation.Propagation
 import org.encog.neural.networks.training.propagation.resilient.RPROPType
 import org.encog.neural.networks.training.propagation.resilient.ResilientPropagation
-import java.util.Collections
+
+import scala.util.Random
 
 /**
   * @author Alex
@@ -103,17 +103,16 @@ class NetworkTrainer(val settings: AgentSettings, val networkType: PositionClass
   }
 
   private def loadTraingSet(resource: String): MLDataSet = {
-    val data: util.List[TrainEntry] = TrainDataLoader.loadGzipResourceData(resource)
-    Collections.shuffle(data)
+    val data = Random.shuffle(TrainDataLoader.loadGzipResourceData(resource))
     val trainingSet: MLDataSet = new BasicMLDataSet
     val representation: InputRepresentation = new RawRepresentation(new SuttonCodec)
-    import scala.collection.JavaConversions._
     for (e <- data) {
       val input: MLData = new BasicMLData(representation.calculateContactInputs(Board.positionFromID(e.positionId)))
-      val ideal: MLData = new BasicMLData(Normalizer.toSmallerSigmoid(e.reward))
+      val ideal: MLData = new BasicMLData(Normalizer.toSmallerSigmoid(e.reward.toArray))
       val pair: MLDataPair = new BasicMLDataPair(input, ideal)
       trainingSet.add(pair)
     }
-    return trainingSet
+
+    trainingSet
   }
 }
