@@ -1,30 +1,21 @@
 package org.akoshterek.backgammon.train
 
 import org.akoshterek.backgammon.Constants
-import org.akoshterek.backgammon.agent.inputrepresentation.InputRepresentation
-import org.akoshterek.backgammon.agent.inputrepresentation.SuttonCodec
+import org.akoshterek.backgammon.agent.inputrepresentation.{InputRepresentation, SuttonCodec}
 import org.akoshterek.backgammon.agent.raw.RawRepresentation
-import org.akoshterek.backgammon.board.Board
-import org.akoshterek.backgammon.board.PositionClass
+import org.akoshterek.backgammon.board.{Board, PositionClass}
 import org.akoshterek.backgammon.data.TrainDataLoader
 import org.akoshterek.backgammon.util.Normalizer
-import org.encog.engine.network.activation.ActivationClippedLinear
-import org.encog.engine.network.activation.ActivationLinear
-import org.encog.engine.network.activation.ActivationRamp
+import org.encog.engine.network.activation.{ActivationClippedLinear, ActivationLinear, ActivationRamp}
 import org.encog.mathutil.randomize.RangeRandomizer
-import org.encog.ml.data.MLData
-import org.encog.ml.data.MLDataPair
-import org.encog.ml.data.MLDataSet
-import org.encog.ml.data.basic.BasicMLData
-import org.encog.ml.data.basic.BasicMLDataPair
-import org.encog.ml.data.basic.BasicMLDataSet
+import org.encog.ml.data.basic.{BasicMLData, BasicMLDataPair, BasicMLDataSet}
+import org.encog.ml.data.{MLData, MLDataPair, MLDataSet}
 import org.encog.ml.train.strategy.StopTrainingStrategy
 import org.encog.ml.train.strategy.end.SimpleEarlyStoppingStrategy
 import org.encog.neural.networks.BasicNetwork
 import org.encog.neural.networks.layers.BasicLayer
 import org.encog.neural.networks.training.propagation.Propagation
-import org.encog.neural.networks.training.propagation.resilient.RPROPType
-import org.encog.neural.networks.training.propagation.resilient.ResilientPropagation
+import org.encog.neural.networks.training.propagation.resilient.{RPROPType, ResilientPropagation}
 
 import scala.util.Random
 
@@ -97,7 +88,7 @@ class NetworkTrainer(val settings: AgentSettings, val networkType: PositionClass
     networkType match {
       case PositionClass.CLASS_CONTACT => settings.representation.getContactInputsCount
       case PositionClass.CLASS_CRASHED => settings.representation.getCrashedInputsCount
-      case PositionClass.CLASS_RACE => settings.representation.getRaceInputsCouns
+      case PositionClass.CLASS_RACE => settings.representation.getRaceInputsCount
       case _ => throw new IllegalArgumentException("Unknown network type " + networkType)
     }
   }

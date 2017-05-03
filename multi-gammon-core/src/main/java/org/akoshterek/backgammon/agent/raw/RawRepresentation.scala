@@ -1,7 +1,6 @@
 package org.akoshterek.backgammon.agent.raw
 
-import org.akoshterek.backgammon.agent.inputrepresentation.InputRepresentation
-import org.akoshterek.backgammon.agent.inputrepresentation.PointCodec
+import org.akoshterek.backgammon.agent.inputrepresentation.{InputRepresentation, PointCodec}
 import org.akoshterek.backgammon.board.Board
 
 /**
@@ -9,7 +8,7 @@ import org.akoshterek.backgammon.board.Board
   *         date 21.09.2015.
   */
 class RawRepresentation(val codec: PointCodec) extends InputRepresentation {
-    def getRaceInputsCouns: Int = {
+    def getRaceInputsCount: Int = {
         getContactInputsCount
     }
 
