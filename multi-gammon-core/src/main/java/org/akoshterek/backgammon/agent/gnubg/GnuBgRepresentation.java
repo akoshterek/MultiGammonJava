@@ -1,13 +1,12 @@
 package org.akoshterek.backgammon.agent.gnubg;
 
-import com.google.common.io.LittleEndianDataInputStream;
 import org.akoshterek.backgammon.agent.inputrepresentation.InputRepresentation;
 import org.akoshterek.backgammon.board.Board;
 
-import java.util.Arrays;
-
-import static org.akoshterek.backgammon.agent.gnubg.InputConstants.*;
+import static org.akoshterek.backgammon.agent.gnubg.HitIntermediate.*;
 import static org.akoshterek.backgammon.agent.gnubg.InputConstants.ContactInputs.*;
+import static org.akoshterek.backgammon.agent.gnubg.InputConstants.NUM_INPUTS;
+import static org.akoshterek.backgammon.agent.gnubg.InputConstants.NUM_RACE_INPUTS;
 import static org.akoshterek.backgammon.agent.gnubg.InputConstants.RaceInputs.*;
 
 /**
@@ -15,139 +14,6 @@ import static org.akoshterek.backgammon.agent.gnubg.InputConstants.RaceInputs.*;
  *         date 12.09.2015.
  */
 class GnuBgRepresentation implements InputRepresentation {
-    private static int[] anEscapes = new int[0x1000];
-    private static int[] anEscapes1 = new int[0x1000];
-
-	/* aanCombination[n] -
-     How many ways to hit from a distance of n pips.
-     Each number is an index into aIntermediate below.
-	*/
-    private static int[][] aanCombination = new int[][]
-    {
-        {  0, -1, -1, -1, -1 }, /*  1 */
-        {  1,  2, -1, -1, -1 }, /*  2 */
-        {  3,  4,  5, -1, -1 }, /*  3 */
-        {  6,  7,  8,  9, -1 }, /*  4 */
-        { 10, 11, 12, -1, -1 }, /*  5 */
-        { 13, 14, 15, 16, 17 }, /*  6 */
-        { 18, 19, 20, -1, -1 }, /*  7 */
-        { 21, 22, 23, 24, -1 }, /*  8 */
-        { 25, 26, 27, -1, -1 }, /*  9 */
-        { 28, 29, -1, -1, -1 }, /* 10 */
-        { 30, -1, -1, -1, -1 }, /* 11 */
-        { 31, 32, 33, -1, -1 }, /* 12 */
-        { -1, -1, -1, -1, -1 }, /* 13 */
-        { -1, -1, -1, -1, -1 }, /* 14 */
-        { 34, -1, -1, -1, -1 }, /* 15 */
-        { 35, -1, -1, -1, -1 }, /* 16 */
-        { -1, -1, -1, -1, -1 }, /* 17 */
-        { 36, -1, -1, -1, -1 }, /* 18 */
-        { -1, -1, -1, -1, -1 }, /* 19 */
-        { 37, -1, -1, -1, -1 }, /* 20 */
-        { -1, -1, -1, -1, -1 }, /* 21 */
-        { -1, -1, -1, -1, -1 }, /* 22 */
-        { -1, -1, -1, -1, -1 }, /* 23 */
-        { 38, -1, -1, -1, -1 }  /* 24 */
-    };
-
-    /* One way to hit */
-    private static class Inter
-    {
-		/* if true, all intermediate points (if any) are required;
-		   if false, one of two intermediate points are required.
-		   Set to true for a direct hit, but that can be checked with
-		   nFaces == 1,
-		*/
-        final int fAll;
-
-		/* Intermediate points required */
-        final int[] anIntermediate;
-
-		/* Number of faces used in hit (1 to 4) */
-        final int nFaces;
-
-		/* Number of pips used to hit */
-        final int nPips;
-
-        Inter(final int fAll, final int[] anIntermediate, final int nFaces, final int nPips) {
-            this.fAll = fAll;
-            this.anIntermediate = anIntermediate;
-            this.nFaces = nFaces;
-            this.nPips = nPips;
-        }
-    }
-
-      /* All ways to hit */
-    private static Inter[] aIntermediate = new Inter[]
-    {
-        new Inter(1, new int[]{ 0, 0, 0 }, 1, 1 ), /*  0: 1x hits 1 */
-        new Inter( 1, new int[]{ 0, 0, 0 }, 1, 2 ), /*  1: 2x hits 2 */
-        new Inter( 1, new int[]{ 1, 0, 0 }, 2, 2 ), /*  2: 11 hits 2 */
-        new Inter( 1, new int[]{ 0, 0, 0 }, 1, 3 ), /*  3: 3x hits 3 */
-        new Inter( 0, new int[]{ 1, 2, 0 }, 2, 3 ), /*  4: 21 hits 3 */
-        new Inter( 1, new int[]{ 1, 2, 0 }, 3, 3 ), /*  5: 11 hits 3 */
-        new Inter( 1, new int[]{ 0, 0, 0 }, 1, 4 ), /*  6: 4x hits 4 */
-        new Inter( 0, new int[]{ 1, 3, 0 }, 2, 4 ), /*  7: 31 hits 4 */
-        new Inter( 1, new int[]{ 2, 0, 0 }, 2, 4 ), /*  8: 22 hits 4 */
-        new Inter( 1, new int[]{ 1, 2, 3 }, 4, 4 ), /*  9: 11 hits 4 */
-        new Inter( 1, new int[]{ 0, 0, 0 }, 1, 5 ), /* 10: 5x hits 5 */
-        new Inter( 0, new int[]{ 1, 4, 0 }, 2, 5 ), /* 11: 41 hits 5 */
-        new Inter( 0, new int[]{ 2, 3, 0 }, 2, 5 ), /* 12: 32 hits 5 */
-        new Inter( 1, new int[]{ 0, 0, 0 }, 1, 6 ), /* 13: 6x hits 6 */
-        new Inter( 0, new int[]{ 1, 5, 0 }, 2, 6 ), /* 14: 51 hits 6 */
-        new Inter( 0, new int[]{ 2, 4, 0 }, 2, 6 ), /* 15: 42 hits 6 */
-        new Inter( 1, new int[]{ 3, 0, 0 }, 2, 6 ), /* 16: 33 hits 6 */
-        new Inter( 1, new int[]{ 2, 4, 0 }, 3, 6 ), /* 17: 22 hits 6 */
-        new Inter( 0, new int[]{ 1, 6, 0 }, 2, 7 ), /* 18: 61 hits 7 */
-        new Inter( 0, new int[]{ 2, 5, 0 }, 2, 7 ), /* 19: 52 hits 7 */
-        new Inter( 0, new int[]{ 3, 4, 0 }, 2, 7 ), /* 20: 43 hits 7 */
-        new Inter( 0, new int[]{ 2, 6, 0 }, 2, 8 ), /* 21: 62 hits 8 */
-        new Inter( 0, new int[]{ 3, 5, 0 }, 2, 8 ), /* 22: 53 hits 8 */
-        new Inter( 1, new int[]{ 4, 0, 0 }, 2, 8 ), /* 23: 44 hits 8 */
-        new Inter( 1, new int[]{ 2, 4, 6 }, 4, 8 ), /* 24: 22 hits 8 */
-        new Inter( 0, new int[]{ 3, 6, 0 }, 2, 9 ), /* 25: 63 hits 9 */
-        new Inter( 0, new int[]{ 4, 5, 0 }, 2, 9 ), /* 26: 54 hits 9 */
-        new Inter( 1, new int[]{ 3, 6, 0 }, 3, 9 ), /* 27: 33 hits 9 */
-        new Inter( 0, new int[]{ 4, 6, 0 }, 2, 10 ), /* 28: 64 hits 10 */
-        new Inter( 1, new int[]{ 5, 0, 0 }, 2, 10 ), /* 29: 55 hits 10 */
-        new Inter( 0, new int[]{ 5, 6, 0 }, 2, 11 ), /* 30: 65 hits 11 */
-        new Inter( 1, new int[]{ 6, 0, 0 }, 2, 12 ), /* 31: 66 hits 12 */
-        new Inter( 1, new int[]{ 4, 8, 0 }, 3, 12 ), /* 32: 44 hits 12 */
-        new Inter( 1, new int[]{ 3, 6, 9 }, 4, 12 ), /* 33: 33 hits 12 */
-        new Inter( 1, new int[]{ 5, 10, 0 }, 3, 15 ), /* 34: 55 hits 15 */
-        new Inter( 1, new int[]{ 4, 8, 12 }, 4, 16 ), /* 35: 44 hits 16 */
-        new Inter( 1, new int[]{ 6, 12, 0 }, 3, 18 ), /* 36: 66 hits 18 */
-        new Inter( 1, new int[]{ 5, 10, 15 }, 4, 20 ), /* 37: 55 hits 20 */
-        new Inter( 1, new int[]{ 6, 12, 18 }, 4, 24 )  /* 38: 66 hits 24 */
-    };
-
-	/** aaRoll[n] - All ways to hit with the n'th roll
-      *Each entry is an index into aIntermediate above.
-	  */
-    private static int[][] aaRoll = new int [][] {
-        {  0,  2,  5,  9 }, /* 11 */
-        {  0,  1,  4, -1 }, /* 21 */
-        {  1,  8, 17, 24 }, /* 22 */
-        {  0,  3,  7, -1 }, /* 31 */
-        {  1,  3, 12, -1 }, /* 32 */
-        {  3, 16, 27, 33 }, /* 33 */
-        {  0,  6, 11, -1 }, /* 41 */
-        {  1,  6, 15, -1 }, /* 42 */
-        {  3,  6, 20, -1 }, /* 43 */
-        {  6, 23, 32, 35 }, /* 44 */
-        {  0, 10, 14, -1 }, /* 51 */
-        {  1, 10, 19, -1 }, /* 52 */
-        {  3, 10, 22, -1 }, /* 53 */
-        {  6, 10, 26, -1 }, /* 54 */
-        { 10, 29, 34, 37 }, /* 55 */
-        {  0, 13, 18, -1 }, /* 61 */
-        {  1, 13, 21, -1 }, /* 62 */
-        {  3, 13, 25, -1 }, /* 63 */
-        {  6, 13, 28, -1 }, /* 64 */
-        { 10, 13, 30, -1 }, /* 65 */
-        { 13, 31, 36, 38 }  /* 66 */
-    };
-
 	/* One roll stat */
     private static class OneRollStat {
 		/* count of pips this roll hits */
@@ -157,13 +23,8 @@ class GnuBgRepresentation implements InputRepresentation {
         int nChequers = 0;
     }
 
-    static {
-        computeTable0();
-        computeTable1();
-    }
-
     @Override
-    public int getRaceInputsCouns() {
+    public int getRaceInputsCount() {
         return NUM_RACE_INPUTS;
     }
 
@@ -253,9 +114,8 @@ class GnuBgRepresentation implements InputRepresentation {
 
     private static void calculateHalfInputs(final int[] anBoard, final int[] anBoardOpp, final double[] input, final int index) {
         int i, j, k, l, nOppBack, nBoard;
-        int[] aHit = new int[39];
 
-        Inter pi;
+        HitIntermediate pi;
 
         for (nOppBack = 24; nOppBack >= 0; --nOppBack) {
             if (anBoardOpp[nOppBack] != 0)
@@ -375,7 +235,7 @@ class GnuBgRepresentation implements InputRepresentation {
             if (anBoard[i] != 0)
                 nBoard++;
 
-        Arrays.fill(aHit, 0);
+        int[] aHit = new int[39];
 
     /* for every point we'd consider hitting a blot on, */
         for (i = (nBoard > 2) ? 23 : 21; i >= 0; i--) {
@@ -391,22 +251,22 @@ class GnuBgRepresentation implements InputRepresentation {
 					/* for every roll that can hit from that point */
 
                         for (int n = 0; n < 5; n++) {
-                            if (aanCombination[j - 24 + i][n] == -1)
+                            if (aanCombination()[j - 24 + i][n] == -1)
                                 break;
 
 						/* find the intermediate points required to play */
 
-                            pi = aIntermediate[aanCombination[j - 24 + i][n]];
+                            pi = aIntermediate()[aanCombination()[j - 24 + i][n]];
 
                             boolean cannot_hit = false;
-                            if (pi.fAll != 0) {
+                            if (pi.fAll() != 0) {
 							/* if nFaces is 1, there are no intermediate points */
 
-                                if (pi.nFaces > 1) {
+                                if (pi.nFaces() > 1) {
 								/* all the intermediate points are required */
 
-                                    for (k = 0; k < 3 && pi.anIntermediate[k] > 0; k++)
-                                        if (anBoardOpp[i - pi.anIntermediate[k]] > 1) {
+                                    for (k = 0; k < 3 && pi.anIntermediate()[k] > 0; k++)
+                                        if (anBoardOpp[i - pi.anIntermediate()[k]] > 1) {
 										/* point is blocked; look for other hits */
                                             cannot_hit = true;
                                         }
@@ -414,8 +274,8 @@ class GnuBgRepresentation implements InputRepresentation {
                             } else {
 							/* either of two points are required */
 
-                                if (anBoardOpp[i - pi.anIntermediate[0]] > 1
-                                        && anBoardOpp[i - pi.anIntermediate[1]] > 1) {
+                                if (anBoardOpp[i - pi.anIntermediate()[0]] > 1
+                                        && anBoardOpp[i - pi.anIntermediate()[1]] > 1) {
 								/* both are blocked; look for other hits */
                                     cannot_hit = true;
                                 }
@@ -423,7 +283,7 @@ class GnuBgRepresentation implements InputRepresentation {
 
 						/* enter this shot as available */
                             if (!cannot_hit) {
-                                aHit[aanCombination[j - 24 + i][n]] |= 1 << j;
+                                aHit[aanCombination()[j - 24 + i][n]] |= 1 << j;
                             }
                         }
                     }
@@ -444,16 +304,16 @@ class GnuBgRepresentation implements InputRepresentation {
 
 			/* for each way that roll hits, */
                 for (j = 0; j < 4; j++) {
-                    int r = aaRoll[i][j];
+                    int r = aaRoll()[i][j];
                     if (r < 0)
                         break;
 
                     if (aHit[r] == 0)
                         continue;
 
-                    pi = aIntermediate[r];
+                    pi = aIntermediate()[r];
 
-                    if (pi.nFaces == 1) {
+                    if (pi.nFaces() == 1) {
 					/* direct shot */
                         for (k = 23; k > 0; k--) {
                             if ((aHit[r] & (1 << k)) != 0) {
@@ -465,13 +325,13 @@ class GnuBgRepresentation implements InputRepresentation {
 
                                 n = k;
 
-                                if (k - pi.nPips + 1 > aRoll[i].nPips)
-                                    aRoll[i].nPips = k - pi.nPips + 1;
+                                if (k - pi.nPips() + 1 > aRoll[i].nPips)
+                                    aRoll[i].nPips = k - pi.nPips() + 1;
 
 							/* if rolling doubles, check for multiple
 							direct shots */
 
-                                if (aaRoll[i][3] >= 0 && (aHit[r] & ~(1 << k)) != 0)
+                                if (aaRoll()[i][3] >= 0 && (aHit[r] & ~(1 << k)) != 0)
                                     aRoll[i].nChequers++;
 
                                 break;
@@ -487,13 +347,13 @@ class GnuBgRepresentation implements InputRepresentation {
                             if ((aHit[r] & (1 << k)) != 0)
                                 break;
 
-                        if (k - pi.nPips + 1 > aRoll[i].nPips)
-                            aRoll[i].nPips = k - pi.nPips + 1;
+                        if (k - pi.nPips() + 1 > aRoll[i].nPips)
+                            aRoll[i].nPips = k - pi.nPips() + 1;
 
 					/* check for blots hit on intermediate points */
 
-                        for (l = 0; l < 3 && pi.anIntermediate[l] > 0; l++) {
-                            if (anBoardOpp[23 - k + pi.anIntermediate[l]] == 1) {
+                        for (l = 0; l < 3 && pi.anIntermediate()[l] > 0; l++) {
+                            if (anBoardOpp[23 - k + pi.anIntermediate()[l]] == 1) {
                                 aRoll[i].nChequers++;
                                 break;
                             }
@@ -508,16 +368,16 @@ class GnuBgRepresentation implements InputRepresentation {
                 int n = 0; /* (free to use either die to enter) */
 
                 for (j = 0; j < 4; j++) {
-                    int r = aaRoll[i][j];
+                    int r = aaRoll()[i][j];
                     if (r < 0)
                         break;
 
                     if (aHit[r] == 0)
                         continue;
 
-                    pi = aIntermediate[r];
+                    pi = aIntermediate()[r];
 
-                    if (pi.nFaces == 1) {
+                    if (pi.nFaces() == 1) {
 					/* direct shot */
 
                         for (k = 24; k > 0; k--) {
@@ -531,7 +391,7 @@ class GnuBgRepresentation implements InputRepresentation {
 							other die must be used to enter */
 
                                 if (k != 24) {
-                                    int npip = aIntermediate[aaRoll[i][1 - j]].nPips;
+                                    int npip = aIntermediate()[aaRoll()[i][1 - j]].nPips();
 
                                     if (anBoardOpp[npip - 1] > 1)
                                         break;
@@ -541,8 +401,8 @@ class GnuBgRepresentation implements InputRepresentation {
 
                                 aRoll[i].nChequers++;
 
-                                if (k - pi.nPips + 1 > aRoll[i].nPips)
-                                    aRoll[i].nPips = k - pi.nPips + 1;
+                                if (k - pi.nPips() + 1 > aRoll[i].nPips)
+                                    aRoll[i].nPips = k - pi.nPips() + 1;
                             }
                         }
                     } else {
@@ -553,12 +413,12 @@ class GnuBgRepresentation implements InputRepresentation {
                         if (aRoll[i].nChequers == 0)
                             aRoll[i].nChequers = 1;
 
-                        if (25 - pi.nPips > aRoll[i].nPips)
-                            aRoll[i].nPips = 25 - pi.nPips;
+                        if (25 - pi.nPips() > aRoll[i].nPips)
+                            aRoll[i].nPips = 25 - pi.nPips();
 
 					/* check for blots hit on intermediate points */
-                        for (k = 0; k < 3 && pi.anIntermediate[k] > 0; k++) {
-                            if (anBoardOpp[pi.anIntermediate[k] + 1] == 1) {
+                        for (k = 0; k < 3 && pi.anIntermediate()[k] > 0; k++) {
+                            if (anBoardOpp[pi.anIntermediate()[k] + 1] == 1) {
                                 aRoll[i].nChequers++;
                                 break;
                             }
@@ -574,20 +434,20 @@ class GnuBgRepresentation implements InputRepresentation {
 		  /* for the first two ways that hit from the bar */
 
                 for (j = 0; j < 2; j++) {
-                    int r = aaRoll[i][j];
+                    int r = aaRoll()[i][j];
                     if ((aHit[r] & (1 << 24)) == 0)
                         continue;
 
-                    pi = aIntermediate[r];
+                    pi = aIntermediate()[r];
 
 				/* only consider direct shots */
-                    if (pi.nFaces != 1)
+                    if (pi.nFaces() != 1)
                         continue;
 
                     aRoll[i].nChequers++;
 
-                    if (25 - pi.nPips > aRoll[i].nPips)
-                        aRoll[i].nPips = 25 - pi.nPips;
+                    if (25 - pi.nPips() > aRoll[i].nPips)
+                        aRoll[i].nPips = 25 - pi.nPips();
                 }
             }
         }
@@ -598,7 +458,7 @@ class GnuBgRepresentation implements InputRepresentation {
             int n2 = 0;
 
             for (i = 0; i < 21; i++) {
-                int w = aaRoll[i][3] > 0 ? 1 : 2;
+                int w = aaRoll()[i][3] > 0 ? 1 : 2;
                 int nc = aRoll[i].nChequers;
                 np += aRoll[i].nPips * w;
 
@@ -614,14 +474,14 @@ class GnuBgRepresentation implements InputRepresentation {
             input[index + I_P2] = n2 / 36.0f;
         }
 
-        input[index + I_BACKESCAPES] = escapes(anBoard, 23 - nOppBack) / 36.0f;
-        input[index + I_BACKRESCAPES] = escapes1(anBoard, 23 - nOppBack) / 36.0f;
+        input[index + I_BACKESCAPES] = Escapes.escapes0(anBoard, 23 - nOppBack) / 36.0f;
+        input[index + I_BACKRESCAPES] = Escapes.escapes1(anBoard, 23 - nOppBack) / 36.0f;
 
         {
             i = 15;
             int n;
             for (n = 36; i < 24 - nOppBack; i++)
-                if ((j = escapes(anBoard, i)) < n)
+                if ((j = Escapes.escapes0(anBoard, i)) < n)
                     n = j;
 
             input[index + I_ACONTAIN] = (36 - n) / 36.0f;
@@ -634,7 +494,7 @@ class GnuBgRepresentation implements InputRepresentation {
             }
 
             for (; i < 24; i++)
-                if ((j = escapes(anBoard, i)) < n)
+                if ((j = Escapes.escapes0(anBoard, i)) < n)
                     n = j;
 
 
@@ -643,7 +503,7 @@ class GnuBgRepresentation implements InputRepresentation {
 
             for (n = 0, i = 6; i < 25; i++)
                 if (anBoard[i] != 0)
-                    n += (i - 5) * anBoard[i] * escapes(anBoardOpp, i);
+                    n += (i - 5) * anBoard[i] * Escapes.escapes0(anBoardOpp, i);
 
             input[index + I_MOBILITY] = n / 3600.0f;
 
@@ -844,49 +704,5 @@ class GnuBgRepresentation implements InputRepresentation {
             arInput[afInput + 24 * 4 + 2] = (nc >= 3) ? 1.0f : 0.0f;
             arInput[afInput + 24 * 4 + 3] = nc > 3 ? (nc - 3) / 2.0f : 0.0f;
         }
-    }
-
-    private static void computeTable0() {
-        try (LittleEndianDataInputStream is = new LittleEndianDataInputStream(GnubgAgent.class.getResourceAsStream(
-                "/org/akoshterek/backgammon/gnu/escapes0.dat"))) {
-            for (int i = 0; i < 0x1000; i++) {
-                anEscapes[i] = is.readInt();
-            }
-        } catch (final Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private static void computeTable1() {
-        try (LittleEndianDataInputStream is = new LittleEndianDataInputStream(GnubgAgent.class.getResourceAsStream(
-                "/org/akoshterek/backgammon/gnu/escapes1.dat"))) {
-            for (int i = 0; i < 0x1000; i++) {
-                anEscapes1[i] = is.readInt();
-            }
-        } catch (final Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private static int escapes(final int[] anBoard, final int n) {
-        int i, af = 0, m;
-        m = (n < 12) ? n : 12;
-
-        for (i = 0; i < m; i++)
-            if (anBoard[24 + i - n] > 1)
-                af |= (1 << i);
-
-        return anEscapes[af];
-    }
-
-    private static int escapes1(final int[] anBoard, final int n) {
-        int i, af = 0, m;
-        m = (n < 12) ? n : 12;
-
-        for( i = 0; i < m; i++ )
-            if( anBoard[ 24 + i - n ] > 1 )
-                af |= ( 1 << i );
-
-        return anEscapes1[ af ];
     }
 }

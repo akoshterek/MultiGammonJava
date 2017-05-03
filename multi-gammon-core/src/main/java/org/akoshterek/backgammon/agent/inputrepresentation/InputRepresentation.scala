@@ -3,7 +3,7 @@ package org.akoshterek.backgammon.agent.inputrepresentation
 import org.akoshterek.backgammon.board.Board
 
 trait InputRepresentation {
-    def getRaceInputsCouns: Int
+    def getRaceInputsCount: Int
     def getCrashedInputsCount: Int
     def getContactInputsCount: Int
 
