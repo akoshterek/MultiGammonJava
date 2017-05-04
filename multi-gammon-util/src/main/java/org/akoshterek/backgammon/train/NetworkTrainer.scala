@@ -96,7 +96,7 @@ class NetworkTrainer(val settings: AgentSettings, val networkType: PositionClass
   private def loadTraingSet(resource: String): MLDataSet = {
     val data = Random.shuffle(TrainDataLoader.loadGzipResourceData(resource))
     val trainingSet: MLDataSet = new BasicMLDataSet
-    val representation: InputRepresentation = new RawRepresentation(new SuttonCodec)
+    val representation: InputRepresentation = new RawRepresentation(SuttonCodec)
     for (e <- data) {
       val input: MLData = new BasicMLData(representation.calculateContactInputs(Board.positionFromID(e.positionId)))
       val ideal: MLData = new BasicMLData(Normalizer.toSmallerSigmoid(e.reward.toArray))

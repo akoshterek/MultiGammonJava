@@ -24,7 +24,7 @@ import java.util.Map;
  */
 public class RawRl40 extends AbsAgent implements Cloneable {
     private static final double MIN_ETRACE = 0.00000001;
-    private InputRepresentation representation = new RawRepresentation(new Tesauro89Codec());
+    private InputRepresentation representation = new RawRepresentation(Tesauro89Codec.self());
     private NeuralNetworkFA fa;
     private Map<String, ETraceEntry> eligibilityTraces;
     private int step = 0;
