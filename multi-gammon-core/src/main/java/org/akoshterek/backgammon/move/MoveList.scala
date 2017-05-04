@@ -23,13 +23,19 @@ object MoveList {
 class MoveList {
   var cMaxMoves: Int = 0
   var cMaxPips: Int = 0
-  var amMoves: ArrayBuffer[Move] = ArrayBuffer[Move]()
-  def cMoves = amMoves.length
+  val _amMoves: ArrayBuffer[Move] = ArrayBuffer[Move]()
+  def cMoves: Int = amMoves.length
+
+  def amMoves: ArrayBuffer[Move] = _amMoves
+  def amMoves_=(moves: Seq[Move]): Unit = {
+    _amMoves.clear()
+    _amMoves ++= moves
+  }
 
   def this(src: MoveList) {
     this()
     amMoves.clear()
-    amMoves :+ src.amMoves
+    amMoves ++= src.amMoves
     cMaxMoves = src.cMaxMoves
     cMaxPips = src.cMaxPips
   }

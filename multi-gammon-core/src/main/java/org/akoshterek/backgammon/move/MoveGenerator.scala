@@ -2,8 +2,6 @@ package org.akoshterek.backgammon.move
 
 import org.akoshterek.backgammon.board.Board
 
-import scala.collection.mutable.ArrayBuffer
-
 /**
   * @author Alex
   *         date 29.07.2015.

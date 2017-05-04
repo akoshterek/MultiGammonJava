@@ -20,15 +20,15 @@ class GameDispatcherMovesFinder(agents: Array[AgentEntry]) {
     MoveGenerator.generateMoves(anBoard, pml, dice)
     agents(currentMatch.fMove).agent.currentBoard = currentMatch.board
     if (pml.cMoves == 0) {
-      pml.amMoves = null
+      pml.amMoves.clear()
     } else {
       scoreMoves(currentMatch, pml)
-      scala.util.Sorting.stableSort(pml.amMoves, Move.gt _)
     }
   }
 
   private def scoreMoves(currentMatch: MatchState, pml: MoveList) {
     val agent: Agent = agents(currentMatch.fMove).agent
     agent.scoreMoves(pml.amMoves)
+    pml.amMoves = scala.util.Sorting.stableSort(pml.amMoves, Move.gt _)
   }
 }

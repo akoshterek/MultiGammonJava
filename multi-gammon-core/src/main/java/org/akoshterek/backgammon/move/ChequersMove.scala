@@ -12,9 +12,5 @@ class ChequersMove {
     move = for (e <- o.move) yield e.clone()
   }
 
-  override def toString: String = {
-    val builder: StringBuilder = new StringBuilder
-    move.sorted.foreach(aMove => builder.append(aMove.toString))
-    builder.toString
-  }
+  override def toString: String = move.filter(m => m.from >= 0).sorted.mkString(", ")
 }

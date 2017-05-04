@@ -68,7 +68,7 @@ class GameDispatcher(val agent1: Agent, val agent2: Agent) {
     currentMatch.board.initBoard()
 
     lMatch.clear()
-    lMatch :+ new MatchMove
+    lMatch += new MatchMove
 
     {
       val pmr: MoveRecord = new MoveRecord
@@ -118,7 +118,7 @@ class GameDispatcher(val agent1: Agent, val agent2: Agent) {
     }
 
     fixMatchState(pmr)
-    lMatch.last.moveRecords :+ pmr
+    lMatch.last.moveRecords += pmr
     applyMoveRecord(pmr)
   }
 
@@ -334,7 +334,7 @@ class GameDispatcher(val agent1: Agent, val agent2: Agent) {
 
       val pmr: MoveRecord = new MoveRecord
       pmr.mt = MoveType.MOVE_NORMAL
-      ms.anDice = pmr.anDice.copy()
+      pmr.anDice = ms.anDice.copy()
       pmr.fPlayer = ms.fTurn
 
       val fd: FindData = new FindData(pmr.ml, anBoardMove)

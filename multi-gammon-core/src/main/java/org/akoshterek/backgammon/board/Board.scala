@@ -247,8 +247,9 @@ class Board extends Cloneable {
 
       val auch: AuchKey = calcPositionKey
       val filteredMoves = pml.amMoves.takeWhile(m => !(auch == m.auch && (cMoves > m.cMoves || cPip > m.cPips)))
-      filteredMoves :+ copyMove(cMoves, cPip, auch, anMoves)
-      pml.amMoves = filteredMoves
+      filteredMoves += copyMove(cMoves, cPip, auch, anMoves)
+      pml.amMoves.clear()
+      pml.amMoves ++= filteredMoves
 
       require(pml.cMoves < MoveList.MAX_INCOMPLETE_MOVES)
     }
