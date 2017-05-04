@@ -11,9 +11,9 @@ import org.akoshterek.backgammon.util.Normalizer
 import java.nio.file.Path
 
 class RawBatch40(override val path: Path) extends AbsFlexAgent("RawBatch40", path) {
-  contactRepresentation = new RawRepresentation(new Tesauro89Codec)
-  raceRepresentation = new RawRepresentation(new GnuBgCodec)
-  crashedRepresentation = new RawRepresentation(new GnuBgCodec)
+  contactRepresentation = new RawRepresentation(Tesauro89Codec)
+  raceRepresentation = new RawRepresentation(GnuBgCodec)
+  crashedRepresentation = new RawRepresentation(GnuBgCodec)
 
   contactFa = new SimpleEncogFA(SimpleEncogFA.loadNNFromResource("org/akoshterek/backgammon/agent/raw/Raw-Tesauro89-40-contact.eg"))
   raceFa = new SimpleEncogFA(SimpleEncogFA.loadNNFromResource("org/akoshterek/backgammon/agent/raw/Raw-GnuBg-40-race.eg"))

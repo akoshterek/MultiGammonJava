@@ -7,12 +7,12 @@ import org.akoshterek.backgammon.eval.Reward
 import java.nio.file.Path
 
 abstract class AbsFlexAgent(override val fullName: String, override val path: Path) extends AbsAgent(fullName, path) {
-    protected var contactRepresentation: InputRepresentation = null
-    protected var raceRepresentation: InputRepresentation = null
-    protected var crashedRepresentation: InputRepresentation = null
-    protected var contactFa: FunctionApproximator = null
-    protected var raceFa: FunctionApproximator = null
-    protected var crashedFa: FunctionApproximator = null
+    protected var contactRepresentation: InputRepresentation = _
+    protected var raceRepresentation: InputRepresentation = _
+    protected var crashedRepresentation: InputRepresentation = _
+    protected var contactFa: FunctionApproximator = _
+    protected var raceFa: FunctionApproximator = _
+    protected var crashedFa: FunctionApproximator = _
 
     def evalContact(board: Board): Reward = {
         val inputs: Array[Double] = contactRepresentation.calculateContactInputs(board)
