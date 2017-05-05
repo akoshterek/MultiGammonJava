@@ -1,12 +1,11 @@
 package org.akoshterek.backgammon.dispatch
 
-import java.util
-
 import org.akoshterek.backgammon.agent.Agent
 import org.akoshterek.backgammon.board.{Board, PositionClass}
 import org.akoshterek.backgammon.matchstate.{GameResult, GameState, MatchMove, MatchState}
 import org.akoshterek.backgammon.move._
 
+import scala.collection.mutable.ArrayBuffer
 import scala.util.control.Breaks._
 
 class GameDispatcher(val agent1: Agent, val agent2: Agent) {
@@ -26,7 +25,7 @@ class GameDispatcher(val agent1: Agent, val agent2: Agent) {
   private var numGames: Int = 0
   private var playedGames: Int = 0
   private var currentMatch: MatchState = _
-  private val lMatch: util.Deque[MatchMove] = new util.LinkedList[MatchMove]
+  private val lMatch: ArrayBuffer[MatchMove] = ArrayBuffer()
   private var pmrHint: MoveRecord = _
 
   def playGames(games: Int, learn: Boolean) {
@@ -73,7 +72,7 @@ class GameDispatcher(val agent1: Agent, val agent2: Agent) {
     currentMatch.board.initBoard()
 
     lMatch.clear()
-    lMatch.add(new MatchMove)
+    lMatch += new MatchMove
 
     {
       val pmr: MoveRecord = new MoveRecord
@@ -112,23 +111,23 @@ class GameDispatcher(val agent1: Agent, val agent2: Agent) {
     var pmrOld: MoveRecord = null
     addMoveRecordGetCur(pmr)
     addMoverecordSanityCheck(pmr)
-    val hasMoves: Boolean = !lMatch.isEmpty && lMatch.getLast.moveRecords.nonEmpty
+    val hasMoves: Boolean = lMatch.nonEmpty && lMatch.last.moveRecords.nonEmpty
 
     if (hasMoves) {
-      pmrOld = lMatch.getLast.moveRecords.last
+      pmrOld = lMatch.last.moveRecords.last
     }
 
     if (hasMoves && pmr.mt == MoveType.MOVE_NORMAL && pmrOld.mt == MoveType.MOVE_SETDICE && pmrOld.fPlayer == pmr.fPlayer) {
-      lMatch.getLast.moveRecords = lMatch.getLast.moveRecords.dropRight(1)
+      lMatch.last.moveRecords = lMatch.last.moveRecords.dropRight(1)
     }
 
     fixMatchState(pmr)
-    lMatch.getLast.moveRecords += pmr
+    lMatch.last.moveRecords += pmr
     applyMoveRecord(pmr)
   }
 
   private def applyMoveRecord(pmr: MoveRecord) {
-    val lGame = lMatch.getLast.moveRecords
+    val lGame = lMatch.last.moveRecords
 
     val pmrx: MoveRecord = lGame.head
     var pmgi: XMoveGameInfo = null
@@ -216,7 +215,7 @@ class GameDispatcher(val agent1: Agent, val agent2: Agent) {
   }
 
   private def applyGameOver() {
-    val pmr: MoveRecord = lMatch.getLast.moveRecords.head
+    val pmr: MoveRecord = lMatch.last.moveRecords.head
     val pmgi: XMoveGameInfo = pmr.g
 
     require(pmr.mt == MoveType.MOVE_GAMEINFO)
@@ -272,9 +271,9 @@ class GameDispatcher(val agent1: Agent, val agent2: Agent) {
   }
 
   private def getCurrentMoveRecord: MoveRecord = {
-    val hasMoves: Boolean = !lMatch.isEmpty && lMatch.getLast.moveRecords.nonEmpty
+    val hasMoves: Boolean = lMatch.nonEmpty && lMatch.last.moveRecords.nonEmpty
     if (hasMoves) {
-      lMatch.getLast.moveRecords.last
+      lMatch.last.moveRecords.last
     } else if (currentMatch.gs ne GameState.GAME_PLAYING) {
       pmrHint = null
       pmrHint
@@ -314,7 +313,7 @@ class GameDispatcher(val agent1: Agent, val agent2: Agent) {
   private def nextTurn() {
     val ms: MatchState = currentMatch
     if (ms.board.gameResult != GameResult.PLAYING) {
-      val pmr: MoveRecord = lMatch.getLast.moveRecords.last
+      val pmr: MoveRecord = lMatch.last.moveRecords.last
       val pmgi: XMoveGameInfo = pmr.g
       if (showLog) {
         GameInfoPrinter.printWin(agents, currentMatch, pmgi.fWinner, pmgi.nPoints)
