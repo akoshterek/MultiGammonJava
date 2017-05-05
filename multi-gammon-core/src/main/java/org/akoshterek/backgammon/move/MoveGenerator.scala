@@ -14,7 +14,6 @@ object MoveGenerator {
     pml.cMoves = 0
     pml.cMaxMoves = 0
     pml.cMaxPips = 0
-    pml.iMoveBest = 0
     pml.amMoves = amMoves
     generateMovesSub(board, pml, anRoll, 0, 23, 0, anMoves)
 

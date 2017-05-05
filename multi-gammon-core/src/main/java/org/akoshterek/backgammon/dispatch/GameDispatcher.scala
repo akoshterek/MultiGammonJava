@@ -328,7 +328,6 @@ class GameDispatcher(val agent1: Agent, val agent2: Agent) {
   private def computerTurn() {
     val ms: MatchState = currentMatch
     if (ms.gs == GameState.GAME_PLAYING) {
-      val fd: FindData = new FindData
 
       //Don't use the global board for this call, to avoid
       //race conditions with updating the board and aborting the
@@ -346,14 +345,8 @@ class GameDispatcher(val agent1: Agent, val agent2: Agent) {
       pmr.anDice = ms.anDice.copy()
       pmr.fPlayer = ms.fTurn
 
-      fd.ml = pmr.ml
-      fd.board = anBoardMove
-      fd.auchMove = null
+      val fd: FindData = new FindData(pmr.ml, anBoardMove)
       movesHelper.findMove(currentMatch, fd, amMoves)
-      /* resorts the moves according to cubeful (if applicable),
-                cubeless and chequer on highest point to avoid some silly
-                looking moves */
-      //RefreshMoveList(pmr.ml, NULL);
 
       // make the move found above
       if (pmr.ml.cMoves != 0) {

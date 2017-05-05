@@ -19,8 +19,6 @@ public class MoveList {
 
     public int cMoves = 0; /* and current move when building list */
     public int cMaxMoves, cMaxPips;
-    public int iMoveBest;
-    public double rBestScore;
     public Move[] amMoves = null;
 
     MoveList() {}
@@ -46,8 +44,6 @@ public class MoveList {
         cMoves = src.cMoves;
         cMaxMoves = src.cMaxMoves;
         cMaxPips = src.cMaxPips;
-        iMoveBest = src.iMoveBest;
-        rBestScore = src.rBestScore;
     }
 
     public void deleteMoves() {

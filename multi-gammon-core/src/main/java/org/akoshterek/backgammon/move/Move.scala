@@ -1,7 +1,7 @@
 package org.akoshterek.backgammon.move
 
-import org.akoshterek.backgammon.eval.Reward
 import org.akoshterek.backgammon.board.PositionClass
+import org.akoshterek.backgammon.eval.Reward
 
 /**
   * @author Alex
@@ -28,7 +28,7 @@ class Move {
   var cMoves = 0
   var cPips = 0
   /** scores for this move */
-  var rScore = .0
+  def rScore: Double = arEvalMove.equity
   /** evaluation for this move */
   var arEvalMove: Reward = new Reward()
   var pc: PositionClass = PositionClass.CLASS_OVER
