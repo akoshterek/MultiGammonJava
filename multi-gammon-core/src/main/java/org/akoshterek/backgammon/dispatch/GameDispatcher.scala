@@ -1,19 +1,23 @@
 package org.akoshterek.backgammon.dispatch
 
-import scala.util.control.Breaks._
 import org.akoshterek.backgammon.agent.Agent
-import org.akoshterek.backgammon.board.Board
-import org.akoshterek.backgammon.board.PositionClass
+import org.akoshterek.backgammon.board.{Board, PositionClass}
 import org.akoshterek.backgammon.matchstate.{GameResult, GameState, MatchMove, MatchState}
 import org.akoshterek.backgammon.move._
 
 import scala.collection.mutable.ArrayBuffer
+import scala.util.control.Breaks._
 
 class GameDispatcher(val agent1: Agent, val agent2: Agent) {
   private val agents: Array[AgentEntry] = Array[AgentEntry](
     new AgentEntry(agent1),
     new AgentEntry(agent2)
   )
+
+  private val amMoves: Array[Move] = new Array[Move](MoveList.MAX_INCOMPLETE_MOVES)
+  for (i <- 0 until MoveList.MAX_INCOMPLETE_MOVES) {
+    amMoves(i) = new Move
+  }
 
   private val movesHelper: GameDispatcherMovesFinder = new GameDispatcherMovesFinder(agents)
 
@@ -90,8 +94,8 @@ class GameDispatcher(val agent1: Agent, val agent2: Agent) {
     {
       val pmr: MoveRecord = new MoveRecord
       pmr.mt = MoveType.MOVE_SETDICE
-      pmr.anDice = currentMatch.anDice.copy()
-      pmr.fPlayer = if (currentMatch.anDice._1 > currentMatch.anDice._2) 1 else 0
+      pmr.anDice = currentMatch.anDice
+      pmr.fPlayer = if (currentMatch.anDice._2 > currentMatch.anDice._1) 1 else 0
       addMoveRecord(pmr)
     }
     diceRolled()
@@ -114,7 +118,7 @@ class GameDispatcher(val agent1: Agent, val agent2: Agent) {
     }
 
     if (hasMoves && pmr.mt == MoveType.MOVE_NORMAL && pmrOld.mt == MoveType.MOVE_SETDICE && pmrOld.fPlayer == pmr.fPlayer) {
-      lMatch.last.moveRecords.dropRight(1)
+      lMatch.last.moveRecords = lMatch.last.moveRecords.dropRight(1)
     }
 
     fixMatchState(pmr)
@@ -126,10 +130,12 @@ class GameDispatcher(val agent1: Agent, val agent2: Agent) {
     val lGame = lMatch.last.moveRecords
 
     val pmrx: MoveRecord = lGame.head
+    var pmgi: XMoveGameInfo = null
     //this is wrong -- plGame is not necessarily the right game
 
-    require(pmr.mt == MoveType.MOVE_GAMEINFO || pmrx.mt == MoveType.MOVE_GAMEINFO)
-    val pmgi = pmrx.g
+    assert(pmr.mt == MoveType.MOVE_GAMEINFO || pmrx.mt == MoveType.MOVE_GAMEINFO)
+    pmgi = pmrx.g
+
     currentMatch.gs = GameState.GAME_PLAYING
 
     pmr.mt match {
@@ -232,7 +238,7 @@ class GameDispatcher(val agent1: Agent, val agent2: Agent) {
       case MoveType.MOVE_GAMEINFO =>
       case MoveType.MOVE_NORMAL =>
         if (pmr.ml.cMoves != 0) {
-          require(pmr.n.iMove <= pmr.ml.cMoves)
+          assert(pmr.n.iMove <= pmr.ml.cMoves)
         }
       case MoveType.MOVE_SETDICE =>
       case MoveType.MOVE_SETBOARD =>
@@ -241,24 +247,24 @@ class GameDispatcher(val agent1: Agent, val agent2: Agent) {
     }
   }
 
-  private def copyFromPmrCur(pmr: MoveRecord, get_move: Boolean) {
+  private def copyFromPmrCur(pmr: MoveRecord, getMove: Boolean) {
     getCurrentMoveRecord match {
       case null =>
       case pmr_cur: MoveRecord =>
-        if (get_move && pmr_cur.ml.cMoves > 0) {
-        pmr.ml = new MoveList(pmr_cur.ml)
-        pmr.n.iMove = currentMatch.board.locateMove(pmr.n.anMove, pmr.ml)
-      }
+        if (getMove && pmr_cur.ml.cMoves > 0) {
+          pmr.ml = new MoveList(pmr_cur.ml)
+          pmr.n.iMove = currentMatch.board.locateMove(pmr.n.anMove, pmr.ml)
+        }
     }
   }
 
   private def addMoveRecordGetCur(pmr: MoveRecord) {
     pmr.mt match {
       case MoveType.MOVE_NORMAL =>
-        copyFromPmrCur(pmr, get_move = true)
+        copyFromPmrCur(pmr, getMove = true)
         pmrHint = null
       case MoveType.MOVE_SETDICE =>
-        copyFromPmrCur(pmr, get_move = false)
+        copyFromPmrCur(pmr, getMove = false)
       case _ =>
         pmrHint = null
     }
@@ -272,6 +278,7 @@ class GameDispatcher(val agent1: Agent, val agent2: Agent) {
       pmrHint = null
       pmrHint
     } else {
+
       // invalidate on changed dice
       if (currentMatch.anDice._1 > 0 && pmrHint != null && pmrHint.anDice._1 > 0
         && (pmrHint.anDice._1 != currentMatch.anDice._1 || pmrHint.anDice._2 != currentMatch.anDice._2)) {
@@ -313,7 +320,7 @@ class GameDispatcher(val agent1: Agent, val agent2: Agent) {
         GameInfoPrinter.printScore(agents, ms, playedGames)
       }
     }
-    require(currentMatch.gs == GameState.GAME_PLAYING)
+    assert(currentMatch.gs eq GameState.GAME_PLAYING)
     computerTurn()
   }
 
@@ -338,7 +345,7 @@ class GameDispatcher(val agent1: Agent, val agent2: Agent) {
       pmr.fPlayer = ms.fTurn
 
       val fd: FindData = new FindData(pmr.ml, anBoardMove)
-      movesHelper.findMove(currentMatch, fd)
+      movesHelper.findMove(currentMatch, fd, amMoves)
 
       // make the move found above
       if (pmr.ml.cMoves != 0) {

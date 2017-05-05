@@ -9,5 +9,5 @@ import scala.collection.mutable
   *         date 06.08.2015.
   */
 final class MatchMove {
-  val moveRecords: mutable.Buffer[MoveRecord] = mutable.Buffer[MoveRecord]()
+    var moveRecords: mutable.Buffer[MoveRecord] = mutable.Buffer[MoveRecord]()
 }

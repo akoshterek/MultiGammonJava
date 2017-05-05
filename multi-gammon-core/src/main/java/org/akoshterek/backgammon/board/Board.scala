@@ -1,16 +1,9 @@
 package org.akoshterek.backgammon.board
 
-import org.akoshterek.backgammon.Constants.OUTPUT_LOSEBACKGAMMON
-import org.akoshterek.backgammon.Constants.OUTPUT_LOSEGAMMON
-import org.akoshterek.backgammon.Constants.OUTPUT_WINBACKGAMMON
-import org.akoshterek.backgammon.Constants.OUTPUT_WINGAMMON
-import org.akoshterek.backgammon.eval.Reward
-import org.akoshterek.backgammon.eval.Evaluator
+import org.akoshterek.backgammon.Constants.{OUTPUT_LOSEBACKGAMMON, OUTPUT_LOSEGAMMON, OUTPUT_WINBACKGAMMON, OUTPUT_WINGAMMON}
+import org.akoshterek.backgammon.eval.{Evaluator, Reward}
 import org.akoshterek.backgammon.matchstate.GameResult
-import org.akoshterek.backgammon.move.AuchKey
-import org.akoshterek.backgammon.move.ChequersMove
-import org.akoshterek.backgammon.move.Move
-import org.akoshterek.backgammon.move.MoveList
+import org.akoshterek.backgammon.move.{AuchKey, ChequersMove, Move, MoveList}
 import org.akoshterek.backgammon.util.Base64
 
 object Board {
@@ -73,6 +66,7 @@ object Board {
     auchKey.key(puch) = ((ach(pch) << 2) | (ach(pch + 1) >> 4)).toByte
     val anBoard: Board = positionFromKey(auchKey)
     require(anBoard.checkPosition, "Invalid PositionID")
+
     anBoard
   }
 
@@ -176,8 +170,44 @@ class Board extends Cloneable {
     })
   }
 
-  private def isLegalSubMove(iSrc: Int, nRoll: Int, iDest: Int, fCheckLegal: Boolean): Boolean = {
-  if (fCheckLegal && (nRoll < 1 || nRoll > 6)) {
+  def applySubMove(iSrc: Int, nRoll: Int, fCheckLegal: Boolean): Boolean = {
+    val iDest: Int = iSrc - nRoll
+
+    if (!isLegalSubMove(iSrc, nRoll, fCheckLegal)) {
+      false
+    } else {
+      anBoard(Board.SELF)(iSrc) = (anBoard(Board.SELF)(iSrc) - 1).toByte
+      if (iDest < 0) {
+        true
+      } else {
+        if (anBoard(0)(23 - iDest) != 0) {
+          var res = true
+          if (anBoard(0)(23 - iDest) > 1) {
+            // Trying to move to a point already made by the opponent
+            res = false
+          }
+
+          if (res) {
+            //blot hit
+            anBoard(Board.SELF)(iDest) = 1
+            anBoard(Board.OPPONENT)(23 - iDest) = 0
+
+            //send to bar
+            anBoard(Board.OPPONENT)(Board.BAR) += 1
+          }
+          res
+        }
+        else {
+          anBoard(Board.SELF)(iDest) += 1
+          true
+        }
+      }
+    }
+  }
+
+  def isLegalSubMove(iSrc: Int, nRoll: Int, fCheckLegal: Boolean): Boolean = {
+    val iDest: Int = iSrc - nRoll
+    if (fCheckLegal && (nRoll < 1 || nRoll > 6)) {
       // Invalid dice roll
       false
     } else if (iSrc < 0 || iSrc > 24 || iDest > 24 || anBoard(1)(iSrc) < 1) {
@@ -185,39 +215,6 @@ class Board extends Cloneable {
       false
     } else {
       true
-    }
-  }
-
-  private def applySubMove(iSrc: Int, iDest: Int): Boolean = {
-    anBoard(Board.SELF)(iSrc) = (anBoard(Board.SELF)(iSrc) - 1).toByte
-    val chequersOnPosition = anBoard(0)(23 - iDest)
-    if (chequersOnPosition == 1) {
-      // blot hit
-      anBoard(Board.SELF)(iDest) = 1
-      anBoard(Board.OPPONENT)(23 - iDest) = 0
-
-      // send to bar
-      anBoard(Board.OPPONENT)(Board.BAR) += 1
-      true
-    } else if (chequersOnPosition == 0) {
-      // empty position
-      anBoard(Board.SELF)(iDest) += 1
-      true
-    } else {
-      // Trying to move to a point already made by the opponent
-      false
-    }
-  }
-
-  def applySubMove(iSrc: Int, nRoll: Int, fCheckLegal: Boolean): Boolean = {
-    val iDest: Int = iSrc - nRoll
-    if (!isLegalSubMove(iSrc, nRoll, iDest, fCheckLegal)) {
-      false
-    } else if (iDest < 0) {
-      //possible off
-      true
-    } else {
-      applySubMove(iSrc, iDest)
     }
   }
 
@@ -229,7 +226,10 @@ class Board extends Cloneable {
       anBoard(Board.OPPONENT)(23 - iDest) < 2
     } else {
       // otherwise, attempting to bear off
-      val nBack = anBoard(Board.SELF).indexWhere(_ > 0, 1)
+      var nBack = 0
+      for (i <- 1 until 25 if anBoard(Board.SELF)(i) > 0) {
+          nBack = i
+      }
       nBack <= 5 && (iSrc == nBack || iDest == -1)
     }
   }
@@ -239,36 +239,42 @@ class Board extends Cloneable {
     //chequers or pips than those already found, it is illegal; if
     //it plays more, the old moves are illegal.
     if (cMoves >= pml.cMaxMoves && cPip >= pml.cMaxPips) {
-      if (cMoves > pml.cMaxMoves || cPip > pml.cMaxPips)
-        pml.amMoves.clear()
+      if (cMoves > pml.cMaxMoves || cPip > pml.cMaxPips) {
+        pml.cMoves = 0
+      }
 
       pml.cMaxMoves = cMoves
       pml.cMaxPips = cPip
 
       val auch: AuchKey = calcPositionKey
-      val filteredMoves = pml.amMoves.takeWhile(m => !(auch == m.auch && (cMoves > m.cMoves || cPip > m.cPips)))
-      filteredMoves += copyMove(cMoves, cPip, auch, anMoves)
-      pml.amMoves.clear()
-      pml.amMoves ++= filteredMoves
+      pml.amMoves
+        .take(pml.cMoves)
+        .filter(m => auch == m.auch && (cMoves > m.cMoves || cPip > m.cPips))
+        .take(1).headOption match {
+        case Some(m) =>
+          m.anMove.copyFrom(anMoves)
+          m.cMoves = cMoves
+          m.cPips = cPip
+        case None =>
+          val pm: Move = pml.amMoves(pml.cMoves)
+          pm.anMove.copyFrom(anMoves)
+          pm.auch = auch
+
+          pm.cMoves = cMoves
+          pm.cPips = cPip
+          pm.backChequer = backChequerIndex(Board.SELF)
+
+          pm.arEvalMove = new Reward()
+          pml.cMoves += 1
+      }
 
       require(pml.cMoves < MoveList.MAX_INCOMPLETE_MOVES)
     }
   }
 
-  private def copyMove(cMoves: Int, cPip: Int, auch: AuchKey, anMoves: ChequersMove): Move = {
-    val pm: Move = new Move
-    pm.anMove.copyFrom(anMoves)
-    pm.auch = auch
-    pm.cMoves = cMoves
-    pm.cPips = cPip
-    pm.backChequer = backChequerIndex(Board.SELF)
-    pm.arEvalMove = new Reward()
-    pm
-  }
-
   def locateMove(anMove: ChequersMove, pml: MoveList): Int = {
-    val moveKey = calcMoveKey(anMove)
-    pml.amMoves.take(pml.cMoves).indexWhere(m => moveKey == calcMoveKey(m.anMove))
+    val key: AuchKey = calcMoveKey(anMove)
+    Math.max(pml.amMoves.take(pml.cMoves).indexWhere(_ => calcMoveKey(anMove) == key), 0)
   }
 
   private def calcMoveKey(anMove: ChequersMove): AuchKey = {

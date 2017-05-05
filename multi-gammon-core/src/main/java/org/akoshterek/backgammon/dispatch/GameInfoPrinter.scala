@@ -1,16 +1,11 @@
 package org.akoshterek.backgammon.dispatch
 
-import org.akoshterek.backgammon.board.Board
-import org.akoshterek.backgammon.board.BoardFormatter
-import org.akoshterek.backgammon.matchstate.{GameResult, MatchMove, MatchState}
-import org.akoshterek.backgammon.move.ChequersMove
-import org.akoshterek.backgammon.move.MoveRecord
 import java.io.PrintWriter
-import java.nio.file.Files
-import java.nio.file.Path
-import java.nio.file.Paths
-import java.nio.file.StandardOpenOption
+import java.nio.file.{Files, Path, Paths, StandardOpenOption}
 
+import org.akoshterek.backgammon.board.{Board, BoardFormatter}
+import org.akoshterek.backgammon.matchstate.{GameResult, MatchMove, MatchState}
+import org.akoshterek.backgammon.move.{ChequersMove, MoveRecord}
 import org.apache.commons.lang3.StringUtils
 import resource.managed
 

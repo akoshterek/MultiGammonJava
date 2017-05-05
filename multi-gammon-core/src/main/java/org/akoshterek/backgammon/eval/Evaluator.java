@@ -9,7 +9,6 @@ import org.akoshterek.backgammon.board.PositionId;
 import org.apache.commons.math3.distribution.UniformIntegerDistribution;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.commons.math3.random.Well19937c;
-import scala.collection.immutable.Vector;
 
 import java.nio.file.Path;
 
@@ -116,7 +115,7 @@ public class Evaluator {
         final int CHEQUERS = 15;
 
         int i = anBoard.firstChequerIndex(Board.OPPONENT());
-        if (i == 25) {
+        if (i == -1) {
             // opponent has no pieces on board; player has lost
             arOutput[OUTPUT_WIN()] = arOutput[OUTPUT_WINGAMMON()] = arOutput[OUTPUT_WINBACKGAMMON()] = 0.0f;
             if (CHEQUERS == anBoard.chequersCount(Board.SELF())) {
@@ -141,7 +140,7 @@ public class Evaluator {
         }
 
         i = anBoard.firstChequerIndex(Board.SELF());
-        if (i == 25) {
+        if (i == -1) {
 		    // player has no pieces on board; wins
             arOutput[OUTPUT_WIN()] = 1.0f;
             arOutput[OUTPUT_LOSEGAMMON()] = arOutput[OUTPUT_LOSEBACKGAMMON()] = 0.0f;
@@ -370,8 +369,8 @@ public class Evaluator {
             dummy.anBoard()[1 - side][i] = 0;
         }
 
-        Vector<Object> bgp = BearoffGammon.getRaceBGprobs(dummy.anBoard()[1 - side]);
-        if (bgp.nonEmpty()) {
+        long[] bgp = BearoffGammon.getRaceBGprobs(dummy.anBoard()[1 - side]);
+        if (bgp.length > 0) {
             int k = PositionId.positionBearoff(anBoard.anBoard()[side], pbc1.getnPoints(), pbc1.getnChequers());
             short[] aProb = new short[32];
             float p = 0.0f;
@@ -383,7 +382,7 @@ public class Evaluator {
                 scale *= 36;
                 for (int i = 1; i <= j + side; ++i)
                     sum += aProb[i];
-                p += ((float)((Long)(bgp.apply(j)))) / scale * sum;
+                p += ((float)((Long)(bgp[j]))) / scale * sum;
             }
 
             p /= 65535.0;

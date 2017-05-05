@@ -1,9 +1,10 @@
 package org.akoshterek.backgammon.agent
 
+import java.nio.file.Path
+
 import org.akoshterek.backgammon.Constants
 import org.akoshterek.backgammon.board.Board
 import org.akoshterek.backgammon.eval.Reward
-import java.nio.file.Path
 
 /**
   * @author Alex
@@ -22,11 +23,11 @@ class HeuristicAgent(override val path: Path) extends AbsAgent("Heuristic", path
   def evalContact(board: Board): Reward = {
     val tmpBoard: Board = board.clone().swapSides()
     val reward = Reward.rewardArray
-    reward(Constants.OUTPUT_WIN) = evaluate(tmpBoard.anBoard(Board.SELF).toVector)
+    reward(Constants.OUTPUT_WIN) = evaluate(tmpBoard.anBoard(Board.SELF))
     new Reward(reward)
   }
 
-  private def evaluate(points: Vector[Int]): Double = {
+  private def evaluate(points: Array[Int]): Double = {
     var equity: Double = 0.0
     val atHome: Int = 15 - points.sum
 

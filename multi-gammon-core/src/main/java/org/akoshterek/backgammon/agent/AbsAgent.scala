@@ -1,12 +1,10 @@
 package org.akoshterek.backgammon.agent
 
-import org.akoshterek.backgammon.board.Board
-import org.akoshterek.backgammon.board.PositionClass
-import org.akoshterek.backgammon.eval.Evaluator
-import org.akoshterek.backgammon.eval.Reward
+import java.nio.file.{Path, Paths}
+
+import org.akoshterek.backgammon.board.{Board, PositionClass}
+import org.akoshterek.backgammon.eval.{Evaluator, Reward}
 import org.akoshterek.backgammon.move.Move
-import java.nio.file.Path
-import java.nio.file.Paths
 
 object AbsAgent {
     private val AGENTS_SUBFOLDER: String = "bin/agents"

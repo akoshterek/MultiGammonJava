@@ -8,8 +8,8 @@ import org.akoshterek.backgammon.Constants._
   *
   *         backgammon reward
   */
-final class Reward(input: Vector[Double]) {
-  def data: Vector[Double] = input
+final class Reward(input: Array[Double]) {
+  def data: Array[Double] = input
 
   require(data.length == NUM_OUTPUTS)
 
@@ -17,12 +17,12 @@ final class Reward(input: Vector[Double]) {
     this(reward.data)
   }
 
-  def this(reward: Array[Double]) {
-    this(reward.toVector)
+  def this(reward: Seq[Double]) {
+    this(reward.toArray)
   }
 
   def this() {
-    this(Vector.fill[Double](NUM_OUTPUTS)(0))
+    this(Array.fill[Double](NUM_OUTPUTS)(0))
   }
 
   def apply(index: Int): Double = data.apply(index)
@@ -67,14 +67,14 @@ final class Reward(input: Vector[Double]) {
   }
 
   def +(that: Reward): Reward = {
-    new Reward(Vector.tabulate[Double](NUM_OUTPUTS)(i => data(i) + that.data(i)))
+    new Reward(Array.tabulate[Double](NUM_OUTPUTS)(i => data(i) + that.data(i)))
   }
 
   override def toString: String = {
     data.mkString(", ")
   }
 
-  def toArray : Array[Double] = data.toArray
+  def toArray : Array[Double] = data
 }
 
 object Reward {

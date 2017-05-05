@@ -7,15 +7,15 @@ import resource.managed
   * Created by Alex on 03-05-17.
   */
 object Escapes {
-  val anEscapes0: Vector[Int] = loadTable("/org/akoshterek/backgammon/gnu/escapes0.dat")
-  val anEscapes1: Vector[Int] = loadTable("/org/akoshterek/backgammon/gnu/escapes1.dat")
+  private val anEscapes0: Array[Int] = loadTable("/org/akoshterek/backgammon/gnu/escapes0.dat")
+  private val anEscapes1: Array[Int] = loadTable("/org/akoshterek/backgammon/gnu/escapes1.dat")
 
-  private def loadTable(resource: String): Vector[Int] = {
+  private def loadTable(resource: String): Array[Int] = {
     managed(new LittleEndianDataInputStream(
       classOf[GnubgAgent].getResourceAsStream(resource)))
     .acquireAndGet(is => {
       for(_ <- 0 until 0x1000) yield is.readInt
-    }).toVector
+    }).toArray
   }
 
   def escapes0(anBoard: Array[Int], n: Int): Int = {
@@ -26,7 +26,7 @@ object Escapes {
     escapes(anBoard, n, anEscapes1)
   }
 
-  def escapes(anBoard: Array[Int], n: Int, anEscapes: Vector[Int]): Int = {
+  def escapes(anBoard: Array[Int], n: Int, anEscapes: Array[Int]): Int = {
     val m = if (n < 12) n else 12
 
     var af = 0

@@ -1,7 +1,7 @@
 package org.akoshterek.backgammon.move
 
-import org.akoshterek.backgammon.eval.Reward
 import org.akoshterek.backgammon.board.PositionClass
+import org.akoshterek.backgammon.eval.Reward
 
 /**
   * @author Alex

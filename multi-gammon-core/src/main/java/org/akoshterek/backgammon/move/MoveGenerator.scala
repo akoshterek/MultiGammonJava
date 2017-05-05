@@ -7,11 +7,14 @@ import org.akoshterek.backgammon.board.Board
   *         date 29.07.2015.
   */
 object MoveGenerator {
-  def generateMoves(board: Board, pml: MoveList, dice: (Int, Int)): Int = {
+  def generateMoves(board: Board, pml: MoveList, amMoves: Array[Move], dice: (Int, Int)): Int = {
     val anRoll: Array[Int] = makeAnRoll(dice)
     val anMoves: ChequersMove = new ChequersMove
 
-    pml.deleteMoves()
+    pml.cMoves = 0
+    pml.cMaxMoves = 0
+    pml.cMaxPips = 0
+    pml.amMoves = amMoves
     generateMovesSub(board, pml, anRoll, 0, 23, 0, anMoves)
 
     if (anRoll(0) != anRoll(1)) {
@@ -28,10 +31,11 @@ object MoveGenerator {
     dice._1,
     dice._2,
     if (dice._1 == dice._2) dice._1 else 0,
-    if (dice._1 == dice._2) dice._1 else 0)
+    if (dice._1 == dice._2) dice._1 else 0
+  )
 
-  private def generateMovesSub(board: Board, pml: MoveList, anRoll: Array[Int], nMoveDepth: Int,
-                               iPip: Int, cPip: Int, anMoves: ChequersMove): Boolean = {
+  private[move] def generateMovesSub(board: Board, pml: MoveList, anRoll: Array[Int], nMoveDepth: Int,
+                                     iPip: Int, cPip: Int, anMoves: ChequersMove): Boolean = {
     var fUsed: Boolean = false
     val anBoard: Array[Array[Int]] = board.anBoard
 

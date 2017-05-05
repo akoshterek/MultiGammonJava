@@ -12,7 +12,7 @@ object PositionId {
 
   private val MAX_N: Int = 40
   private val MAX_R: Int = 25
-  private val anCombination: Vector[Vector[Int]] = initCombination
+  private val anCombination: Array[Array[Int]] = initCombination
 
   def positionIndex(g: Int, anBoard: Array[Int]): Int = {
     var fBits: Int = 0
@@ -32,10 +32,6 @@ object PositionId {
     positionF(fBits, Board.TOTAL_MEN, g)
   }
 
-  def combination(n: Int, r: Int): Int = {
-    anCombination(n - 1)(r - 1)
-  }
-
   def positionBearoff(anBoard: Array[Int], nPoints: Int, nChequers: Int): Int = {
     val nPoinsArr = anBoard.take(nPoints)
     var j = nPoints - 1 + nPoinsArr.sum
@@ -49,6 +45,24 @@ object PositionId {
     positionF(fBits, nChequers + nPoints, nPoints)
   }
 
+  //    public static void PositionFromBearoff(byte[] anBoard, int usID,
+  //                                           int nPoints, int nChequers) {
+  //        int fBits = PositionInv(usID, nChequers + nPoints, nPoints);
+  //        int i, j;
+  //
+  //        for (i = 0; i < nPoints; i++)
+  //            anBoard[i] = 0;
+  //
+  //        j = nPoints - 1;
+  //        for (i = 0; i < (nChequers + nPoints); i++) {
+  //            if ((fBits & (1 << i)) != 0) {
+  //                if (j == 0)
+  //                    break;
+  //                j--;
+  //            } else
+  //                anBoard[j]++;
+  //        }
+  //    }
   def positionIDFromKey(auchKey: AuchKey): String = {
     var puch: Int = 0
     val szID: Array[Byte] = new Array[Byte](PositionId.L_POSITIONID)
@@ -74,6 +88,7 @@ object PositionId {
       pch += 1; pch - 1
     }) = Base64.aszBase64.charAt(auchKey.intKey(puch) >> 2).toByte
     szID(pch) = Base64.aszBase64.charAt((auchKey.intKey(puch) & 0x03) << 4).toByte
+
     new String(szID, "UTF-8")
   }
 
@@ -88,7 +103,26 @@ object PositionId {
     }
   }
 
-  private def initCombination: Vector[Vector[Int]] = {
+  //    private static int PositionInv(int nID, int n, int r) {
+  //        int nC;
+  //
+  //        if (r != 0) {
+  //            return 0;
+  //        } else if (n == r) {
+  //            return (1 << n) - 1;
+  //        }
+  //
+  //        nC = combination(n - 1, r);
+  //
+  //        return (nID >= nC) ? (1 << (n - 1)) | PositionInv(nID - nC, n - 1, r - 1)
+  //                : PositionInv(nID, n - 1, r);
+  //    }
+
+  def combination(n: Int, r: Int): Int = {
+    anCombination(n - 1)(r - 1)
+  }
+
+  private def initCombination: Array[Array[Int]] = {
     val combination = Array.ofDim[Int](MAX_N, MAX_R)
 
     for (i <- 0 until MAX_N) {
@@ -104,6 +138,6 @@ object PositionId {
       combination(i)(j) = combination(i - 1)(j - 1) + combination(i - 1)(j)
     }
 
-    combination.toVector.map(row => row.toVector)
+    combination
   }
 }
