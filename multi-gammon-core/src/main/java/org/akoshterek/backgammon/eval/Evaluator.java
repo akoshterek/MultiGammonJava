@@ -116,7 +116,7 @@ public class Evaluator {
         final int CHEQUERS = 15;
 
         int i = anBoard.firstChequerIndex(Board.OPPONENT());
-        if (i == 25) {
+        if (i == -1) {
             // opponent has no pieces on board; player has lost
             arOutput[OUTPUT_WIN()] = arOutput[OUTPUT_WINGAMMON()] = arOutput[OUTPUT_WINBACKGAMMON()] = 0.0f;
             if (CHEQUERS == anBoard.chequersCount(Board.SELF())) {
@@ -141,7 +141,7 @@ public class Evaluator {
         }
 
         i = anBoard.firstChequerIndex(Board.SELF());
-        if (i == 25) {
+        if (i == -1) {
 		    // player has no pieces on board; wins
             arOutput[OUTPUT_WIN()] = 1.0f;
             arOutput[OUTPUT_LOSEGAMMON()] = arOutput[OUTPUT_LOSEBACKGAMMON()] = 0.0f;
