@@ -1,9 +1,9 @@
 package org.akoshterek.backgammon.data
 
-import org.akoshterek.backgammon.Constants
 import java.io.InputStream
 import java.util.zip.GZIPInputStream
 
+import org.akoshterek.backgammon.Constants
 import resource.managed
 
 import scala.collection.mutable.ListBuffer
@@ -20,8 +20,8 @@ object TrainDataLoader {
       for (line <- source.getLines()) {
         val tokens: Array[String] = line.split("\\s")
         val reward = for (i <- 0 until Constants.NUM_OUTPUTS) yield tokens(i + 1).toDouble
-        val entry: TrainEntry = new TrainEntry(tokens(0), reward.toVector)
-        data :+ entry
+        val entry: TrainEntry = new TrainEntry(tokens(0), reward.toArray)
+        data += entry
       }
       data
     })
