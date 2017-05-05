@@ -22,15 +22,15 @@ class GameDispatcherMovesFinder(agents: Array[AgentEntry]) {
     if (pml.cMoves == 0) {
       pml.deleteMoves()
     } else {
-      val pm: Array[Move] = pml.amMoves.take(pml.cMoves)
-      pml.amMoves = pm
       scoreMoves(currentMatch, pml)
-      scala.util.Sorting.stableSort(pml.amMoves, Move.gt _)
     }
   }
 
   private def scoreMoves(currentMatch: MatchState, pml: MoveList) {
     val agent: Agent = agents(currentMatch.fMove).agent
+    val pm: Array[Move] = pml.amMoves.take(pml.cMoves)
+    pml.amMoves = pm
     agent.scoreMoves(pml.amMoves)
+    scala.util.Sorting.stableSort(pml.amMoves, Move.gt _)
   }
 }

@@ -67,7 +67,7 @@ final class Reward(input: Array[Double]) {
   }
 
   def +(that: Reward): Reward = {
-    new Reward(Vector.tabulate[Double](NUM_OUTPUTS)(i => data(i) + that.data(i)))
+    new Reward(Array.tabulate[Double](NUM_OUTPUTS)(i => data(i) + that.data(i)))
   }
 
   override def toString: String = {
