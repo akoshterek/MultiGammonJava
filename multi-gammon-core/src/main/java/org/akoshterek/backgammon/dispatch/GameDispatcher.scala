@@ -2,12 +2,12 @@ package org.akoshterek.backgammon.dispatch
 
 import java.util
 
-import scala.util.control.Breaks._
 import org.akoshterek.backgammon.agent.Agent
-import org.akoshterek.backgammon.board.Board
-import org.akoshterek.backgammon.board.PositionClass
+import org.akoshterek.backgammon.board.{Board, PositionClass}
 import org.akoshterek.backgammon.matchstate.{GameState, MatchMove, MatchState}
 import org.akoshterek.backgammon.move._
+
+import scala.util.control.Breaks._
 
 class GameDispatcher(val agent1: Agent, val agent2: Agent) {
   private val agents: Array[AgentEntry] = Array[AgentEntry](
@@ -92,15 +92,13 @@ class GameDispatcher(val agent1: Agent, val agent2: Agent) {
       if (showLog) {
         GameInfoPrinter.printRoll(agents, currentMatch.anDice)
       }
-    } while (currentMatch.anDice(1) == currentMatch.anDice(0))
+    } while (currentMatch.anDice._1 == currentMatch.anDice._2)
 
     {
       val pmr: MoveRecord = new MoveRecord
       pmr.mt = MoveType.MOVE_SETDICE
-      pmr.anDice(0) = currentMatch.anDice(0)
-      pmr.anDice(1) = currentMatch.anDice(1)
-      pmr.fPlayer = if (currentMatch.anDice(1) > currentMatch.anDice(0)) 1
-      else 0
+      pmr.anDice = currentMatch.anDice
+      pmr.fPlayer = if (currentMatch.anDice._2 > currentMatch.anDice._1) 1 else 0
       addMoveRecord(pmr)
     }
     diceRolled()
@@ -152,13 +150,11 @@ class GameDispatcher(val agent1: Agent, val agent2: Agent) {
         currentMatch.gs = GameState.GAME_NONE
         currentMatch.fMove = -1
         currentMatch.fTurn = -1
-        currentMatch.anDice(0) = 0
-        currentMatch.anDice(1) = 0
+        currentMatch.anDice = (0, 0)
 
       case MoveType.MOVE_NORMAL =>
         playMove(pmr.n.anMove, pmr.fPlayer)
-        currentMatch.anDice(0) = 0
-        currentMatch.anDice(1) = 0
+        currentMatch.anDice = (0, 0)
         n = currentMatch.board.gameStatus
         if (n != 0) {
           currentMatch.gs = GameState.GAME_OVER
@@ -179,8 +175,7 @@ class GameDispatcher(val agent1: Agent, val agent2: Agent) {
         }
 
       case MoveType.MOVE_SETDICE =>
-        currentMatch.anDice(0) = pmr.anDice(0)
-        currentMatch.anDice(1) = pmr.anDice(1)
+        currentMatch.anDice = pmr.anDice.copy()
         if (currentMatch.fMove != pmr.fPlayer) currentMatch.board.swapSides()
         currentMatch.fTurn = pmr.fPlayer
         currentMatch.fMove = pmr.fPlayer
@@ -289,18 +284,17 @@ class GameDispatcher(val agent1: Agent, val agent2: Agent) {
     } else {
 
       // invalidate on changed dice
-      if (currentMatch.anDice(0) > 0 && pmrHint != null && pmrHint.anDice(0) > 0
-        && (pmrHint.anDice(0) != currentMatch.anDice(0) || pmrHint.anDice(1) != currentMatch.anDice(1))) {
+      if (currentMatch.anDice._1 > 0 && pmrHint != null && pmrHint.anDice._1 > 0
+        && (pmrHint.anDice._1 != currentMatch.anDice._1 || pmrHint.anDice._2 != currentMatch.anDice._2)) {
         pmrHint = null
       }
       if (pmrHint == null) {
         pmrHint = new MoveRecord
         pmrHint.fPlayer = currentMatch.fTurn
       }
-      if (currentMatch.anDice(0) > 0) {
+      if (currentMatch.anDice._1 > 0) {
         pmrHint.mt = MoveType.MOVE_NORMAL
-        pmrHint.anDice(0) = currentMatch.anDice(0)
-        pmrHint.anDice(1) = currentMatch.anDice(1)
+        pmrHint.anDice = currentMatch.anDice.copy()
       }
 
       pmrHint
@@ -345,14 +339,14 @@ class GameDispatcher(val agent1: Agent, val agent2: Agent) {
       val anBoardMove: Board = ms.board.clone()
 
       // Roll dice and move
-      if (ms.anDice(0) == 0) {
+      if (ms.anDice._1 == 0) {
         ms.rollDice()
         diceRolled()
       }
 
       val pmr: MoveRecord = new MoveRecord
       pmr.mt = MoveType.MOVE_NORMAL
-      Array.copy(ms.anDice, 0, pmr.anDice, 0, pmr.anDice.length)
+      pmr.anDice = ms.anDice.copy()
       pmr.fPlayer = ms.fTurn
 
       fd.ml = pmr.ml

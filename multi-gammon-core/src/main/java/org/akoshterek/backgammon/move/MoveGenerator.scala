@@ -7,13 +7,13 @@ import org.akoshterek.backgammon.board.Board
   *         date 29.07.2015.
   */
 object MoveGenerator {
-    def generateMoves(board: Board, pml: MoveList, amMoves: Array[Move], n0: Int, n1: Int, fPartial: Boolean): Int = {
+    def generateMoves(board: Board, pml: MoveList, amMoves: Array[Move], dice: (Int, Int), fPartial: Boolean): Int = {
         val anRoll: Array[Int] = new Array[Int](4)
         val anMoves: ChequersMove = new ChequersMove
 
-        anRoll(0) = n0
-        anRoll(1) = n1
-        anRoll(2) = if (n0 == n1) n0 else 0
+        anRoll(0) = dice._1
+        anRoll(1) = dice._2
+        anRoll(2) = if (dice._1 == dice._2) dice._1 else 0
         anRoll(3) = anRoll(2)
 
         pml.cMoves = 0

@@ -2,8 +2,8 @@ package org.akoshterek.backgammon.dispatch
 
 import org.akoshterek.backgammon.agent.Agent
 import org.akoshterek.backgammon.board.Board
-import org.akoshterek.backgammon.move.{FindData, Move, MoveGenerator, MoveList}
 import org.akoshterek.backgammon.matchstate.MatchState
+import org.akoshterek.backgammon.move.{FindData, Move, MoveGenerator, MoveList}
 /**
   * @author oleksii.koshterek
   *         On: 22.05.16
@@ -11,12 +11,12 @@ import org.akoshterek.backgammon.matchstate.MatchState
 class GameDispatcherMovesFinder(agents: Array[AgentEntry]) {
 
     def findMove(currentMatch: MatchState, pfd: FindData, amMoves: Array[Move]) {
-        findAndSaveBestMoves(currentMatch, pfd.ml, amMoves, currentMatch.anDice(0), currentMatch.anDice(1), pfd.board)
+        findAndSaveBestMoves(currentMatch, pfd.ml, amMoves, currentMatch.anDice, pfd.board)
     }
 
     private def findAndSaveBestMoves(currentMatch: MatchState, pml: MoveList, amMoves: Array[Move],
-                                     nDice0: Int, nDice1: Int, anBoard: Board) {
-        MoveGenerator.generateMoves(anBoard, pml, amMoves, nDice0, nDice1, fPartial = false)
+                                     nDice: (Int, Int), anBoard: Board) {
+        MoveGenerator.generateMoves(anBoard, pml, amMoves, nDice, fPartial = false)
         agents(currentMatch.fMove).agent.currentBoard = currentMatch.board
         if (pml.cMoves == 0) {
             pml.amMoves = null
