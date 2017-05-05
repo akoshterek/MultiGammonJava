@@ -50,7 +50,7 @@ final class Reward(input: Array[Double]) {
     r = data(OUTPUT_WINBACKGAMMON)
     res(OUTPUT_WINBACKGAMMON) = data(OUTPUT_LOSEBACKGAMMON)
     res(OUTPUT_LOSEBACKGAMMON) = r
-    new Reward(res.toVector)
+    new Reward(res)
   }
 
   def clamp(): Reward = {
