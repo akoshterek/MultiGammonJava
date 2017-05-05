@@ -221,15 +221,13 @@ class GameDispatcher(val agent1: Agent, val agent2: Agent) {
 
     require(pmr.mt == MoveType.MOVE_GAMEINFO)
 
-    if (pmgi.fWinner < 0) {
-      return
-    }
-
-    val n = currentMatch.board.gameResult
-    currentMatch.anScore(pmgi.fWinner) += pmgi.nPoints
-    playedGames += 1
-    if (showLog) {
-      GameInfoPrinter.printGameOver(agents, pmgi.fWinner, pmgi.nPoints, n)
+    if (pmgi.fWinner >= 0) {
+      val n = currentMatch.board.gameResult
+      currentMatch.anScore(pmgi.fWinner) += pmgi.nPoints
+      playedGames += 1
+      if (showLog) {
+        GameInfoPrinter.printGameOver(agents, pmgi.fWinner, pmgi.nPoints, n)
+      }
     }
   }
 
@@ -250,22 +248,24 @@ class GameDispatcher(val agent1: Agent, val agent2: Agent) {
     }
   }
 
-  private def copyFromPmrCur(pmr: MoveRecord, get_move: Boolean) {
-    val pmr_cur: MoveRecord = getCurrentMoveRecord
-    if (pmr_cur == null) return
-    if (get_move && pmr_cur.ml.cMoves > 0) {
-      pmr.ml = new MoveList(pmr_cur.ml)
-      pmr.n.iMove = currentMatch.board.locateMove(pmr.n.anMove, pmr.ml)
+  private def copyFromPmrCur(pmr: MoveRecord, getMove: Boolean) {
+    getCurrentMoveRecord match {
+      case null =>
+      case pmr_cur: MoveRecord =>
+        if (getMove && pmr_cur.ml.cMoves > 0) {
+          pmr.ml = new MoveList(pmr_cur.ml)
+          pmr.n.iMove = currentMatch.board.locateMove(pmr.n.anMove, pmr.ml)
+        }
     }
   }
 
   private def addMoveRecordGetCur(pmr: MoveRecord) {
     pmr.mt match {
       case MoveType.MOVE_NORMAL =>
-        copyFromPmrCur(pmr, get_move = true)
+        copyFromPmrCur(pmr, getMove = true)
         pmrHint = null
       case MoveType.MOVE_SETDICE =>
-        copyFromPmrCur(pmr, get_move = false)
+        copyFromPmrCur(pmr, getMove = false)
       case _ =>
         pmrHint = null
     }

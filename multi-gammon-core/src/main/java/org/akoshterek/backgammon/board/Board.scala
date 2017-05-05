@@ -215,21 +215,19 @@ class Board extends Cloneable {
   }
 
   def isLegalMove(iSrc: Int, nPips: Int): Boolean = {
-    var nBack: Int = 0
     val iDest: Int = iSrc - nPips
 
     if (iDest >= 0) {
       // Here we can do the Chris rule check
-      return anBoard(Board.OPPONENT)(23 - iDest) < 2
+      anBoard(Board.OPPONENT)(23 - iDest) < 2
+    } else {
+      // otherwise, attempting to bear off
+      var nBack = 0
+      for (i <- 1 until 25 if anBoard(Board.SELF)(i) > 0) {
+          nBack = i
+      }
+      nBack <= 5 && (iSrc == nBack || iDest == -1)
     }
-
-    // otherwise, attempting to bear off
-    for (i <- 1 until 25) {
-      if (anBoard(Board.SELF)(i) > 0)
-        nBack = i
-    }
-
-    nBack <= 5 && (iSrc == nBack || iDest == -1)
   }
 
   def saveMoves(pml: MoveList, cMoves: Int, cPip: Int, anMoves: ChequersMove) {

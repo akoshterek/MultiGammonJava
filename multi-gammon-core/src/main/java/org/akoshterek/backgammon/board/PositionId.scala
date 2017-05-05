@@ -1,7 +1,5 @@
 package org.akoshterek.backgammon.board
 
-import java.io.UnsupportedEncodingException
-
 import org.akoshterek.backgammon.move.AuchKey
 import org.akoshterek.backgammon.util.Base64
 
@@ -14,8 +12,7 @@ object PositionId {
 
   private val MAX_N: Int = 40
   private val MAX_R: Int = 25
-  private var calculated: Boolean = false
-  private val anCombination: Array[Array[Int]] = Array.ofDim[Int](MAX_N, MAX_R)
+  private val anCombination: Array[Array[Int]] = initCombination
 
   def positionIndex(g: Int, anBoard: Array[Int]): Int = {
     var fBits: Int = 0
@@ -35,29 +32,15 @@ object PositionId {
     positionF(fBits, Board.TOTAL_MEN, g)
   }
 
-  def combination(n: Int, r: Int): Int = {
-    assert(n <= MAX_N && r <= MAX_R)
-    if (!calculated) {
-      initCombination()
-    }
-    anCombination(n - 1)(r - 1)
-  }
-
   def positionBearoff(anBoard: Array[Int], nPoints: Int, nChequers: Int): Int = {
-    var fBits: Int = 0
-    var j: Int = 0
+    val nPoinsArr = anBoard.take(nPoints)
+    var j = nPoints - 1 + nPoinsArr.sum
+    var fBits = 1 << j
 
-    j = nPoints - 1
-    for (i <- 0 until nPoints) {
-      j += anBoard(i)
-    }
-
-    fBits = 1 << j
-
-    for (i <- 0 until nPoints) {
-      j -= anBoard(i) + 1
+    nPoinsArr.foreach(n => {
+      j -= n + 1
       fBits |= (1 << j)
-    }
+    })
 
     positionF(fBits, nChequers + nPoints, nPoints)
   }
@@ -106,12 +89,7 @@ object PositionId {
     }) = Base64.aszBase64.charAt(auchKey.intKey(puch) >> 2).toByte
     szID(pch) = Base64.aszBase64.charAt((auchKey.intKey(puch) & 0x03) << 4).toByte
 
-    try {
-      new String(szID, "UTF-8")
-    }
-    catch {
-      case e: UnsupportedEncodingException => throw new RuntimeException(e)
-    }
+    new String(szID, "UTF-8")
   }
 
   private def positionF(fBits: Int, n: Int, r: Int): Int = {
@@ -139,24 +117,27 @@ object PositionId {
   //        return (nID >= nC) ? (1 << (n - 1)) | PositionInv(nID - nC, n - 1, r - 1)
   //                : PositionInv(nID, n - 1, r);
   //    }
-  private def initCombination() {
-    if (calculated) {
-      return
-    }
+
+  def combination(n: Int, r: Int): Int = {
+    anCombination(n - 1)(r - 1)
+  }
+
+  private def initCombination: Array[Array[Int]] = {
+    val combination = Array.ofDim[Int](MAX_N, MAX_R)
 
     for (i <- 0 until MAX_N) {
-      anCombination(i)(0) = i + 1
+      combination(i)(0) = i + 1
     }
 
     for (j <- 1 until MAX_R) {
-      anCombination(0)(j) = 0
+      combination(0)(j) = 0
     }
 
-    for (i <- 1 until MAX_N) {
-      for (j <- 1 until MAX_R) {
-        anCombination(i)(j) = anCombination(i - 1)(j - 1) + anCombination(i - 1)(j)
-      }
+    for (i <- 1 until MAX_N;
+         j <- 1 until MAX_R) {
+      combination(i)(j) = combination(i - 1)(j - 1) + combination(i - 1)(j)
     }
-    calculated = true
+
+    combination
   }
 }
