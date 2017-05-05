@@ -1,18 +1,9 @@
 package org.akoshterek.backgammon.board
 
-import org.akoshterek.backgammon.Constants.OUTPUT_LOSEBACKGAMMON
-import org.akoshterek.backgammon.Constants.OUTPUT_LOSEGAMMON
-import org.akoshterek.backgammon.Constants.OUTPUT_WINBACKGAMMON
-import org.akoshterek.backgammon.Constants.OUTPUT_WINGAMMON
-import org.akoshterek.backgammon.eval.Reward
-import org.akoshterek.backgammon.eval.Evaluator
-import org.akoshterek.backgammon.move.AuchKey
-import org.akoshterek.backgammon.move.ChequersMove
-import org.akoshterek.backgammon.move.Move
-import org.akoshterek.backgammon.move.MoveList
+import org.akoshterek.backgammon.Constants.{OUTPUT_LOSEBACKGAMMON, OUTPUT_LOSEGAMMON, OUTPUT_WINBACKGAMMON, OUTPUT_WINGAMMON}
+import org.akoshterek.backgammon.eval.{Evaluator, Reward}
+import org.akoshterek.backgammon.move.{AuchKey, ChequersMove, Move, MoveList}
 import org.akoshterek.backgammon.util.Base64
-
-import scala.util.control.Breaks._
 
 object Board {
   val OPPONENT: Int = 0
@@ -98,14 +89,12 @@ object Board {
 class Board extends Cloneable {
   val anBoard: Array[Array[Int]] = Array.ofDim[Int](2, 25)
 
-  private def this(board: Board) {
-    this()
-    System.arraycopy(board.anBoard(0), 0, this.anBoard(0), 0, this.anBoard(0).length)
-    System.arraycopy(board.anBoard(1), 0, this.anBoard(1), 0, this.anBoard(1).length)
-  }
-
   override def clone(): Board = {
-    new Board(this)
+    val board = new Board
+    for (i <- this.anBoard.indices) {
+      Array.copy(this.anBoard(i), 0, board.anBoard(i), 0, Board.HALF_BOARD_SIZE)
+    }
+    board
   }
 
   def swapSides(): Board = {
@@ -179,16 +168,10 @@ class Board extends Cloneable {
     PositionId.positionIDFromKey(auch)
   }
 
-  private def applyMove(anMove: ChequersMove, fCheckLegal: Boolean): Boolean = {
-    var i: Int = 0
-    while (i < anMove.move.length && anMove.move(i).from >= 0) {
-      if (!applySubMove(anMove.move(i).from, anMove.move(i).to - anMove.move(i).from, fCheckLegal)) {
-        return false
-      }
-      i += 1
-    }
-
-    true
+  private def applyMove(anMove: ChequersMove): Boolean = {
+    !anMove.move.exists(m => {
+      m.from >= 0 && !applySubMove(m.from, m.to - m.from, fCheckLegal = false)
+    })
   }
 
   def applySubMove(iSrc: Int, nRoll: Int, fCheckLegal: Boolean): Boolean = {
@@ -248,20 +231,9 @@ class Board extends Cloneable {
     nBack <= 5 && (iSrc == nBack || iDest == -1)
   }
 
-  def saveMoves(pml: MoveList, cMoves: Int, cPip: Int, anMoves: ChequersMove, fPartial: Boolean) {
+  def saveMoves(pml: MoveList, cMoves: Int, cPip: Int, anMoves: ChequersMove) {
     var pm: Move = null
 
-    if (fPartial) {
-      //Save all moves, even incomplete ones
-      if (cMoves > pml.cMaxMoves) {
-        pml.cMaxMoves = cMoves
-      }
-
-      if (cPip > pml.cMaxPips) {
-        pml.cMaxPips = cPip
-      }
-    }
-    else {
       //Save only legal moves: if the current move moves plays less
       //chequers or pips than those already found, it is illegal; if
       //it plays more, the old moves are illegal.
@@ -274,7 +246,6 @@ class Board extends Cloneable {
 
       pml.cMaxMoves = cMoves
       pml.cMaxPips = cPip
-    }
 
     pm = pml.amMoves(pml.cMoves)
     val auch: AuchKey = calcPositionKey
@@ -305,24 +276,12 @@ class Board extends Cloneable {
 
   def locateMove(anMove: ChequersMove, pml: MoveList): Int = {
     val key: AuchKey = calcMoveKey(anMove)
-    var result = 0
-
-    breakable {
-      for (i <- 0 until pml.cMoves) {
-        val auch: AuchKey = calcMoveKey(pml.amMoves(i).anMove)
-        if (auch == key) {
-          result = i
-          break
-        }
-      }
-    }
-
-    result
+    Math.max(pml.amMoves.take(pml.cMoves).indexWhere(_ => calcMoveKey(anMove) == key), 0)
   }
 
   private def calcMoveKey(anMove: ChequersMove): AuchKey = {
-    val anBoardMove: Board = new Board(this)
-    anBoardMove.applyMove(anMove, fCheckLegal = false)
+    val anBoardMove: Board = clone()
+    anBoardMove.applyMove(anMove)
     anBoardMove.calcPositionKey
   }
 
