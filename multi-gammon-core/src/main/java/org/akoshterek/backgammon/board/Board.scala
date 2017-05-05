@@ -2,6 +2,7 @@ package org.akoshterek.backgammon.board
 
 import org.akoshterek.backgammon.Constants.{OUTPUT_LOSEBACKGAMMON, OUTPUT_LOSEGAMMON, OUTPUT_WINBACKGAMMON, OUTPUT_WINGAMMON}
 import org.akoshterek.backgammon.eval.{Evaluator, Reward}
+import org.akoshterek.backgammon.matchstate.GameResult
 import org.akoshterek.backgammon.move.{AuchKey, ChequersMove, Move, MoveList}
 import org.akoshterek.backgammon.util.Base64
 
@@ -104,20 +105,20 @@ class Board extends Cloneable {
     this
   }
 
-  def gameStatus: Int = {
-    if (Evaluator.getInstance.classifyPosition(this) ne PositionClass.CLASS_OVER) {
-      return 0
-    }
-
-    val ar: Reward = Evaluator.getInstance.evalOver(this)
-    if (ar.data(OUTPUT_WINBACKGAMMON) != 0 || ar.data(OUTPUT_LOSEBACKGAMMON) != 0) {
-      3
-    }
-    else if (ar.data(OUTPUT_WINGAMMON) != 0 || ar.data(OUTPUT_LOSEGAMMON) != 0) {
-      2
-    }
-    else {
-      1
+  def gameResult: GameResult = {
+    if (Evaluator.getInstance.classifyPosition(this) != PositionClass.CLASS_OVER) {
+      GameResult.PLAYING
+    } else {
+      val ar: Reward = Evaluator.getInstance.evalOver(this)
+      if (ar(OUTPUT_WINBACKGAMMON) != 0 || ar(OUTPUT_LOSEBACKGAMMON) != 0) {
+        GameResult.BACKGAMMON
+      }
+      else if (ar(OUTPUT_WINGAMMON) != 0 || ar(OUTPUT_LOSEGAMMON) != 0) {
+        GameResult.GAMMON
+      }
+      else {
+        GameResult.SINGLE
+      }
     }
   }
 
