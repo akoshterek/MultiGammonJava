@@ -164,10 +164,7 @@ class Board extends Cloneable {
     auchKey
   }
 
-  def positionID: String = {
-    val auch: AuchKey = calcPositionKey
-    PositionId.positionIDFromKey(auch)
-  }
+  def positionID: String = PositionId.positionIDFromKey(calcPositionKey)
 
   private def applyMove(anMove: ChequersMove): Boolean = {
     !anMove.move.exists(m => {
@@ -178,40 +175,49 @@ class Board extends Cloneable {
   def applySubMove(iSrc: Int, nRoll: Int, fCheckLegal: Boolean): Boolean = {
     val iDest: Int = iSrc - nRoll
 
+    if (!isLegalSubMove(iSrc, nRoll, fCheckLegal)) {
+      false
+    } else {
+      anBoard(Board.SELF)(iSrc) = (anBoard(Board.SELF)(iSrc) - 1).toByte
+      if (iDest < 0) {
+        true
+      } else {
+        if (anBoard(0)(23 - iDest) != 0) {
+          var res = true
+          if (anBoard(0)(23 - iDest) > 1) {
+            // Trying to move to a point already made by the opponent
+            res = false
+          }
+
+          if (res) {
+            //blot hit
+            anBoard(Board.SELF)(iDest) = 1
+            anBoard(Board.OPPONENT)(23 - iDest) = 0
+
+            //send to bar
+            anBoard(Board.OPPONENT)(Board.BAR) += 1
+          }
+          res
+        }
+        else {
+          anBoard(Board.SELF)(iDest) += 1
+          true
+        }
+      }
+    }
+  }
+
+  def isLegalSubMove(iSrc: Int, nRoll: Int, fCheckLegal: Boolean): Boolean = {
+    val iDest: Int = iSrc - nRoll
     if (fCheckLegal && (nRoll < 1 || nRoll > 6)) {
       // Invalid dice roll
-      return false
-    }
-
-    if (iSrc < 0 || iSrc > 24 || iDest > 24 || anBoard(1)(iSrc) < 1) {
+      false
+    } else if (iSrc < 0 || iSrc > 24 || iDest > 24 || anBoard(1)(iSrc) < 1) {
       // Invalid point number, or source point is empty
-      return false
+      false
+    } else {
+      true
     }
-
-    anBoard(Board.SELF)(iSrc) = (anBoard(Board.SELF)(iSrc) - 1).toByte
-
-    if (iDest < 0) {
-      return true
-    }
-
-    if (anBoard(0)(23 - iDest) != 0) {
-      if (anBoard(0)(23 - iDest) > 1) {
-        // Trying to move to a point already made by the opponent
-        return false
-      }
-
-      //blot hit
-      anBoard(Board.SELF)(iDest) = 1
-      anBoard(Board.OPPONENT)(23 - iDest) = 0
-
-      //send to bar
-      anBoard(Board.OPPONENT)(Board.BAR) += 1
-    }
-    else {
-      anBoard(Board.SELF)(iDest) += 1
-    }
-
-    true
   }
 
   def isLegalMove(iSrc: Int, nPips: Int): Boolean = {
