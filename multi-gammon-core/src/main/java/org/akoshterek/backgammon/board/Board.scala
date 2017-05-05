@@ -237,46 +237,41 @@ class Board extends Cloneable {
   }
 
   def saveMoves(pml: MoveList, cMoves: Int, cPip: Int, anMoves: ChequersMove) {
-    var pm: Move = null
-
-      //Save only legal moves: if the current move moves plays less
-      //chequers or pips than those already found, it is illegal; if
-      //it plays more, the old moves are illegal.
-
-      if (cMoves < pml.cMaxMoves || cPip < pml.cMaxPips)
-        return
-
-      if (cMoves > pml.cMaxMoves || cPip > pml.cMaxPips)
+    //Save only legal moves: if the current move moves plays less
+    //chequers or pips than those already found, it is illegal; if
+    //it plays more, the old moves are illegal.
+    if (cMoves >= pml.cMaxMoves && cPip >= pml.cMaxPips) {
+      if (cMoves > pml.cMaxMoves || cPip > pml.cMaxPips) {
         pml.cMoves = 0
+      }
 
       pml.cMaxMoves = cMoves
       pml.cMaxPips = cPip
 
-    pm = pml.amMoves(pml.cMoves)
-    val auch: AuchKey = calcPositionKey
+      val auch: AuchKey = calcPositionKey
+      pml.amMoves
+        .take(pml.cMoves)
+        .filter(m => auch == m.auch && (cMoves > m.cMoves || cPip > m.cPips))
+        .take(1).headOption match {
+        case Some(m) =>
+          m.anMove.copyFrom(anMoves)
+          m.cMoves = cMoves
+          m.cPips = cPip
+        case None =>
+          val pm: Move = pml.amMoves(pml.cMoves)
+          pm.anMove.copyFrom(anMoves)
+          pm.auch = auch
 
-    for (i <- 0 until pml.cMoves) {
-      if (auch == pml.amMoves(i).auch) {
-        if (cMoves > pml.amMoves(i).cMoves || cPip > pml.amMoves(i).cPips) {
-          pml.amMoves(i).anMove.copyFrom(anMoves)
-          pml.amMoves(i).cMoves = cMoves
-          pml.amMoves(i).cPips = cPip
-        }
+          pm.cMoves = cMoves
+          pm.cPips = cPip
+          pm.backChequer = backChequerIndex(Board.SELF)
 
-        return
+          pm.arEvalMove = new Reward()
+          pml.cMoves += 1
       }
+
+      require(pml.cMoves < MoveList.MAX_INCOMPLETE_MOVES)
     }
-
-    pm.anMove.copyFrom(anMoves)
-    pm.auch = auch
-
-    pm.cMoves = cMoves
-    pm.cPips = cPip
-    pm.backChequer = backChequerIndex(Board.SELF)
-
-    pm.arEvalMove = new Reward()
-    pml.cMoves += 1
-    assert(pml.cMoves < MoveList.MAX_INCOMPLETE_MOVES)
   }
 
   def locateMove(anMove: ChequersMove, pml: MoveList): Int = {
@@ -291,13 +286,8 @@ class Board extends Cloneable {
   }
 
   private def checkSamePoint: Boolean = {
-    for (i <- 0 until 24) {
-      if (anBoard(0)(i) != 0 && anBoard(1)(23 - i) != 0) {
-        return false
-      }
-    }
-
-    true
+    !(0 until 24)
+      .exists(i => anBoard(Board.OPPONENT)(i) != 0 && anBoard(Board.SELF)(23 - i) != 0)
   }
 
   private def checkPosition: Boolean = {
@@ -321,13 +311,15 @@ class Board extends Cloneable {
     anBoard(0)(Board.BAR) == 0 || anBoard(1)(Board.BAR) == 0
   }
 
-  private def canEqual(a: Any) = a.isInstanceOf[Board]
-
   override def equals(that: Any): Boolean = {
     that match {
-      case that: Board => that.canEqual(this) && anBoard.deep == that.anBoard.deep
+      case that: Board => anBoard.deep == that.anBoard.deep
       case _ => false
     }
+  }
+
+  override def hashCode: Int = {
+    31 + anBoard.deep.hashCode()
   }
 
   private def clearBoard() {
