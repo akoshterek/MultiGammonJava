@@ -52,19 +52,8 @@ public class Evaluator {
     }
 
     public PositionClass classifyPosition(final Board anBoard) {
-        int nOppBack, nBack;
-
-        for (nOppBack = 24; nOppBack >= 0; --nOppBack) {
-            if (anBoard.anBoard()[0][nOppBack] != 0) {
-                break;
-            }
-        }
-
-        for (nBack = 24; nBack >= 0; --nBack) {
-            if (anBoard.anBoard()[1][nBack] != 0) {
-                break;
-            }
-        }
+        int nOppBack = anBoard.backChequerIndex(Board.OPPONENT());
+        int nBack = anBoard.backChequerIndex(Board.SELF());
 
         if (nBack < 0 || nOppBack < 0) {
             return PositionClass.CLASS_OVER;
