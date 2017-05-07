@@ -96,6 +96,8 @@ class Board extends Cloneable {
     board
   }
 
+  def apply(side: Int): Array[Int] = anBoard(side)
+  
   def swapSides(): Board = {
     val tmp: Array[Int] = anBoard(0)
     anBoard(0) = anBoard(1)

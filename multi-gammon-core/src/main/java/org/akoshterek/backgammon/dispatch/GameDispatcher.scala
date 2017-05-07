@@ -130,11 +130,10 @@ class GameDispatcher(val agent1: Agent, val agent2: Agent) {
     val lGame = lMatch.last.moveRecords
 
     val pmrx: MoveRecord = lGame.head
-    var pmgi: XMoveGameInfo = null
     //this is wrong -- plGame is not necessarily the right game
 
     assert(pmr.mt == MoveType.MOVE_GAMEINFO || pmrx.mt == MoveType.MOVE_GAMEINFO)
-    pmgi = pmrx.g
+    val pmgi = pmrx.g
 
     currentMatch.gs = GameState.GAME_PLAYING
 

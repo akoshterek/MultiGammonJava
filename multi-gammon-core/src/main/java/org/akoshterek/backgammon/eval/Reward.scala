@@ -75,8 +75,21 @@ final class Reward(input: Array[Double]) {
   }
 
   def toArray : Array[Double] = data
+
+  override def equals(that: Any): Boolean = {
+    that match {
+      case that: Reward => this.data.sameElements(that.data)
+      case _ => false
+    }
+  }
+
+  override def hashCode: Int = {
+    31 + data.toSeq.hashCode()
+  }
 }
 
 object Reward {
+  def apply(input: Array[Double]): Reward = new Reward(input)
+
   def rewardArray: Array[Double] = Array.ofDim[Double](NUM_OUTPUTS)
 }
