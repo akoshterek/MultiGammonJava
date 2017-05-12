@@ -1,14 +1,11 @@
 package org.akoshterek.backgammon.agent.gnubg;
 
-import com.google.common.io.LittleEndianDataInputStream;
 import org.akoshterek.backgammon.agent.AbsAgent;
-import org.akoshterek.backgammon.agent.gnubg.nn.NeuralNet;
+import org.akoshterek.backgammon.agent.gnubg.nn.GnuNeuralNets;
 import org.akoshterek.backgammon.board.Board;
 import org.akoshterek.backgammon.eval.Evaluator;
 import org.akoshterek.backgammon.eval.Reward;
 
-import java.io.DataInput;
-import java.io.IOException;
 import java.nio.file.Path;
 
 import static org.akoshterek.backgammon.Constants.*;
@@ -19,7 +16,6 @@ import static org.akoshterek.backgammon.eval.Gammons.*;
  *         date 12.09.2015.
  */
 public class GnubgAgent extends AbsAgent {
-    private NeuralNet nnContact, nnRace, nnCrashed;
     private GnuBgRepresentation representation = new GnuBgRepresentation();
 
     public GnubgAgent(final Path path) {
@@ -34,7 +30,7 @@ public class GnubgAgent extends AbsAgent {
     public Reward evalRace(final Board board) {
         double[] inputs = representation.calculateRaceInputs(board);
         double reward[] = Reward.rewardArray();
-        nnRace.evaluate(inputs, reward);
+        GnuNeuralNets.nnRace().evaluate(inputs, reward);
 
         // anBoard[1] is on roll
         // total men for side not on roll
@@ -120,7 +116,7 @@ public class GnubgAgent extends AbsAgent {
     public Reward evalCrashed(final Board board) {
         double[] inputs = representation.calculateCrashedInputs(board);
         double[] reward = Reward.rewardArray();
-        nnCrashed.evaluate(inputs, reward);
+        GnuNeuralNets.nnCrashed().evaluate(inputs, reward);
         return new Reward(reward);
     }
 
@@ -128,29 +124,7 @@ public class GnubgAgent extends AbsAgent {
     public Reward evalContact(final Board board) {
         double[] inputs = representation.calculateContactInputs(board);
         double[] reward = Reward.rewardArray();
-        nnContact.evaluate(inputs, reward);
+        GnuNeuralNets.nnContact().evaluate(inputs, reward);
         return new Reward(reward);
-    }
-
-    @Override
-    public void load() {
-        try (LittleEndianDataInputStream is = new LittleEndianDataInputStream(
-            GnubgAgent.class.getResourceAsStream("/org/akoshterek/backgammon/gnu/gnubg.wd"))) {
-            checkBinaryWeights(is);
-            nnContact = NeuralNet.loadBinary(is);
-            nnRace = NeuralNet.loadBinary(is);
-            nnCrashed = NeuralNet.loadBinary(is);
-        } catch (final Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private void checkBinaryWeights(final DataInput is) throws IOException {
-        float magic = is.readFloat();
-        float version = is.readFloat();
-
-        if(magic != 472.3782f || version != 1.0f) {
-            throw new IllegalArgumentException("Invalid weights file");
-        }
     }
 }

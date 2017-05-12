@@ -7,8 +7,8 @@ import resource.managed
   * Created by Alex on 03-05-17.
   */
 object Escapes {
-  private val anEscapes0: Array[Int] = loadTable("/org/akoshterek/backgammon/gnu/escapes0.dat")
-  private val anEscapes1: Array[Int] = loadTable("/org/akoshterek/backgammon/gnu/escapes1.dat")
+  private val anEscapes0: Array[Int] = loadTable("/org/akoshterek/backgammon/agent/gnubg/escapes0.dat")
+  private val anEscapes1: Array[Int] = loadTable("/org/akoshterek/backgammon/agent/gnubg/escapes1.dat")
 
   private def loadTable(resource: String): Array[Int] = {
     managed(new LittleEndianDataInputStream(

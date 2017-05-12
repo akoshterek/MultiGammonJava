@@ -31,7 +31,7 @@ class PubEvalAgent(override val path: Path, val contactWeights: Array[Double], v
   }
 
   private def preparePos(board: Board, pos: Array[Int]) {
-    val tmpBoard: Board = board.clone().swapSides()
+    val tmpBoard: Board = board.clone().swapSides
     val (opponent, self) = tmpBoard.chequersCount
 
     for (i <- 0 until Board.HALF_BOARD_SIZE - 1) {

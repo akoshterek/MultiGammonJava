@@ -400,7 +400,7 @@ public class Evaluator {
     }
 
     private void loadBearoff() {
-        pbc1 = BearoffContext.bearoffInit("/org/akoshterek/backgammon/gnu/gnubg_os0.bd");
-        pbc2 = BearoffContext.bearoffInit("/org/akoshterek/backgammon/gnu/gnubg_ts0.bd");
+        pbc1 = BearoffContext.bearoffInit("/org/akoshterek/backgammon/agent/gnubg/gnubg_os0.bd");
+        pbc2 = BearoffContext.bearoffInit("/org/akoshterek/backgammon/agent/gnubg/gnubg_ts0.bd");
     }
 }
