@@ -7,7 +7,7 @@ import org.akoshterek.backgammon.agent.gnubg.GnubgAgent
 import resource.managed
 
 /**
-  * Created by oleksii on 12-May-17.
+  * Created by Alex on 12-May-17.
   */
 object GnuNeuralNets {
   private var _nnContact: NeuralNet = _

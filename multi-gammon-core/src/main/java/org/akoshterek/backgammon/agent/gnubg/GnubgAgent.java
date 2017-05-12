@@ -23,7 +23,6 @@ public class GnubgAgent extends AbsAgent {
 
         supportsSanityCheck_$eq(true);
         needsInvertedEval_$eq(true);
-        load();
     }
 
     @Override
