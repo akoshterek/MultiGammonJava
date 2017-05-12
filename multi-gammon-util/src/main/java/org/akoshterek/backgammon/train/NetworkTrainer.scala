@@ -86,9 +86,9 @@ class NetworkTrainer(val settings: AgentSettings, val networkType: PositionClass
 
   private def getInputNeuronsCount: Int = {
     networkType match {
-      case PositionClass.CLASS_CONTACT => settings.representation.getContactInputsCount
-      case PositionClass.CLASS_CRASHED => settings.representation.getCrashedInputsCount
-      case PositionClass.CLASS_RACE => settings.representation.getRaceInputsCount
+      case PositionClass.CLASS_CONTACT => settings.representation.contactInputsCount
+      case PositionClass.CLASS_CRASHED => settings.representation.crashedInputsCount
+      case PositionClass.CLASS_RACE => settings.representation.raceInputsCount
       case _ => throw new IllegalArgumentException("Unknown network type " + networkType)
     }
   }
@@ -99,7 +99,7 @@ class NetworkTrainer(val settings: AgentSettings, val networkType: PositionClass
     val representation: InputRepresentation = new RawRepresentation(SuttonCodec)
     for (e <- data) {
       val input: MLData = new BasicMLData(representation.calculateContactInputs(Board.positionFromID(e.positionId)))
-      val ideal: MLData = new BasicMLData(Normalizer.toSmallerSigmoid(e.reward.toArray))
+      val ideal: MLData = new BasicMLData(Normalizer.toSmallerSigmoid(e.reward))
       val pair: MLDataPair = new BasicMLDataPair(input, ideal)
       trainingSet.add(pair)
     }

@@ -24,17 +24,17 @@ class GnuBgRepresentation implements InputRepresentation {
     }
 
     @Override
-    public int getRaceInputsCount() {
+    public int raceInputsCount() {
         return NUM_RACE_INPUTS;
     }
 
     @Override
-    public int getCrashedInputsCount() {
+    public int crashedInputsCount() {
         return NUM_INPUTS;
     }
 
     @Override
-    public int getContactInputsCount() {
+    public int contactInputsCount() {
         return NUM_INPUTS;
     }
 

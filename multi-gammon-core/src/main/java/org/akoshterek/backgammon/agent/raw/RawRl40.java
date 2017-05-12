@@ -38,7 +38,7 @@ public class RawRl40 extends AbsAgent implements Cloneable {
         fixed_$eq(false);
         supportsSanityCheck_$eq(false);
 
-        BasicNetwork network = SimpleEncogFA.createNN(representation.getContactInputsCount(), 40);
+        BasicNetwork network = SimpleEncogFA.createNN(representation.contactInputsCount(), 40);
         fa = new SimpleEncogFA(network);
         supportsBearoff_$eq(false);
         eligibilityTraces = new HashMap<>();
@@ -112,7 +112,9 @@ public class RawRl40 extends AbsAgent implements Cloneable {
     @Override
     public void save() {
         Path folder = path().resolve(fullName());
-        folder.toFile().mkdirs();
+        if (!folder.toFile().exists()) {
+            folder.toFile().mkdirs();
+        }
         Path nn = folder.resolve(fullName() + ".eg");
         fa.saveNN(nn);
     }
