@@ -18,11 +18,11 @@ class TestHeuristicAgent {
   }
 
   private def checkPosition(agent: Agent, positionId: String) = {
-    val board = Board.positionFromID(positionId)
+    var board = Board.positionFromID(positionId)
     val backPosId = board.positionID
     //System.out.println(BoardFormatter.drawBoard(board, 0, new String[7], ""));
     val reward = agent.evalContact(board)
-    board.swapSides()
+    board = board.swapSides()
     val reward2 = agent.evalContact(board)
     Assert.assertEquals("Mismatch in board conversion", positionId, backPosId)
     Assert.assertTrue("Wrong calculation for " + positionId, reward.equity > reward2.equity)

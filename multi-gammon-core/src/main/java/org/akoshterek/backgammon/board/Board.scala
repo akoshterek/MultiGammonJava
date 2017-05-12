@@ -83,26 +83,48 @@ object Board {
       auchKey.key(k + 1) = (auchKey.key(k + 1) | (b >> 8)).toByte
     }
   }
+
+  def apply(board: Array[Array[Int]]): Board = new Board(board)
+
+  def initialPosition: Board = {
+    val anBoard: Array[Array[Int]] = Array.ofDim[Int](2, 25)
+    anBoard(0)(5) = 5
+    anBoard(1)(5) = 5
+    anBoard(0)(12) = 5
+    anBoard(1)(12) = 5
+    anBoard(0)(7) = 3
+    anBoard(1)(7) = 3
+    anBoard(0)(23) = 2
+    anBoard(1)(23) = 2
+
+    Board(anBoard)
+  }
 }
 
 class Board extends Cloneable {
   val anBoard: Array[Array[Int]] = Array.ofDim[Int](2, 25)
 
+  def this(board: Array[Array[Int]]) {
+    this()
+    require(board.length == 2 && board(0).length == Board.HALF_BOARD_SIZE && board(1).length == Board.HALF_BOARD_SIZE, "Invalid board array")
+    Array.copy(board(0), 0, this.anBoard(0), 0, Board.HALF_BOARD_SIZE)
+    Array.copy(board(1), 0, this.anBoard(1), 0, Board.HALF_BOARD_SIZE)
+  }
+
   override def clone(): Board = {
     val board = new Board
-    for (i <- this.anBoard.indices) {
-      Array.copy(this.anBoard(i), 0, board.anBoard(i), 0, Board.HALF_BOARD_SIZE)
-    }
+    Array.copy(this.anBoard(0), 0, board.anBoard(0), 0, Board.HALF_BOARD_SIZE)
+    Array.copy(this.anBoard(1), 0, board.anBoard(1), 0, Board.HALF_BOARD_SIZE)
     board
   }
 
   def apply(side: Int): Array[Int] = anBoard(side)
   
   def swapSides(): Board = {
-    val tmp: Array[Int] = anBoard(0)
-    anBoard(0) = anBoard(1)
-    anBoard(1) = tmp
-    this
+    val board: Array[Array[Int]] = Array.ofDim[Int](2, 25)
+    Array.copy(this.anBoard(0), 0, board(1), 0, Board.HALF_BOARD_SIZE)
+    Array.copy(this.anBoard(1), 0, board(0), 0, Board.HALF_BOARD_SIZE)
+    Board(board)
   }
 
   def gameResult: GameResult = {
@@ -120,18 +142,6 @@ class Board extends Cloneable {
         GameResult.SINGLE
       }
     }
-  }
-
-  def initBoard(): Unit = {
-    clearBoard()
-    anBoard(0)(5) = 5
-    anBoard(1)(5) = 5
-    anBoard(0)(12) = 5
-    anBoard(1)(12) = 5
-    anBoard(0)(7) = 3
-    anBoard(1)(7) = 3
-    anBoard(0)(23) = 2
-    anBoard(1)(23) = 2
   }
 
   def chequersCount(side: Int): Int = anBoard(side).sum
@@ -317,9 +327,5 @@ class Board extends Cloneable {
 
   override def hashCode: Int = {
     31 + anBoard.deep.hashCode()
-  }
-
-  private def clearBoard() {
-    anBoard.transform(_ => Array.fill[Int](Board.HALF_BOARD_SIZE)(0))
   }
 }

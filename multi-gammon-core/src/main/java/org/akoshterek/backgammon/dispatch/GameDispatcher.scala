@@ -69,7 +69,7 @@ class GameDispatcher(val agent1: Agent, val agent2: Agent) {
 
   private def startGame() {
     currentMatch = new MatchState
-    currentMatch.board.initBoard()
+    currentMatch.board = Board.initialPosition
 
     lMatch.clear()
     lMatch += new MatchMove
@@ -139,7 +139,7 @@ class GameDispatcher(val agent1: Agent, val agent2: Agent) {
 
     pmr.mt match {
       case MoveType.MOVE_GAMEINFO =>
-        currentMatch.board.initBoard()
+        currentMatch.board = Board.initialPosition
         currentMatch.anScore(0) = pmr.g.anScore(0)
         currentMatch.anScore(1) = pmr.g.anScore(1)
         currentMatch.gs = GameState.GAME_NONE
@@ -166,12 +166,14 @@ class GameDispatcher(val agent1: Agent, val agent2: Agent) {
         }
 
         if (currentMatch.fMove != 0) {
-          currentMatch.board.swapSides()
+          currentMatch.board = currentMatch.board.swapSides()
         }
 
       case MoveType.MOVE_SETDICE =>
         currentMatch.anDice = pmr.anDice.copy()
-        if (currentMatch.fMove != pmr.fPlayer) currentMatch.board.swapSides()
+        if (currentMatch.fMove != pmr.fPlayer) {
+          currentMatch.board = currentMatch.board.swapSides()
+        }
         currentMatch.fTurn = pmr.fPlayer
         currentMatch.fMove = pmr.fPlayer
 
@@ -181,7 +183,7 @@ class GameDispatcher(val agent1: Agent, val agent2: Agent) {
 
   private def playMove(anMove: ChequersMove, fPlayer: Int) {
     if (currentMatch.fMove != -1 && fPlayer != currentMatch.fMove) {
-      currentMatch.board.swapSides()
+      currentMatch.board = currentMatch.board.swapSides()
     }
 
     breakable {
@@ -210,7 +212,7 @@ class GameDispatcher(val agent1: Agent, val agent2: Agent) {
 
     currentMatch.fMove = if (fPlayer != 0) 0 else 1
     currentMatch.fTurn = currentMatch.fMove
-    currentMatch.board.swapSides()
+    currentMatch.board = currentMatch.board.swapSides()
   }
 
   private def applyGameOver() {
@@ -300,7 +302,7 @@ class GameDispatcher(val agent1: Agent, val agent2: Agent) {
     pmr.mt match {
       case MoveType.MOVE_NORMAL =>
         if (currentMatch.fTurn != pmr.fPlayer) {
-          currentMatch.board.swapSides()
+          currentMatch.board = currentMatch.board.swapSides()
           currentMatch.fMove = pmr.fPlayer
           currentMatch.fTurn = pmr.fPlayer
         }
@@ -377,8 +379,7 @@ class GameDispatcher(val agent1: Agent, val agent2: Agent) {
   }
 
   private def forceMove(endMove: Move) {
-    val board: Board = Board.positionFromKey(endMove.auch)
-    board.swapSides()
+    val board: Board = Board.positionFromKey(endMove.auch).swapSides()
     endMove.auch = board.calcPositionKey
     endMove.arEvalMove = endMove.arEvalMove.invert
     currentAgent.doMove(endMove)

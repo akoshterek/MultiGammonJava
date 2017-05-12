@@ -49,7 +49,7 @@ public class BoardFormatter {
         if (fRoll != 0) {
             pch.append(board.positionID());
         } else {
-            an.swapSides();
+            an = an.swapSides();
             pch.append(an.positionID());
         }
         pch.append("              \n");

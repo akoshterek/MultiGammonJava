@@ -41,20 +41,13 @@ trait Agent {
     def evaluatePosition(board: Board, pc: PositionClass): Reward = {
         val effectivePc: PositionClass = if (PositionClass.isBearoff(pc) && !supportsBearoff) PositionClass.CLASS_RACE else pc
         effectivePc match {
-            case PositionClass.CLASS_OVER =>
-                evalOver(board)
-            case PositionClass.CLASS_RACE =>
-                evalRace(board)
-            case PositionClass.CLASS_CRASHED =>
-                evalCrashed(board)
-            case PositionClass.CLASS_CONTACT =>
-                evalContact(board)
-            case PositionClass.CLASS_BEAROFF1 =>
-                Evaluator.getInstance.evalBearoff1(board)
-            case PositionClass.CLASS_BEAROFF2 =>
-                Evaluator.getInstance.evalBearoff2(board)
-            case _ =>
-                throw new RuntimeException("Unknown class. How did we get here?")
+            case PositionClass.CLASS_OVER => evalOver(board)
+            case PositionClass.CLASS_RACE => evalRace(board)
+            case PositionClass.CLASS_CRASHED => evalCrashed(board)
+            case PositionClass.CLASS_CONTACT => evalContact(board)
+            case PositionClass.CLASS_BEAROFF1 => Evaluator.getInstance.evalBearoff1(board)
+            case PositionClass.CLASS_BEAROFF2 => Evaluator.getInstance.evalBearoff2(board)
+            case _ => throw new RuntimeException("Unknown class. How did we get here?")
         }
     }
 

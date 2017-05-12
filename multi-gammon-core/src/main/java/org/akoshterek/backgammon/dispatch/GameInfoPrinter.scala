@@ -29,7 +29,7 @@ object GameInfoPrinter {
     val pointDiff: Float = agents(0).wonPoints - agents(1).wonPoints
     System.out.println("%c:%s: won %+5.3f ppg\n".format(signs(0), agents(0).agent.fullName, pointDiff / numGames))
 
-    val logPath: Path = Paths.get(agents(0).agent.path.toString, "bin", getLogFileName(agents))
+    val logPath: Path = Paths.get(agents(0).agent.path.toString, "log", getLogFileName(agents))
     managed(new PrintWriter(Files.newBufferedWriter(logPath, StandardOpenOption.APPEND, StandardOpenOption.CREATE))).acquireAndGet(writer => {
       writer.println("%d;%f".format(agents(0).agent.playedGames, pointDiff / numGames))
     })
@@ -42,11 +42,7 @@ object GameInfoPrinter {
   def printBoard(agents: Array[AgentEntry], matchState: MatchState, matchMoves: ArrayBuffer[MatchMove]) {
     val apch: Array[String] = new Array[String](7)
 
-    val an: Board = matchState.board.clone()
-    if (matchState.fMove == 0) {
-      an.swapSides()
-    }
-
+    val an: Board = if (matchState.fMove == 0) matchState.board.clone().swapSides() else matchState.board.clone()
     apch(0) = "O: " + agents(0).agent.fullName
     apch(6) = "X: " + agents(1).agent.fullName
     //apch[1] = String.format("%d point(s)", match.anScore[0]);

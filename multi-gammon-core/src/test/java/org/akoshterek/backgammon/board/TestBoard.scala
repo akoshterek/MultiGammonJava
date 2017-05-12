@@ -9,8 +9,7 @@ import org.junit.Test
   */
 class TestBoard {
   @Test def testInit(): Unit = {
-    val board = new Board
-    board.initBoard()
+    val board = Board.initialPosition
     val other = Board.positionFromID(board.positionID)
     Assert.assertEquals(board, other)
   }

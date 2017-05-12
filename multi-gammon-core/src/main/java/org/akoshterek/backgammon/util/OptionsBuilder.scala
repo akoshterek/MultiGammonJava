@@ -14,7 +14,7 @@ object OptionsBuilder {
   private val BENCH_GAMES_OPTION: String = "bench-games"
   private val BENCH_PERIOD_OPTION: String = "bench-period"
   private val options: Options = new Options
-  private var commandLine: CommandLine = null
+  private var commandLine: CommandLine = _
 
   def build() {
     options.addOption("h", HELP_OPTION, false, "produce help message")
