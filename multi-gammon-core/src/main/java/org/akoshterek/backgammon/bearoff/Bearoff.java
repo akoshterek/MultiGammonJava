@@ -76,15 +76,17 @@ public class Bearoff {
      * BEAROFF_GNUBG: read two sided bearoff database
      * */
     private static void ReadTwoSidedBearoff(BearoffContext pbc, int iPos, float[] ar) {
-        int i, k = (pbc.isfCubeful()) ? 4 : 1;
+        int k = (pbc.isfCubeful()) ? 4 : 1;
         byte[] ac = new byte[8];
         int us;
 
         pbc.readBearoffData(40 + 2 * iPos * k, ac, k * 2);
         // add to cache
 
-        for (i = 0; i < k; ++i) {
-            us = ac[2 * i] | (ac[2 * i + 1]) << 8;
+        for (int i = 0; i < k; ++i) {
+            int ac1 = (int) ac[2 * i] & 0xff;
+            int ac2 = (int) (ac[2 * i + 1]) & 0xff;
+            us = ac1 | ac2 << 8;
             ar[i] = us / 32767.5f - 1.0f;
         }
     }

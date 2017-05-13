@@ -8,7 +8,7 @@ import org.junit.Test
 /**
   * Created by Alex on 07.05.2017.
   */
-class TestEval {
+class TestEvalOver {
   @Test
   def testEvalOverWinSingle(): Unit = {
     val board = new Board

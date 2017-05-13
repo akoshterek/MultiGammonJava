@@ -13,5 +13,5 @@ trait PointCodec {
     */
   def point(men: Int, index: Int): Double
 
-  def self: this.type = this
+  val self: this.type = this
 }

@@ -41,7 +41,7 @@ object Board {
 
   def positionFromID(pchEnc: String): Board = {
     val auchKey: AuchKey = new AuchKey
-    val ach: Array[Byte] = new Array[Byte](PositionId.L_POSITIONID)
+    val ach: Array[Int] = new Array[Int](PositionId.L_POSITIONID)
     var pch: Int = 0
     var puch: Int = 0
 
@@ -85,6 +85,8 @@ object Board {
   }
 
   def apply(board: Array[Array[Int]]): Board = new Board(board)
+
+  def apply(): Board = new Board()
 
   def initialPosition: Board = {
     val anBoard: Array[Array[Int]] = Array.ofDim[Int](2, 25)
