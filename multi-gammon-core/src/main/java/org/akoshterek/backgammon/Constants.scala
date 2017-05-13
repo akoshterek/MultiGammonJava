@@ -5,11 +5,11 @@ package org.akoshterek.backgammon
  *         date 19.07.2015.
  */
 object Constants {
-    val NUM_OUTPUTS: Int = 5
+    final val NUM_OUTPUTS: Int = 5
 
-    val OUTPUT_WIN: Int = 0
-    val OUTPUT_WINGAMMON: Int = 1
-    val OUTPUT_WINBACKGAMMON: Int = 2
-    val OUTPUT_LOSEGAMMON: Int = 3
-    val OUTPUT_LOSEBACKGAMMON: Int = 4
+    final val OUTPUT_WIN: Int = 0
+    final val OUTPUT_WINGAMMON: Int = 1
+    final val OUTPUT_WINBACKGAMMON: Int = 2
+    final val OUTPUT_LOSEGAMMON: Int = 3
+    final val OUTPUT_LOSEBACKGAMMON: Int = 4
 }

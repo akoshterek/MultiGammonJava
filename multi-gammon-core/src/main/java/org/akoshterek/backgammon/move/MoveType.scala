@@ -5,7 +5,7 @@ package org.akoshterek.backgammon.move
   *         date 20.07.2015.
   */
 sealed trait MoveType {
-    def value: Int
+    val value: Int
 }
 
 object MoveType {

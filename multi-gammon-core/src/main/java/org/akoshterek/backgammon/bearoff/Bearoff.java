@@ -1,5 +1,6 @@
 package org.akoshterek.backgammon.bearoff;
 
+import com.google.common.primitives.Ints;
 import org.akoshterek.backgammon.board.Board;
 import org.akoshterek.backgammon.board.PositionId;
 import org.akoshterek.backgammon.eval.Reward;
@@ -75,15 +76,17 @@ public class Bearoff {
      * BEAROFF_GNUBG: read two sided bearoff database
      * */
     private static void ReadTwoSidedBearoff(BearoffContext pbc, int iPos, float[] ar) {
-        int i, k = (pbc.isfCubeful()) ? 4 : 1;
+        int k = (pbc.isfCubeful()) ? 4 : 1;
         byte[] ac = new byte[8];
         int us;
 
         pbc.readBearoffData(40 + 2 * iPos * k, ac, k * 2);
         // add to cache
 
-        for (i = 0; i < k; ++i) {
-            us = ac[2 * i] | (ac[2 * i + 1]) << 8;
+        for (int i = 0; i < k; ++i) {
+            int ac1 = (int) ac[2 * i] & 0xff;
+            int ac2 = (int) (ac[2 * i + 1]) & 0xff;
+            us = ac1 | ac2 << 8;
             ar[i] = us / 32767.5f - 1.0f;
         }
     }
@@ -283,10 +286,6 @@ public class Bearoff {
         ar[arrOffset + 1] = (float) Math.sqrt(sx2 - sx * sx);
     }
 
-    private static int makeInt(byte a, byte b, byte c, byte d) {
-        return ((int) a | (int) b << 8 | (int) c << 16 | (int) d << 24);
-    }
-
     private static void getDistCompressed(short[] aus, BearoffContext pbc, int nPosID) {
         byte[] ac = new byte[128];
         int iOffset;
@@ -299,9 +298,8 @@ public class Bearoff {
 
         pbc.readBearoffData(40 + nPosID * index_entry_size, ac, index_entry_size);
 
-        // find offset
-
-        iOffset = makeInt(ac[0], ac[1], ac[2], ac[3]);
+        // find offset (LE byte order)
+        iOffset = Ints.fromBytes(ac[3], ac[2], ac[1], ac[0]);
 
         nz = ac[4];
         ioff = ac[5];

@@ -4,7 +4,7 @@ package org.akoshterek.backgammon.matchstate
   * Created by Alex on 29-04-17.
   */
 sealed trait GameResult {
-  def value: Int
+  val value: Int
 }
 
 object GameResult {
