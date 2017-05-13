@@ -8,17 +8,9 @@ import org.akoshterek.backgammon.board.Board
   *         date 21.09.2015.
   */
 class RawRepresentation(val codec: PointCodec) extends InputRepresentation {
-  def getRaceInputsCount: Int = {
-    getContactInputsCount
-  }
-
-  def getCrashedInputsCount: Int = {
-    getContactInputsCount
-  }
-
-  def getContactInputsCount: Int = {
-    2 * (codec.inputsPerPoint * 24 + 2)
-  }
+  val contactInputsCount: Int = 2 * (codec.inputsPerPoint * 24 + 2)
+  val raceInputsCount: Int = contactInputsCount
+  val crashedInputsCount: Int = contactInputsCount
 
   def calculateRaceInputs(anBoard: Board): Array[Double] = {
     calculateContactInputs(anBoard)
@@ -29,7 +21,7 @@ class RawRepresentation(val codec: PointCodec) extends InputRepresentation {
   }
 
   def calculateContactInputs(anBoard: Board): Array[Double] = {
-    val inputs: Array[Double] = new Array[Double](getContactInputsCount)
+    val inputs: Array[Double] = new Array[Double](contactInputsCount)
     calculateHalfBoard(anBoard.anBoard(0), inputs, 0)
     calculateHalfBoard(anBoard.anBoard(1), inputs, inputs.length / 2)
     inputs

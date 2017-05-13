@@ -2,7 +2,6 @@ package org.akoshterek.backgammon.agent.gnubg.nn;
 
 import java.io.DataInput;
 import java.io.IOException;
-import java.util.Random;
 
 public class NeuralNet {
     private int cInput;
@@ -26,11 +25,6 @@ public class NeuralNet {
         arOutputWeight = new float[cOutput * cHidden];
         arHiddenThreshold = new float[cHidden];
         arOutputThreshold = new float[cOutput];
-
-        initArray(arHiddenWeight);
-        initArray(arOutputWeight);
-        initArray(arHiddenThreshold);
-        initArray(arOutputThreshold);
     }
 
     public static NeuralNet loadBinary(DataInput inputStream)   {
@@ -100,13 +94,6 @@ public class NeuralNet {
                 r += ar[j] * arOutputWeight[prWeight++];
 
             arOutput[i] = Sigmoid.sigmoid(-rBetaOutput * r);
-        }
-    }
-
-    private static void initArray(float[] arr) {
-        Random random = new Random();
-        for (int i = 0; i < arr.length; i++) {
-            arr[i] = ((random.nextInt() & 0xFFFF) - 0x8000) / 131072.0f;
         }
     }
 

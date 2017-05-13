@@ -19,15 +19,10 @@ abstract class AbsAgent(override val fullName: String, override val path: Path) 
     }
 
     def scoreMove(pm: Move): Reward = {
-      var anBoardTemp: Board = Board.positionFromKey(pm.auch)
+        val anBoardTemp: Board = Board.positionFromKey(pm.auch).swapSides
         pm.pc = Evaluator.getInstance.classifyPosition(anBoardTemp)
-
-      if (needsInvertedEval && (pm.pc == PositionClass.CLASS_RACE || pm.pc == PositionClass.CLASS_CONTACT || pm.pc == PositionClass.CLASS_CRASHED)) {
-        anBoardTemp = anBoardTemp.swapSides
-      }
-
         var arEval: Reward = evaluatePositionFull(anBoardTemp, pm.pc)
-        if (needsInvertedEval && !PositionClass.isExact(pm.pc)) {
+        if (needsInvertedEval) {
             //TODO why?
             arEval = arEval.invert
         }

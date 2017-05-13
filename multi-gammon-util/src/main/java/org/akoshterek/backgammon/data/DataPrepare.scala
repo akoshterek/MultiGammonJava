@@ -57,7 +57,7 @@ object DataPrepare extends App {
     val missed: mutable.Map[String, Reward] = new mutable.TreeMap[String, Reward]
 
     for (key <- data.keySet) {
-      val board: Board = Board.positionFromID(key).swapSides()
+      val board: Board = Board.positionFromID(key).swapSides
       val posRev: String = board.positionID
       if (!data.contains(posRev)) {
         val reward: Reward = data(key).invert

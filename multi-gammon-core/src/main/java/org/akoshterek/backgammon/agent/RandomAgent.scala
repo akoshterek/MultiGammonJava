@@ -15,11 +15,7 @@ class RandomAgent(override val path: Path) extends AbsAgent("Random", path) {
         new Reward(reward)
     }
 
-    override def evalRace(board: Board): Reward = {
-        evalContact(board)
-    }
+    override def evalRace(board: Board): Reward = evalContact(board)
 
-    override def evalCrashed(board: Board): Reward = {
-        evalContact(board)
-    }
+    override def evalCrashed(board: Board): Reward = evalContact(board)
 }

@@ -42,7 +42,7 @@ object GameInfoPrinter {
   def printBoard(agents: Array[AgentEntry], matchState: MatchState, matchMoves: ArrayBuffer[MatchMove]) {
     val apch: Array[String] = new Array[String](7)
 
-    val an: Board = if (matchState.fMove == 0) matchState.board.clone().swapSides() else matchState.board.clone()
+    val an: Board = if (matchState.fMove == 0) matchState.board.clone().swapSides else matchState.board.clone()
     apch(0) = "O: " + agents(0).agent.fullName
     apch(6) = "X: " + agents(1).agent.fullName
     //apch[1] = String.format("%d point(s)", match.anScore[0]);
