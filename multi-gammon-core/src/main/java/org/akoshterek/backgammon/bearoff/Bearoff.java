@@ -47,8 +47,8 @@ public class Bearoff {
             n += anBoard[1][i];
         }
 
-        return n <= pbc.getnChequers() && nOpp <= pbc.getnChequers()
-                && nBack < pbc.getnPoints() && nOppBack < pbc.getnPoints();
+        return n <= pbc.chequers() && nOpp <= pbc.chequers()
+                && nBack < pbc.points() && nOppBack < pbc.points();
     }
 
     public static Reward bearoffEval(BearoffContext pbc, Board anBoard) {
@@ -60,9 +60,9 @@ public class Bearoff {
     }
 
     private static Reward bearoffEvalTwoSided (BearoffContext pbc, Board anBoard) {
-        int nUs = PositionId.positionBearoff(anBoard.anBoard()[1], pbc.getnPoints(), pbc.getnChequers());
-        int nThem = PositionId.positionBearoff(anBoard.anBoard()[0], pbc.getnPoints(), pbc.getnChequers());
-        int n = PositionId.combination(pbc.getnPoints() + pbc.getnChequers(), pbc.getnPoints());
+        int nUs = PositionId.positionBearoff(anBoard.anBoard()[1], pbc.points(), pbc.chequers());
+        int nThem = PositionId.positionBearoff(anBoard.anBoard()[0], pbc.points(), pbc.chequers());
+        int n = PositionId.combination(pbc.points() + pbc.chequers(), pbc.points());
         int iPos = nUs * n + nThem;
         float[] ar = new float[4];
 
@@ -76,11 +76,10 @@ public class Bearoff {
      * BEAROFF_GNUBG: read two sided bearoff database
      * */
     private static void ReadTwoSidedBearoff(BearoffContext pbc, int iPos, float[] ar) {
-        int k = (pbc.isfCubeful()) ? 4 : 1;
-        byte[] ac = new byte[8];
+        int k = (pbc.isCubeful()) ? 4 : 1;
         int us;
 
-        pbc.readBearoffData(40 + 2 * iPos * k, ac, k * 2);
+        byte[] ac = pbc.readBearoffData(40 + 2 * iPos * k, k * 2);
         // add to cache
 
         for (int i = 0; i < k; ++i) {
@@ -103,7 +102,7 @@ public class Bearoff {
         // get bearoff probabilities
 
         for (i = 0; i < 2; ++i) {
-            an[i] = PositionId.positionBearoff(anBoard.anBoard()[i], pbc.getnPoints(), pbc.getnChequers());
+            an[i] = PositionId.positionBearoff(anBoard.anBoard()[i], pbc.points(), pbc.chequers());
             bearoffDist(pbc, an[i], aarProb[i], aarGammonProb[i], ar[i], null);
         }
 
@@ -126,7 +125,7 @@ public class Bearoff {
         }
 
         if (anOn[0] == 15 || anOn[1] == 15) {
-            if (pbc.isfGammon()) {
+            if (pbc.isWithGammonProbs()) {
                 // my gammon chance: I'm out in i rolls and my opponent isn't inside
                 //home quadrant in less than i rolls
                 r = 0;
@@ -170,7 +169,7 @@ public class Bearoff {
             throw new IllegalArgumentException("Invalid bearoff database");
         }
 
-        if (pbc.isfND()) {
+        if (pbc.isNormalDistribution()) {
             readBearoffOneSidedND(pbc, nPosID, arProb, arGammonProb, ar, ausProb);
         } else {
             readBearoffOneSidedExact(pbc, nPosID, arProb, arGammonProb, ar, ausProb);
@@ -194,18 +193,14 @@ public class Bearoff {
                                               float[] ar,
                                               short[] ausProb) {
 
-        byte[] ac = new byte[16];
-        int i;
-        float r;
-
-        pbc.readBearoffData(40 + nPosID * 16, ac, 16);
+        byte[] ac = pbc.readBearoffData(40 + nPosID * 16, 16);
         ByteBuffer bb = ByteBuffer.wrap(ac);
         bb.order(ByteOrder.LITTLE_ENDIAN);
         float[] arx = bb.asFloatBuffer().array();
 
         if ( arProb != null || ausProb != null) {
-            for (i = 0; i < 32; ++i) {
-                r = fnd(1.0f * i, arx[0], arx[1]);
+            for (int i = 0; i < 32; ++i) {
+                float r = fnd(1.0f * i, arx[0], arx[1]);
                 if(arProb != null) {
                     arProb[i] = r;
                 }
@@ -216,8 +211,8 @@ public class Bearoff {
         }
 
         if ( arGammonProb != null) {
-            for (i = 0; i < 32; ++i) {
-                r = fnd(1.0f * i, arx[2], arx[3]);
+            for (int i = 0; i < 32; ++i) {
+                float r = fnd(1.0f * i, arx[2], arx[3]);
                 arGammonProb[i] = r;
             }
         }
@@ -234,20 +229,19 @@ public class Bearoff {
                                                  short[] ausProb) {
         short[] aus = new short[64];
     	// get distribution
-        if (pbc.isfCompressed()) {
+        if (pbc.isCompressed()) {
             getDistCompressed(aus, pbc, nPosID);
         } else {
             getDistUncompressed(aus, pbc, nPosID);
         }
 
-        assignOneSided(arProb, arGammonProb, ar, ausProb, aus, 32);
+        assignOneSided(arProb, arGammonProb, ar, ausProb, aus);
     }
 
     private static void assignOneSided(float[] arProb, float[] arGammonProb,
                                        float[] ar,
                                        short[] ausProb,
-                                       short[] ausProbx,
-                                       int ausGammonProbxOffset) {
+                                       short[] ausProbx) {
 
         float[] arx = new float[64];
 
@@ -259,7 +253,7 @@ public class Bearoff {
                 arx[i] = ausProbx[i] / 65535.0f;
 
             for (int i = 0; i < 32; ++i)
-                arx[32 + i] = ausProbx[ausGammonProbxOffset + i] / 65535.0f;
+                arx[32 + i] = ausProbx[32 + i] / 65535.0f;
 
             if (arProb != null) {
                 System.arraycopy(arx, 0, arProb, 0, 32);
@@ -287,23 +281,22 @@ public class Bearoff {
     }
 
     private static void getDistCompressed(short[] aus, BearoffContext pbc, int nPosID) {
-        byte[] ac = new byte[128];
         int iOffset;
         int nBytes;
-        int ioff, nz, ioffg = 0, nzg = 0;
-        int nPos = PositionId.combination(pbc.getnPoints() + pbc.getnChequers(), pbc.getnPoints());
-        int index_entry_size = pbc.isfGammon() ? 8 : 6;
+        int ioff, ioffg = 0, nzg = 0;
+        int nPos = PositionId.combination(pbc.points() + pbc.chequers(), pbc.points());
+        int index_entry_size = pbc.isWithGammonProbs() ? 8 : 6;
 
         // find offsets and no. of non-zero elements
 
-        pbc.readBearoffData(40 + nPosID * index_entry_size, ac, index_entry_size);
+        byte[] ac = pbc.readBearoffData(40 + nPosID * index_entry_size, index_entry_size);
 
         // find offset (LE byte order)
         iOffset = Ints.fromBytes(ac[3], ac[2], ac[1], ac[0]);
 
-        nz = ac[4];
+        int nz = ac[4];
         ioff = ac[5];
-        if (pbc.isfGammon()) {
+        if (pbc.isWithGammonProbs()) {
             nzg = ac[6];
             ioffg = ac[7];
         }
@@ -312,11 +305,10 @@ public class Bearoff {
         if ((iOffset > 64 * nPos && 64 * nPos > 0) ||
                 nz > 32 || ioff > 32 ||
                 nzg > 32 || ioffg > 32) {
-            throw new IllegalArgumentException("The bearoff file '" + pbc.getSzFilename() + "' is likely to be corrupted.");
+            throw new IllegalArgumentException("The bearoff database is likely to be corrupted.");
         }
 
         // read prob + gammon probs
-
         iOffset = 40     /* the header */
                 + nPos * index_entry_size     /* the offset data */
                 + 2 * iOffset; /* offset to current position */
@@ -326,18 +318,15 @@ public class Bearoff {
         nBytes = 2 * (nz + nzg);
 
         // get distribution
-        pbc.readBearoffData(iOffset, ac, nBytes);
+        ac = pbc.readBearoffData(iOffset, nBytes);
         copyBytes(aus, ac, nz, ioff, nzg, ioffg);
     }
 
     private static void getDistUncompressed (short[] aus, BearoffContext pbc, int nPosID) {
-        byte[] ac = new byte[128];
-        int iOffset;
+        // read from buffer
+        int iOffset = 40 + 64 * nPosID * (pbc.isWithGammonProbs() ? 2 : 1);
 
-        // read from file
-        iOffset = 40 + 64 * nPosID * (pbc.isfGammon() ? 2 : 1);
-
-        pbc.readBearoffData(iOffset, ac, pbc.isfGammon() ? 128 : 64);
+        byte[] ac = pbc.readBearoffData(iOffset, pbc.isWithGammonProbs() ? 128 : 64);
         copyBytes ( aus, ac, 32, 0, 32, 0 );
     }
 
@@ -345,11 +334,11 @@ public class Bearoff {
         int i = 0;
         Arrays.fill(aus, 0, 64, (short) 0);
         for (int j = 0; j < nz; ++j, i += 2) {
-            aus[ioff + j] = (short) (ac[i] | ac[i + 1] << 8);
+            aus[ioff + j] = (short)((short)(ac[i] & 0xff) | (short)(ac[i + 1] & 0xff) << 8);
         }
 
         for (int j = 0; j < nzg; ++j, i += 2) {
-            aus[32 + ioffg + j] = (short) (ac[i] | ac[i + 1] << 8);
+            aus[32 + ioffg + j] = (short) ((short)(ac[i] & 0xff) | (short)(ac[i + 1] & 0xff) << 8);
         }
     }
 }
