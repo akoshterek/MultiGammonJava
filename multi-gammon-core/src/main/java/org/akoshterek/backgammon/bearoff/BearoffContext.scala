@@ -18,7 +18,7 @@ import resource.managed
   * @param isNormalDistribution normal distribution instead of exact dist?
   * @param data pointer to data in memory
   */
-class BearoffContext private(val isTwoSided: Boolean,
+final class BearoffContext private(val isTwoSided: Boolean,
                              val points: Int,
                              val chequers: Int,
                              val isWithGammonProbs: Boolean,

@@ -1,11 +1,10 @@
 package org.akoshterek.backgammon.agent
 
-import org.akoshterek.backgammon.board.Board
-import org.akoshterek.backgammon.board.PositionClass
-import org.akoshterek.backgammon.eval.Evaluator
-import org.akoshterek.backgammon.eval.Reward
-import org.akoshterek.backgammon.move.Move
 import java.nio.file.Path
+
+import org.akoshterek.backgammon.board.{Board, PositionClass}
+import org.akoshterek.backgammon.eval.{Evaluator, Reward}
+import org.akoshterek.backgammon.move.Move
 
 trait Agent {
     protected val _fullName: String
@@ -15,15 +14,14 @@ trait Agent {
     def path: Path = _path
 
     var isLearnMode: Boolean = false
-    protected var supportsSanityCheck: Boolean = false
+    val supportsSanityCheck: Boolean = false
+    val needsInvertedEval: Boolean = false
+    val supportsBearoff: Boolean = false
 
     private var _playedGames: Int = 0
     def playedGames: Int = _playedGames
 
     protected var fixed: Boolean = true
-
-    protected var needsInvertedEval: Boolean = false
-    protected var supportsBearoff: Boolean = false
 
     protected var _currentBoard: Board = _
     protected var curPC: PositionClass = PositionClass.CLASS_OVER
