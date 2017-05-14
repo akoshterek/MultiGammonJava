@@ -35,12 +35,8 @@ public class RawRl40 extends AbsAgent implements Cloneable {
 
     public RawRl40(Path path) {
         super("RawRl40", path);
-        fixed_$eq(false);
-        supportsSanityCheck_$eq(false);
-
         BasicNetwork network = SimpleEncogFA.createNN(representation.contactInputsCount(), 40);
         fa = new SimpleEncogFA(network);
-        supportsBearoff_$eq(false);
         eligibilityTraces = new HashMap<>();
     }
 

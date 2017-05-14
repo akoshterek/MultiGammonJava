@@ -1,6 +1,6 @@
 package org.akoshterek.backgammon.board
 
-import org.akoshterek.backgammon.Constants.{OUTPUT_LOSEBACKGAMMON, OUTPUT_LOSEGAMMON, OUTPUT_WINBACKGAMMON, OUTPUT_WINGAMMON}
+import org.akoshterek.backgammon.Constants._
 import org.akoshterek.backgammon.eval.{Evaluator, Reward}
 import org.akoshterek.backgammon.matchstate.GameResult
 import org.akoshterek.backgammon.move.{AuchKey, ChequersMove, Move, MoveList}
