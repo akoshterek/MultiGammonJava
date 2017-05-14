@@ -3,6 +3,7 @@ package org.akoshterek.backgammon.agent.gnubg.nn;
 import java.io.DataInput;
 import java.io.IOException;
 
+// DO NOT convert to Scala due to significant performance degradation
 public class NeuralNet {
     private int cInput;
     private int cHidden;
