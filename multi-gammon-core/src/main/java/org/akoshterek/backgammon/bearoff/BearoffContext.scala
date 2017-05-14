@@ -1,104 +1,74 @@
 package org.akoshterek.backgammon.bearoff
 
+import java.io.{IOException, InputStream}
+
 import com.google.common.io.LittleEndianDataInputStream
 import org.apache.commons.io.IOUtils
-
 import resource.managed
 
 /**
- * @author Alex
- *         date 31.08.2015.
- */
-class BearoffContext {
-    var isTwoSided: Boolean = _   // type of bearoff database
-    var nPoints: Int = _          // number of points covered by database
-    var nChequers: Int = _        // number of chequers for one-sided database
-    var szFilename: String = _    // filename
+  * @author Alex
+  *         date 31.08.2015.
+  * @param isTwoSided type of bearoff database
+  * @param points number of points covered by database
+  * @param chequers number of chequers for one-sided database
+  * @param isWithGammonProbs gammon probabilities included
+  * @param isCubeful cubeful equities included
+  * @param isCompressed is database compressed?
+  * @param isNormalDistribution normal distribution instead of exact dist?
+  * @param data pointer to data in memory
+  */
+class BearoffContext private(val isTwoSided: Boolean,
+                             val points: Int,
+                             val chequers: Int,
+                             val isWithGammonProbs: Boolean,
+                             val isCubeful: Boolean,
+                             val isCompressed: Boolean,
+                             val isNormalDistribution: Boolean,
+                             private val data: Array[Byte]) {
 
-    // one sided dbs
-    var fCompressed: Boolean = _  // is database compressed?
-    var fGammon: Boolean = _      // gammon probs included
-
-    var fND: Boolean = _          // normal distibution instead of exact dist?
-    /* two sided dbs */
-    var fCubeful: Boolean = _     // cubeful equities included
-    private var data: Array[Byte] = _ // pointer to data in memory
-
-    def readBearoffData(offset: Int, buf: Array[Byte], nBytes: Int): Unit = {
-      Array.copy(data, offset, buf, 0, nBytes)
+    def readBearoffData(offset: Int, nBytes: Int): Array[Byte] = {
+      data.slice(offset, offset + nBytes)
     }
-
-  def getnChequers: Int = nChequers
-
-  def getnPoints: Int = nPoints
-
-  def isfCubeful: Boolean = fCubeful
-
-  def isfGammon: Boolean = fGammon
-
-  def isfND: Boolean = fND
-
-  def isfCompressed: Boolean = fCompressed
-
-  def getSzFilename: String = szFilename
 }
 
 object BearoffContext {
-  def bearoffInit(szFilename: String): BearoffContext = {
-    val pbc = new BearoffContext()
-    val sz = Array.ofDim[Byte](40)
-
-    pbc.szFilename = szFilename
-
+  def apply(szFilename: String): BearoffContext = {
     managed(new LittleEndianDataInputStream(classOf[BearoffContext].getResourceAsStream(szFilename))).acquireAndGet(inputStream => {
-      // read header
-      inputStream.readFully(sz)
-      // detect bearoff program
-      val header = new String(sz, 0, 5, "UTF-8")
-      if(!"gnubg".equals(header)) {
-        throw new IllegalArgumentException("Unknown bearoff database")
-      }
-
-      // one sided or two sided?
-      val _type = new String(sz, 6, 2, "UTF-8")
-      _type match {
-        case "TS" => pbc.isTwoSided = true
-        case "OS" => pbc.isTwoSided = false
-        case _ => throw new IllegalArgumentException("Illegal bearoff type " + _type)
-      }
-
-      // number of points
-      val pointsStr = new String(sz, 9, 2, "UTF-8")
-      pbc.nPoints = Integer.valueOf(pointsStr)
-      if (pbc.nPoints < 1 || pbc.nPoints >= 24) {
-        throw new IllegalArgumentException("illegal number of points " + pbc.nPoints)
-      }
-
-      // number of chequers
-      val nChequersStr = new String(sz, 12, 2, "UTF-8")
-      pbc.nChequers = Integer.valueOf(nChequersStr)
-      if (pbc.nChequers < 1 || pbc.nChequers > 15) {
-        throw new IllegalArgumentException("illegal number of chequers " + pbc.nChequers)
-      }
-
-      if (pbc.isTwoSided) {
-        // options for two-sided dbs
-        pbc.fCubeful = Integer.valueOf(new String(sz, 15, 1, "UTF-8")) != 0
-      } else {
-        // options for one-sided dbs
-        pbc.fGammon = Integer.valueOf(new String(sz, 15, 1, "UTF-8")) != 0
-        pbc.fCompressed = Integer.valueOf(new String(sz, 17, 1, "UTF-8")) != 0
-        pbc.fND = Integer.valueOf(new String(sz, 19, 1, "UTF-8")) != 0
-      }
+      loadBearoffDatabase(inputStream)
     })
-
-    pbc.data = BearoffContext.readBinaryData(szFilename)
-    pbc
   }
 
-  private def readBinaryData(szFilename: String): Array[Byte] = {
-    managed(classOf[BearoffContext].getResourceAsStream(szFilename)).acquireAndGet(inputStream => {
-      IOUtils.toByteArray(inputStream)
-    })
+  @throws[IOException]
+  private def loadBearoffDatabase(inputStream: InputStream): BearoffContext = {
+    // read header
+    val data = IOUtils.toByteArray(inputStream)
+    // detect bearoff program
+    require("gnubg".equals(new String(data, 0, 5, "UTF-8")), "Unknown bearoff database")
+
+    // one sided or two sided?
+    val _type = new String(data, 6, 2, "UTF-8")
+    val isTwoSided = _type match {
+      case "TS" => true
+      case "OS" => false
+      case _ => throw new IllegalArgumentException("Illegal bearoff type " + _type)
+    }
+
+    // number of points
+    val pointsStr = new String(data, 9, 2, "UTF-8")
+    val nPoints = Integer.valueOf(pointsStr)
+    require (nPoints >= 1 || nPoints < 24, "illegal number of points " + nPoints)
+
+    // number of chequers
+    val nChequersStr = new String(data, 12, 2, "UTF-8")
+    val nChequers = Integer.valueOf(nChequersStr)
+    require(nChequers >= 1 && nChequers <= 15, "illegal number of chequers " + nChequers)
+
+    val fCubeful = if (isTwoSided) Integer.valueOf(new String(data, 15, 1, "UTF-8")) != 0 else false
+    val fGammon = if (isTwoSided) false else Integer.valueOf(new String(data, 15, 1, "UTF-8")) != 0
+    val fCompressed = if (isTwoSided) false else Integer.valueOf(new String(data, 17, 1, "UTF-8")) != 0
+    val fND = if (isTwoSided) false else Integer.valueOf(new String(data, 19, 1, "UTF-8")) != 0
+
+    new BearoffContext(isTwoSided, nPoints, nChequers, fGammon, fCubeful, fCompressed, fND, data)
   }
 }

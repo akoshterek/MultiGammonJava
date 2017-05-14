@@ -237,7 +237,7 @@ public class Evaluator {
             for (i = 0; i < 2; i++) {
                 if (anBack[i] < 6) {
                     anMaxTurns[i] =
-                            maxTurns(PositionId.positionBearoff(board.anBoard()[i], pbc1.getnPoints(), pbc1.getnChequers()));
+                            maxTurns(PositionId.positionBearoff(board.anBoard()[i], pbc1.points(), pbc1.chequers()));
                 } else {
                     anMaxTurns[i] = anCross[i] * 2;
                 }
@@ -360,7 +360,7 @@ public class Evaluator {
 
         long[] bgp = BearoffGammon.getRaceBGprobs(dummy.anBoard()[1 - side]);
         if (bgp.length > 0) {
-            int k = PositionId.positionBearoff(anBoard.anBoard()[side], pbc1.getnPoints(), pbc1.getnChequers());
+            int k = PositionId.positionBearoff(anBoard.anBoard()[side], pbc1.points(), pbc1.chequers());
             short[] aProb = new short[32];
             float p = 0.0f;
             long scale = (side == 0) ? 36 : 1;
@@ -400,7 +400,7 @@ public class Evaluator {
     }
 
     private void loadBearoff() {
-        pbc1 = BearoffContext.bearoffInit("/org/akoshterek/backgammon/agent/gnubg/gnubg_os0.bd");
-        pbc2 = BearoffContext.bearoffInit("/org/akoshterek/backgammon/agent/gnubg/gnubg_ts0.bd");
+        pbc1 = BearoffContext.apply("/org/akoshterek/backgammon/agent/gnubg/gnubg_os0.bd");
+        pbc2 = BearoffContext.apply("/org/akoshterek/backgammon/agent/gnubg/gnubg_ts0.bd");
     }
 }

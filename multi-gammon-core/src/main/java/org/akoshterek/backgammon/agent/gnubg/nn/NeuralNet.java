@@ -53,10 +53,8 @@ public class NeuralNet {
     }
 
     public void evaluate(double[] arInput, double[] arOutput) {
-        float[] ar = new float[cHidden];
-
         // Calculate activity at hidden nodes
-        System.arraycopy(arHiddenThreshold, 0, ar, 0, cHidden);
+        float[] ar = arHiddenThreshold.clone();
 
         int prWeight = 0;
         //arHiddenWeight

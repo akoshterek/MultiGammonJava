@@ -108,15 +108,17 @@ class Board extends Cloneable {
 
   def this(board: Array[Array[Int]]) {
     this()
-    require(board.length == 2 && board(0).length == Board.HALF_BOARD_SIZE && board(1).length == Board.HALF_BOARD_SIZE, "Invalid board array")
-    Array.copy(board(0), 0, this.anBoard(0), 0, Board.HALF_BOARD_SIZE)
-    Array.copy(board(1), 0, this.anBoard(1), 0, Board.HALF_BOARD_SIZE)
+    require(board.length == 2
+      && board(0).length == Board.HALF_BOARD_SIZE
+      && board(1).length == Board.HALF_BOARD_SIZE, "Invalid board array")
+    this.anBoard(0) = board(0).clone()
+    this.anBoard(1) = board(1).clone()
   }
 
   override def clone(): Board = {
     val board = new Board
-    Array.copy(this.anBoard(0), 0, board.anBoard(0), 0, Board.HALF_BOARD_SIZE)
-    Array.copy(this.anBoard(1), 0, board.anBoard(1), 0, Board.HALF_BOARD_SIZE)
+    board.anBoard(0) = this.anBoard(0).clone()
+    board.anBoard(1) = this.anBoard(1).clone()
     board
   }
 
@@ -124,8 +126,8 @@ class Board extends Cloneable {
   
   def swapSides: Board = {
     val board: Array[Array[Int]] = Array.ofDim[Int](2, 25)
-    Array.copy(this.anBoard(0), 0, board(1), 0, Board.HALF_BOARD_SIZE)
-    Array.copy(this.anBoard(1), 0, board(0), 0, Board.HALF_BOARD_SIZE)
+    board(0) = this.anBoard(1).clone()
+    board(1) = this.anBoard(0).clone()
     Board(board)
   }
 
