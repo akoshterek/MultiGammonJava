@@ -5,7 +5,7 @@ import java.nio.file.Path
 import org.akoshterek.backgammon.Constants._
 import org.akoshterek.backgammon.agent.AbsAgent
 import org.akoshterek.backgammon.agent.gnubg.nn.GnuNeuralNets
-import org.akoshterek.backgammon.board.Board
+import org.akoshterek.backgammon.board.{Board, PositionClass}
 import org.akoshterek.backgammon.eval.Gammons._
 import org.akoshterek.backgammon.eval.{Evaluator, Reward}
 
@@ -54,6 +54,19 @@ class GnubgAgent(override val path: Path) extends AbsAgent("Gnubg", path) {
     val reward = Reward.rewardArray
     GnuNeuralNets.nnContact.evaluate(inputs, reward)
     Reward(reward)
+  }
+
+  def evaluatePositionTemp(board: Board, pc: PositionClass): Reward = {
+    val effectivePc: PositionClass = if (PositionClass.isBearoff(pc) && !supportsBearoff) PositionClass.CLASS_RACE else pc
+    effectivePc match {
+      case PositionClass.CLASS_OVER => evalOver(board)
+      case PositionClass.CLASS_RACE => evalRace(board)
+      case PositionClass.CLASS_CRASHED => evalCrashed(board)
+      case PositionClass.CLASS_CONTACT => evalContact(board)
+      case PositionClass.CLASS_BEAROFF1 => Evaluator.getInstance.evalBearoff1(board)
+      case PositionClass.CLASS_BEAROFF2 => Evaluator.getInstance.evalBearoff2(board)
+      case _ => throw new RuntimeException("Unknown class. How did we get here?")
+    }
   }
 }
 
