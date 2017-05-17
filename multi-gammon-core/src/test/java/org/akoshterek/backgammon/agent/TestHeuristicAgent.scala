@@ -25,6 +25,6 @@ class TestHeuristicAgent {
     board = board.swapSides
     val reward2 = agent.evalContact(board)
     Assert.assertEquals("Mismatch in board conversion", positionId, backPosId)
-    Assert.assertTrue("Wrong calculation for " + positionId, reward.equity > reward2.equity)
+    Assert.assertTrue("Wrong calculation for " + positionId, reward.equity < reward2.equity)
   }
 }

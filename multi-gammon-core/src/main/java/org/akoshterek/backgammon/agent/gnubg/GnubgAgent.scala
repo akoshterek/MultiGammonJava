@@ -16,15 +16,15 @@ import org.akoshterek.backgammon.eval.{Evaluator, Reward}
 class GnubgAgent(override val path: Path) extends AbsAgent("Gnubg", path) {
   private val representation = new GnuBgRepresentation()
   override val supportsSanityCheck = true
-  //TODO: change to true
-  override val supportsBearoff = false
+  override val supportsBearoff = true
   override val needsInvertedEval = true
 
   override def evalRace(board: Board): Reward = {
-    val inputs = representation.calculateRaceInputs(board)
+    val swappedBoard = board.swapSides
+    val inputs = representation.calculateRaceInputs(swappedBoard)
     val reward = Reward.rewardArray
     GnuNeuralNets.nnRace.evaluate(inputs, reward)
-    val (totMen0, totMen1) = board.chequersCount
+    val (totMen0, totMen1) = swappedBoard.chequersCount
 
     // a set flag for every possible outcome
     var any: Int = 0
@@ -36,37 +36,24 @@ class GnubgAgent(override val path: Path) extends AbsAgent("Gnubg", path) {
       any |= G_POSSIBLE
     }
 
-    any = GnubgAgent.calculateBackgammonPossibility(board, any)
-    GnubgAgent.evaluatePossibleBackgammon(board, any, reward)
+    any = GnubgAgent.calculateBackgammonPossibility(swappedBoard, any)
+    GnubgAgent.evaluatePossibleBackgammon(swappedBoard, any, reward)
     // sanity check will take care of rest
-    Reward(reward)
+    Reward(reward).invert
   }
 
   override def evalCrashed(board: Board): Reward = {
-    val inputs = representation.calculateCrashedInputs(board)
+    val inputs = representation.calculateCrashedInputs(board.swapSides)
     val reward = Reward.rewardArray
     GnuNeuralNets.nnCrashed.evaluate(inputs, reward)
-    Reward(reward)
+    Reward(reward).invert
   }
 
   override def evalContact(board: Board): Reward = {
-    val inputs = representation.calculateContactInputs(board)
+    val inputs = representation.calculateContactInputs(board.swapSides)
     val reward = Reward.rewardArray
     GnuNeuralNets.nnContact.evaluate(inputs, reward)
-    Reward(reward)
-  }
-
-  def evaluatePositionTemp(board: Board, pc: PositionClass): Reward = {
-    val effectivePc: PositionClass = if (PositionClass.isBearoff(pc) && !supportsBearoff) PositionClass.CLASS_RACE else pc
-    effectivePc match {
-      case PositionClass.CLASS_OVER => evalOver(board)
-      case PositionClass.CLASS_RACE => evalRace(board)
-      case PositionClass.CLASS_CRASHED => evalCrashed(board)
-      case PositionClass.CLASS_CONTACT => evalContact(board)
-      case PositionClass.CLASS_BEAROFF1 => Evaluator.getInstance.evalBearoff1(board)
-      case PositionClass.CLASS_BEAROFF2 => Evaluator.getInstance.evalBearoff2(board)
-      case _ => throw new RuntimeException("Unknown class. How did we get here?")
-    }
+    Reward(reward).invert
   }
 }
 

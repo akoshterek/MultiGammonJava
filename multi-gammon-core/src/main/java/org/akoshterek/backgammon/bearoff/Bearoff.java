@@ -1,6 +1,7 @@
 package org.akoshterek.backgammon.bearoff;
 
 import com.google.common.primitives.Ints;
+import com.google.common.primitives.Shorts;
 import org.akoshterek.backgammon.board.Board;
 import org.akoshterek.backgammon.board.PositionId;
 import org.akoshterek.backgammon.eval.Reward;
@@ -205,7 +206,7 @@ public class Bearoff {
                     arProb[i] = r;
                 }
                 if(ausProb != null) {
-                    ausProb[i] = (short)((int)(r * 65535.0f) & 0xffff);
+                    ausProb[i] = (short) ((int) (r * 65535.0f) & 0xffff);
                 }
             }
         }
@@ -250,10 +251,10 @@ public class Bearoff {
 
         if (ar != null || arProb != null || arGammonProb != null) {
             for (int i = 0; i < 32; ++i)
-                arx[i] = ausProbx[i] / 65535.0f;
+                arx[i] = (ausProbx[i] & 0xffff) / 65535.0f;
 
             for (int i = 0; i < 32; ++i)
-                arx[32 + i] = ausProbx[32 + i] / 65535.0f;
+                arx[32 + i] = (ausProbx[32 + i] & 0xffff) / 65535.0f;
 
             if (arProb != null) {
                 System.arraycopy(arx, 0, arProb, 0, 32);
@@ -334,11 +335,11 @@ public class Bearoff {
         int i = 0;
         Arrays.fill(aus, 0, 64, (short) 0);
         for (int j = 0; j < nz; ++j, i += 2) {
-            aus[ioff + j] = (short)((short)(ac[i] & 0xff) | (short)(ac[i + 1] & 0xff) << 8);
+            aus[ioff + j] = Shorts.fromBytes(ac[i + 1], ac[i]);
         }
 
         for (int j = 0; j < nzg; ++j, i += 2) {
-            aus[32 + ioffg + j] = (short) ((short)(ac[i] & 0xff) | (short)(ac[i + 1] & 0xff) << 8);
+            aus[32 + ioffg + j] = Shorts.fromBytes(ac[i + 1], ac[i]);
         }
     }
 }

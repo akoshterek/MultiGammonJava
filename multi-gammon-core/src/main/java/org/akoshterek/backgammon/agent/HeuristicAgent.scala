@@ -21,9 +21,8 @@ class HeuristicAgent(override val path: Path) extends AbsAgent("Heuristic", path
   }
 
   def evalContact(board: Board): Reward = {
-    val tmpBoard: Board = board.clone().swapSides
     val reward = Reward.rewardArray
-    reward(Constants.OUTPUT_WIN) = evaluate(tmpBoard.anBoard(Board.SELF))
+    reward(Constants.OUTPUT_WIN) = evaluate(board.anBoard(Board.SELF))
     new Reward(reward)
   }
 
