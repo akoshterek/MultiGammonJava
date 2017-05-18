@@ -19,21 +19,27 @@ object Board {
     var j: Int = 0
     val newBoard: Board = new Board
 
-    for (a <- auch.key.indices) {
+    var a = 0
+    while (a < auch.key.length) {
       var cur: Byte = auch.key(a)
-      for (_ <- 0 until 8) {
+      var k = 0
+      while (k < 8) {
         if ((cur & 0x1) != 0) {
           require(i < 2 && j < Board.HALF_BOARD_SIZE, "Invalid key")
           newBoard.anBoard(i)(j) = (newBoard.anBoard(i)(j) + 1).toByte
         }
         else {
-          if ( { j += 1; j } == 25) {
+          j += 1
+          if (j == 25) {
             i += 1
             j = 0
           }
         }
         cur = (cur >> 1).toByte
+        k += 1
       }
+
+      a += 1
     }
 
     newBoard
@@ -45,22 +51,23 @@ object Board {
     var pch: Int = 0
     var puch: Int = 0
 
-    for (i <- 0 until PositionId.L_POSITIONID) {
+    var i = 0
+    while (i < PositionId.L_POSITIONID) {
       ach(pch + i) = Base64.base64(pchEnc.charAt(i).toByte)
+      i += 1
     }
 
-    for (_ <- 0 until 3) {
-      auchKey.key({
-        puch += 1; puch - 1
-      }) = ((ach(pch) << 2) | (ach(pch + 1) >> 4)).toByte
-      auchKey.key({
-        puch += 1; puch - 1
-      }) = ((ach(pch + 1) << 4) | (ach(pch + 2) >> 2)).toByte
-      auchKey.key({
-        puch += 1; puch - 1
-      }) = ((ach(pch + 2) << 6) | ach(pch + 3)).toByte
+    i = 0
+    while (i < 3) {
+      auchKey.key(puch) = ((ach(pch) << 2) | (ach(pch + 1) >> 4)).toByte
+      puch += 1
+      auchKey.key(puch) = ((ach(pch + 1) << 4) | (ach(pch + 2) >> 2)).toByte
+      puch += 1
+      auchKey.key(puch) = ((ach(pch + 2) << 6) | ach(pch + 3)).toByte
+      puch += 1
 
       pch += 4
+      i += 1
     }
 
     auchKey.key(puch) = ((ach(pch) << 2) | (ach(pch + 1) >> 4)).toByte

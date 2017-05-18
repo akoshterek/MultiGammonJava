@@ -28,13 +28,18 @@ class RawRepresentation(val codec: PointCodec) extends InputRepresentation {
   }
 
   private def calculateHalfBoard(halfBoard: Array[Int], inputs: Array[Double], offset: Int) {
-    for (point <- 0 until Board.HALF_BOARD_SIZE - 1;
-         i <- 0 until codec.inputsPerPoint) {
-      inputs(offset + point * codec.inputsPerPoint + i) = codec.point(halfBoard(point), i)
+    var point = 0
+    while (point < Board.HALF_BOARD_SIZE - 1) {
+      var i = 0
+      while (i < codec.inputsPerPoint) {
+        inputs(offset + point * codec.inputsPerPoint + i) = codec.point(halfBoard(point), i)
+        i += 1
+      }
+      point += 1
     }
 
     inputs(offset + 96) = halfBoard(Board.BAR) / 15.0f
-    val home = Board.TOTAL_MEN - halfBoard.dropRight(1).sum
+    val home = Board.TOTAL_MEN - halfBoard.sum
     inputs(offset + 97) = home / 15.0f
   }
 }

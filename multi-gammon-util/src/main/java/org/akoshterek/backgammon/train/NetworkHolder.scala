@@ -1,12 +1,12 @@
 package org.akoshterek.backgammon.train
 
+import java.io._
+
 import org.akoshterek.backgammon.board.PositionClass
 import org.apache.commons.lang3.SerializationUtils
 import org.encog.neural.networks.BasicNetwork
 import org.encog.neural.networks.training.propagation.TrainingContinuation
 import org.encog.persist.EncogDirectoryPersistence
-import java.io._
-
 import resource.managed
 
 /**
@@ -28,11 +28,15 @@ object NetworkHolder {
   }
 
   def deserialize(template: NetworkHolder, agentSettings: AgentSettings): Option[NetworkHolder] = {
-    managed(new FileInputStream(getResumeFileName(agentSettings, template.networkType))).acquireFor(is => {
-      SerializationUtils.deserialize[NetworkHolder](is)
-    }).either match {
-      case Right(n) => Some(n)
-      case Left(e) => None
+    val file = new File(getResumeFileName(agentSettings, template.networkType))
+    if (!file.exists()) {
+      None
+    } else {
+      Some(
+        managed(new FileInputStream(file)).acquireFor(is => {
+          SerializationUtils.deserialize[NetworkHolder](is)
+        }).either.right.get
+      )
     }
   }
 

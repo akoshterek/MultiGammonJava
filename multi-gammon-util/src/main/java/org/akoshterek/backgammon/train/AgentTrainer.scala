@@ -1,16 +1,18 @@
 package org.akoshterek.backgammon.train
 
-import org.akoshterek.backgammon.agent.inputrepresentation.RepresentationFactory
+import org.akoshterek.backgammon.agent.inputrepresentation.{EncogActivationFunctionFactory, RepresentationFactory}
 import org.akoshterek.backgammon.board.PositionClass
 import org.encog.Encog
+import org.encog.engine.network.activation.ActivationFunction
 
 object AgentTrainer extends App {
   val agentName: String = args(0)
 
-  val settings: AgentSettings = new AgentSettings
-  settings.representation = RepresentationFactory.createInputRepresentation(agentName)
-  settings.agentName = agentName
-  settings.hiddenNeuronCount = getHiddenNeuronsCount(agentName)
+  val settings: AgentSettings = new AgentSettings(
+    RepresentationFactory.createInputRepresentation(agentName),
+    getHiddenNeuronsCount(agentName),
+    agentName,
+    getActivationFunction(agentName))
 
   trainContact(settings)
   trainCrashed(settings)
@@ -43,5 +45,10 @@ object AgentTrainer extends App {
   private def getHiddenNeuronsCount(agentName: String): Int = {
     val tokens: Array[String] = agentName.split("-")
     tokens(2).toInt
+  }
+
+  private def getActivationFunction(agentName: String): ActivationFunction = {
+    val tokens: Array[String] = agentName.split("-")
+    EncogActivationFunctionFactory(tokens(3))
   }
 }
