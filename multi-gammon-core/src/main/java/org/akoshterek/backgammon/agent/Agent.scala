@@ -7,13 +7,9 @@ import org.akoshterek.backgammon.eval.{Evaluator, Reward}
 import org.akoshterek.backgammon.move.Move
 
 trait Agent {
-  protected val _fullName: String
+  val fullName: String
 
-  def fullName: String = _fullName
-
-  protected val _path: Path
-
-  def path: Path = _path
+  val path: Path
 
   var isLearnMode: Boolean = false
   val supportsSanityCheck: Boolean = false
@@ -54,7 +50,24 @@ trait Agent {
 
   def scoreMoves(moves: Seq[Move]): Unit = moves.foreach(m => m.arEvalMove = scoreMove(m))
 
-  def scoreMove(pm: Move): Reward
+  def scoreMove(pm: Move): Reward = {
+    val board: Board = Board.positionFromKey(pm.auch)
+    pm.pc = Evaluator.getInstance.classifyPosition(board)
+    evaluatePositionFull(board, pm.pc)
+  }
+
+  private def evaluatePositionFull(anBoard: Board, pc: PositionClass): Reward = {
+    val reward = new Reward(evaluatePosition(anBoard, pc))
+    applySanityCheck(anBoard, reward, pc)
+  }
+
+  private def applySanityCheck(anBoard: Board, reward: Reward, pc: PositionClass): Reward = {
+    if (!PositionClass.isExact(pc) && supportsSanityCheck && !isLearnMode) {
+      Evaluator.getInstance.sanityCheck(anBoard, reward)
+    } else {
+      reward
+    }
+  }
 
   def evalOver(board: Board): Reward = {
     Evaluator.getInstance.evalOver(board)

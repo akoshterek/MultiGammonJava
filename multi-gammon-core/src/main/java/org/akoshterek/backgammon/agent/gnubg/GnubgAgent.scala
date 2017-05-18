@@ -5,7 +5,7 @@ import java.nio.file.Path
 import org.akoshterek.backgammon.Constants._
 import org.akoshterek.backgammon.agent.AbsAgent
 import org.akoshterek.backgammon.agent.gnubg.nn.GnuNeuralNets
-import org.akoshterek.backgammon.board.{Board, PositionClass}
+import org.akoshterek.backgammon.board.Board
 import org.akoshterek.backgammon.eval.Gammons._
 import org.akoshterek.backgammon.eval.{Evaluator, Reward}
 
@@ -19,12 +19,19 @@ class GnubgAgent(override val path: Path) extends AbsAgent("Gnubg", path) {
   override val supportsBearoff = true
   override val needsInvertedEval = true
 
-  override def evalRace(board: Board): Reward = {
-    val swappedBoard = board.swapSides
-    val inputs = representation.calculateRaceInputs(swappedBoard)
+  private def evalWithInvert(eval: (Board) => Reward)(board: Board): Reward = eval(board.swapSides).invert
+
+  override def evalRace(board: Board): Reward = evalWithInvert(evalRaceInternal)(board)
+
+  override def evalCrashed(board: Board): Reward = evalWithInvert(evalCrashedInternal)(board)
+
+  override def evalContact(board: Board): Reward = evalWithInvert(evalContactInternal)(board)
+
+  private def evalRaceInternal(board: Board): Reward = {
+    val inputs = representation.calculateRaceInputs(board)
     val reward = Reward.rewardArray
     GnuNeuralNets.nnRace.evaluate(inputs, reward)
-    val (totMen0, totMen1) = swappedBoard.chequersCount
+    val (totMen0, totMen1) = board.chequersCount
 
     // a set flag for every possible outcome
     var any: Int = 0
@@ -36,24 +43,24 @@ class GnubgAgent(override val path: Path) extends AbsAgent("Gnubg", path) {
       any |= G_POSSIBLE
     }
 
-    any = GnubgAgent.calculateBackgammonPossibility(swappedBoard, any)
-    GnubgAgent.evaluatePossibleBackgammon(swappedBoard, any, reward)
+    any = GnubgAgent.calculateBackgammonPossibility(board, any)
+    GnubgAgent.evaluatePossibleBackgammon(board, any, reward)
     // sanity check will take care of rest
-    Reward(reward).invert
+    Reward(reward)
   }
 
-  override def evalCrashed(board: Board): Reward = {
-    val inputs = representation.calculateCrashedInputs(board.swapSides)
+  private def evalCrashedInternal(board: Board): Reward = {
+    val inputs = representation.calculateCrashedInputs(board)
     val reward = Reward.rewardArray
     GnuNeuralNets.nnCrashed.evaluate(inputs, reward)
-    Reward(reward).invert
+    Reward(reward)
   }
 
-  override def evalContact(board: Board): Reward = {
-    val inputs = representation.calculateContactInputs(board.swapSides)
+  private def evalContactInternal(board: Board): Reward = {
+    val inputs = representation.calculateContactInputs(board)
     val reward = Reward.rewardArray
     GnuNeuralNets.nnContact.evaluate(inputs, reward)
-    Reward(reward).invert
+    Reward(reward)
   }
 }
 
