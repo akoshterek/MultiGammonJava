@@ -104,7 +104,7 @@ class NetworkTrainer(val settings: AgentSettings, val networkType: PositionClass
       trainingSet.add(pair)
       i += 1
 
-      if (i % 10000 == 0) println(i)
+      if (i % 100000 == 0) println(s"loaded $i entries")
     }
 
     trainingSet
