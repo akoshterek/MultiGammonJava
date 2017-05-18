@@ -31,18 +31,17 @@ class PubEvalAgent(override val path: Path, val contactWeights: Array[Double], v
   }
 
   private def preparePos(board: Board, pos: Array[Int]) {
-    val tmpBoard: Board = board.clone().swapSides
-    val (opponent, self) = tmpBoard.chequersCount
+    val (opponent, self) = board.chequersCount
 
     for (i <- 0 until Board.HALF_BOARD_SIZE - 1) {
-      pos(i + 1) = tmpBoard.anBoard(Board.SELF)(i)
-      if (tmpBoard.anBoard(Board.OPPONENT)(23 - i) != 0) {
-        pos(i + 1) = -tmpBoard.anBoard(Board.OPPONENT)(23 - i)
+      pos(i + 1) = board.anBoard(Board.SELF)(i)
+      if (board.anBoard(Board.OPPONENT)(23 - i) != 0) {
+        pos(i + 1) = -board.anBoard(Board.OPPONENT)(23 - i)
       }
     }
 
-    pos(25) = tmpBoard.anBoard(Board.SELF)(Board.BAR)
-    pos(0) = -tmpBoard.anBoard(Board.OPPONENT)(Board.BAR)
+    pos(25) = board.anBoard(Board.SELF)(Board.BAR)
+    pos(0) = -board.anBoard(Board.OPPONENT)(Board.BAR)
     pos(26) = 15 - self
     pos(27) = -(15 - opponent)
   }

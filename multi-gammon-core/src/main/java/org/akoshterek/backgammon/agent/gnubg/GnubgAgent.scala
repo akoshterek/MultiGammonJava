@@ -16,11 +16,18 @@ import org.akoshterek.backgammon.eval.{Evaluator, Reward}
 class GnubgAgent(override val path: Path) extends AbsAgent("Gnubg", path) {
   private val representation = new GnuBgRepresentation()
   override val supportsSanityCheck = true
-  //TODO: change to true
-  override val supportsBearoff = false
+  override val supportsBearoff = true
   override val needsInvertedEval = true
 
-  override def evalRace(board: Board): Reward = {
+  private def evalWithInvert(eval: (Board) => Reward)(board: Board): Reward = eval(board.swapSides).invert
+
+  override def evalRace(board: Board): Reward = evalWithInvert(evalRaceInternal)(board)
+
+  override def evalCrashed(board: Board): Reward = evalWithInvert(evalCrashedInternal)(board)
+
+  override def evalContact(board: Board): Reward = evalWithInvert(evalContactInternal)(board)
+
+  private def evalRaceInternal(board: Board): Reward = {
     val inputs = representation.calculateRaceInputs(board)
     val reward = Reward.rewardArray
     GnuNeuralNets.nnRace.evaluate(inputs, reward)
@@ -42,14 +49,14 @@ class GnubgAgent(override val path: Path) extends AbsAgent("Gnubg", path) {
     Reward(reward)
   }
 
-  override def evalCrashed(board: Board): Reward = {
+  private def evalCrashedInternal(board: Board): Reward = {
     val inputs = representation.calculateCrashedInputs(board)
     val reward = Reward.rewardArray
     GnuNeuralNets.nnCrashed.evaluate(inputs, reward)
     Reward(reward)
   }
 
-  override def evalContact(board: Board): Reward = {
+  private def evalContactInternal(board: Board): Reward = {
     val inputs = representation.calculateContactInputs(board)
     val reward = Reward.rewardArray
     GnuNeuralNets.nnContact.evaluate(inputs, reward)
