@@ -9,33 +9,31 @@ import org.encog.util.obj.ActivationUtil
 @SerialVersionUID(1L)
 class ActivationLeakingRelu(thresholdHigh: Double, thresholdLow: Double, high: Double, low: Double, leak: Double) extends ActivationFunction {
   private val params = Array[Double] (thresholdHigh, thresholdLow, high, low, leak)
-  require(leak <= 0, "Leak can not be positive")
+  require(leak >= 0 && leak <= 1, "Leak must be in [0, 1] range")
 
   val PARAM_RAMP_HIGH_THRESHOLD = 0
   val PARAM_RAMP_LOW_THRESHOLD = 1
   val PARAM_RAMP_HIGH = 2
   val PARAM_RAMP_LOW = 3
   val PARAM_RAMP_LEAK = 4
-
+  val slope: Double = (params(PARAM_RAMP_HIGH_THRESHOLD) - params(PARAM_RAMP_LOW_THRESHOLD)) / (params(PARAM_RAMP_HIGH) - params(PARAM_RAMP_LOW))
 
   def this() = {
-    this(1.0D, 0.0D, 1.0D, 0.0D, -0.01)
+    this(1.0D, 0.0D, 1.0D, 0.0D, 0.01)
   }
 
   override def activationFunction(x: Array[Double], start: Int, size: Int): Unit = {
-    val slope = (this.params(PARAM_RAMP_HIGH_THRESHOLD) - this.params(PARAM_RAMP_LOW_THRESHOLD)) / (this.params(PARAM_RAMP_HIGH) - this.params(PARAM_RAMP_LOW))
-
     var i = start
     while (i < start + size) {
       val v = x(i)
-      if (v < this.params(PARAM_RAMP_LOW_THRESHOLD)) {
-        x(i) = this.params(PARAM_RAMP_LOW)
+      if (v < params(PARAM_RAMP_LOW_THRESHOLD)) {
+        x(i) = params(PARAM_RAMP_LOW)
       }
-      else if (v > this.params(PARAM_RAMP_HIGH_THRESHOLD)) {
-        x(i) = this.params(PARAM_RAMP_HIGH)
+      else if (v > params(PARAM_RAMP_HIGH_THRESHOLD)) {
+        x(i) = params(PARAM_RAMP_HIGH)
       }
       else {
-        x(i) = if (v >= 0) slope * v else -0.01 * v
+        x(i) = if (v >= 0) slope * v else -params(PARAM_RAMP_LEAK) * v
       }
 
       i += 1
@@ -43,23 +41,23 @@ class ActivationLeakingRelu(thresholdHigh: Double, thresholdLow: Double, high: D
   }
 
   override def clone = new ActivationLeakingRelu(
-    this.params(PARAM_RAMP_HIGH_THRESHOLD),
-    this.params(PARAM_RAMP_LOW_THRESHOLD),
-    this.params(PARAM_RAMP_HIGH),
-    this.params(PARAM_RAMP_LOW),
-    this.params(PARAM_RAMP_LEAK)
+    params(PARAM_RAMP_HIGH_THRESHOLD),
+    params(PARAM_RAMP_LOW_THRESHOLD),
+    params(PARAM_RAMP_HIGH),
+    params(PARAM_RAMP_LOW),
+    params(PARAM_RAMP_LEAK)
   )
 
-  override def derivativeFunction(b: Double, a: Double): Double = if (b >= 0) 1.0D else params(PARAM_RAMP_LEAK)
+  override def derivativeFunction(b: Double, a: Double): Double = if (b >= 0) slope else -params(PARAM_RAMP_LEAK)
 
   override def getParamNames: Array[String] = Array[String]("thresholdHigh", "thresholdLow", "high", "low", "leak")
 
-  override def getParams: Array[Double] = this.params
+  override def getParams: Array[Double] = params
 
   override def hasDerivative = true
 
   override def setParam(index: Int, value: Double): Unit = {
-    this.params(index) = value
+    params(index) = value
   }
 
   override def getFactoryCode: String = ActivationUtil.generateActivationFactory("leakingrelu", this)
