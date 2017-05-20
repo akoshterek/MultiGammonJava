@@ -10,8 +10,8 @@ object EncogActivationFunctionFactory {
     case "sigmoid" => new ActivationSigmoid()
     case "tanh" => new ActivationTANH()
     case "relu" => new ActivationRamp(10, 0, 10, 0)
-    case "lrelu" => new ActivationLeakingRelu(10, 0, 10, 0, 0.01)
-    case "elu" => new ActivationElu(10, 0, 10, 0, 0.1)
+    case "lrelu" => new ActivationLeakingRelu(10, -10, 10, -10, 0.01)
+    case "elu" => new ActivationElu(10, -10, 10, -10, 0.1)
     case _ => throw new IllegalArgumentException(s"Unknown activation function $name")
   }
 }

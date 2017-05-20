@@ -20,7 +20,7 @@ class ActivationLeakingRelu(thresholdHigh: Double, thresholdLow: Double, high: D
   private def slope: Double = (params(PARAM_RAMP_HIGH_THRESHOLD) - params(PARAM_RAMP_LOW_THRESHOLD)) / (params(PARAM_RAMP_HIGH) - params(PARAM_RAMP_LOW))
 
   def this() = {
-    this(1.0D, 0.0D, 1.0D, 0.0D, 0.01)
+    this(1.0D, -1.0D, 1.0D, -1.0D, 0.01)
   }
 
   override def activationFunction(x: Array[Double], start: Int, size: Int): Unit = {
@@ -50,7 +50,10 @@ class ActivationLeakingRelu(thresholdHigh: Double, thresholdLow: Double, high: D
   )
 
   override def derivativeFunction(b: Double, a: Double): Double = {
-    if (b >= 0) slope else params(PARAM_RAMP_LEAK)
+    if (b >= 0)
+      slope
+    else
+      params(PARAM_RAMP_LEAK)
   }
 
   override def getParamNames: Array[String] = {

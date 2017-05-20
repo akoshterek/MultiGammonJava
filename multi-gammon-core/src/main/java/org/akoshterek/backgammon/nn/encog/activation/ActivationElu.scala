@@ -42,7 +42,7 @@ class ActivationElu(thresholdHigh: Double, thresholdLow: Double, high: Double, l
     }
   }
 
-  override def clone = new ActivationLeakingRelu(
+  override def clone = new ActivationElu(
     params(PARAM_RAMP_HIGH_THRESHOLD),
     params(PARAM_RAMP_LOW_THRESHOLD),
     params(PARAM_RAMP_HIGH),
