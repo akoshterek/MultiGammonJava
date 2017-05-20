@@ -16,7 +16,7 @@ class ActivationLeakingRelu(thresholdHigh: Double, thresholdLow: Double, high: D
   val PARAM_RAMP_HIGH = 2
   val PARAM_RAMP_LOW = 3
   val PARAM_RAMP_LEAK = 4
-  val slope: Double = (params(PARAM_RAMP_HIGH_THRESHOLD) - params(PARAM_RAMP_LOW_THRESHOLD)) / (params(PARAM_RAMP_HIGH) - params(PARAM_RAMP_LOW))
+  val slope: Double = (thresholdHigh - thresholdLow) / (high - low)
 
   def this() = {
     this(1.0D, 0.0D, 1.0D, 0.0D, 0.01)
@@ -48,7 +48,9 @@ class ActivationLeakingRelu(thresholdHigh: Double, thresholdLow: Double, high: D
     params(PARAM_RAMP_LEAK)
   )
 
-  override def derivativeFunction(b: Double, a: Double): Double = if (b >= 0) slope else -params(PARAM_RAMP_LEAK)
+  override def derivativeFunction(b: Double, a: Double): Double = {
+    if (b >= 0) slope else params(PARAM_RAMP_LEAK)
+  }
 
   override def getParamNames: Array[String] = Array[String]("thresholdHigh", "thresholdLow", "high", "low", "leak")
 
