@@ -60,5 +60,5 @@ class ActivationLeakingRelu(thresholdHigh: Double, thresholdLow: Double, high: D
     params(index) = value
   }
 
-  override def getFactoryCode: String = ActivationUtil.generateActivationFactory("leakingrelu", this)
+  override def getFactoryCode: String = ActivationUtil.generateActivationFactory("lrelu", this)
 }
