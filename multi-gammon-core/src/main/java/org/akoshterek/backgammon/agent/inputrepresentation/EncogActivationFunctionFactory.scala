@@ -1,7 +1,8 @@
 package org.akoshterek.backgammon.agent.inputrepresentation
 
-import org.akoshterek.backgammon.nn.encog.activation.{ActivationElu, ActivationLeakingRelu}
+import org.akoshterek.backgammon.nn.encog.activation.{ActivationElu, ActivationLeakingRelu, ActivationSoftplus}
 import org.encog.engine.network.activation.{ActivationFunction, ActivationRamp, ActivationSigmoid, ActivationTANH}
+
 /**
   * Created by Alex on 18-05-17.
   */
@@ -12,6 +13,7 @@ object EncogActivationFunctionFactory {
     case "relu" => new ActivationRamp(10, 0, 10, 0)
     case "lrelu" => new ActivationLeakingRelu(10, -10, 10, -10, 0.01)
     case "elu" => new ActivationElu(10, -10, 10, -10, 0.1)
+    case "elu" => new ActivationSoftplus()
     case _ => throw new IllegalArgumentException(s"Unknown activation function $name")
   }
 }
