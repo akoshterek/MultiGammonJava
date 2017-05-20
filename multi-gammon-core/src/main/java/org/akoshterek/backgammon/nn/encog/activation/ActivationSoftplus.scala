@@ -22,6 +22,7 @@ class ActivationSoftplus extends ActivationFunction {
   override def clone = new ActivationSoftplus()
 
   override def derivativeFunction(b: Double, a: Double): Double = {
+    // 1.0 / (1 + BoundNumbers.bound(Math.exp(-b))) alternative form
     val e = BoundNumbers.bound(Math.exp(b))
     e / (e + 1)
   }
