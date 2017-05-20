@@ -172,7 +172,7 @@ object Bearoff {
     val arx = bb.asFloatBuffer.array
 
     if (arProb != null || ausProb != null) {
-      for (i <- 0 until 32) {
+      (0 until 32).foreach {i =>
         val r = fnd(1.0f * i, arx(0), arx(1))
         if (arProb != null) arProb(i) = r
         if (ausProb != null) ausProb(i) = ((r * 65535.0f).toInt & 0xffff).toShort
@@ -215,9 +215,7 @@ object Bearoff {
     }
 
     if (ar != null || arProb != null || arGammonProb != null) {
-      for (i <- 0 until 64) {
-        arx(i) = (ausProbx(i) & 0xffff) / 65535.0f
-      }
+      (0 until 64).foreach(i => arx(i) = (ausProbx(i) & 0xffff) / 65535.0f)
 
       if (arProb != null) {
         System.arraycopy(arx, 0, arProb, 0, 32)
@@ -235,11 +233,11 @@ object Bearoff {
   private def averageRolls(arProb: Array[Float], probOffset: Int, ar: Array[Float], arrOffset: Int) = {
     var sx: Float = 0
     var sx2: Float = 0
-    for (i <- 1 until 32) {
+    (1 until 32).foreach(i => {
       val p = i * arProb(probOffset + i)
       sx += p
       sx2 += i * p
-    }
+    })
 
     ar(arrOffset) = sx
     ar(arrOffset + 1) = Math.sqrt(sx2 - sx * sx).toFloat
