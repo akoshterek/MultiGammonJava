@@ -16,7 +16,6 @@ class TestEvalOver {
     val reward: Reward = Evaluator.getInstance().evalOver(board)
     assertEquals(GameResult.SINGLE, board.gameResult)
     assertEquals(Reward(Array[Double](1, 0, 0, 0, 0)), reward)
-    println(Evaluator.getInstance().classifyPosition(board))
   }
 
   @Test
@@ -26,7 +25,6 @@ class TestEvalOver {
     val reward: Reward = Evaluator.getInstance().evalOver(board)
     assertEquals(GameResult.SINGLE, board.gameResult)
     assertEquals(Reward(Array[Double](0, 0, 0, 0, 0)), reward)
-    println(Evaluator.getInstance().classifyPosition(board))
   }
 
   @Test
@@ -36,7 +34,6 @@ class TestEvalOver {
     val reward: Reward = Evaluator.getInstance().evalOver(board)
     assertEquals(GameResult.GAMMON, board.gameResult)
     assertEquals(Reward(Array[Double](1, 1, 0, 0, 0)), reward)
-    println(Evaluator.getInstance().classifyPosition(board))
   }
 
   @Test
@@ -46,7 +43,6 @@ class TestEvalOver {
     val reward: Reward = Evaluator.getInstance().evalOver(board)
     assertEquals(GameResult.GAMMON, board.gameResult)
     assertEquals(Reward(Array[Double](0, 0, 0, 1, 0)), reward)
-    println(Evaluator.getInstance().classifyPosition(board))
   }
 
   @Test
@@ -56,7 +52,6 @@ class TestEvalOver {
     val reward: Reward = Evaluator.getInstance().evalOver(board)
     assertEquals(GameResult.BACKGAMMON, board.gameResult)
     assertEquals(Reward(Array[Double](1, 1, 1, 0, 0)), reward)
-    println(Evaluator.getInstance().classifyPosition(board))
   }
 
   @Test
@@ -66,6 +61,5 @@ class TestEvalOver {
     val reward: Reward = Evaluator.getInstance().evalOver(board)
     assertEquals(GameResult.BACKGAMMON, board.gameResult)
     assertEquals(Reward(Array[Double](0, 0, 0, 1, 1)), reward)
-    println(Evaluator.getInstance().classifyPosition(board))
   }
 }

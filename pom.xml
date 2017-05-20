@@ -14,9 +14,10 @@
     </modules>
 
     <properties>
-        <skipTests>true</skipTests>
+        <skipTests>false</skipTests>
         <version>0.1</version>
         <scala.version>2.12.2</scala.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <dependencyManagement>
