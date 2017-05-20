@@ -13,7 +13,7 @@ object EncogActivationFunctionFactory {
     case "relu" => new ActivationRamp(10, 0, 10, 0)
     case "lrelu" => new ActivationLeakingRelu(10, -10, 10, -10, 0.01)
     case "elu" => new ActivationElu(10, -10, 10, -10, 0.1)
-    case "elu" => new ActivationSoftplus()
+    case "softplus" => new ActivationSoftplus()
     case _ => throw new IllegalArgumentException(s"Unknown activation function $name")
   }
 }
