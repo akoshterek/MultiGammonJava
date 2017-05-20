@@ -1,13 +1,14 @@
 package org.akoshterek.backgammon.nn.encog.activation
 
 import org.encog.engine.network.activation.ActivationFunction
+import org.encog.mathutil.BoundNumbers
 import org.encog.util.obj.ActivationUtil
 
 /**
   * Created by Alex on 20-05-17.
   */
 @SerialVersionUID(1L)
-class ActivationLeakingRelu(thresholdHigh: Double, thresholdLow: Double, high: Double, low: Double, leak: Double) extends ActivationFunction {
+class ActivationElu(thresholdHigh: Double, thresholdLow: Double, high: Double, low: Double, leak: Double) extends ActivationFunction {
   private val params = Array[Double] (thresholdHigh, thresholdLow, high, low, leak)
   require(leak >= 0 && leak <= 1, "Leak must be in [0, 1] range")
 
@@ -34,7 +35,7 @@ class ActivationLeakingRelu(thresholdHigh: Double, thresholdLow: Double, high: D
         x(i) = params(PARAM_RAMP_HIGH)
       }
       else {
-        x(i) = if (v >= 0) slope * v else params(PARAM_RAMP_LEAK) * v
+        x(i) = if (v >= 0) slope * v else params(PARAM_RAMP_LEAK) * (BoundNumbers.bound(Math.exp(v)) - 1.0)
       }
 
       i += 1
@@ -50,7 +51,7 @@ class ActivationLeakingRelu(thresholdHigh: Double, thresholdLow: Double, high: D
   )
 
   override def derivativeFunction(b: Double, a: Double): Double = {
-    if (b >= 0) slope else params(PARAM_RAMP_LEAK)
+    if (b >= 0) slope else params(PARAM_RAMP_LEAK) * BoundNumbers.bound(Math.exp(b))
   }
 
   override def getParamNames: Array[String] = {
@@ -65,5 +66,5 @@ class ActivationLeakingRelu(thresholdHigh: Double, thresholdLow: Double, high: D
     params(index) = value
   }
 
-  override def getFactoryCode: String = ActivationUtil.generateActivationFactory("lrelu", this)
+  override def getFactoryCode: String = ActivationUtil.generateActivationFactory("elu", this)
 }
