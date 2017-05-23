@@ -12,22 +12,22 @@ class RawRepresentation(val codec: PointCodec) extends InputRepresentation {
   val raceInputsCount: Int = contactInputsCount
   val crashedInputsCount: Int = contactInputsCount
 
-  def calculateRaceInputs(anBoard: Board): Array[Double] = {
+  def calculateRaceInputs(anBoard: Board): Array[Float] = {
     calculateContactInputs(anBoard)
   }
 
-  def calculateCrashedInputs(anBoard: Board): Array[Double] = {
+  def calculateCrashedInputs(anBoard: Board): Array[Float] = {
     calculateContactInputs(anBoard)
   }
 
-  def calculateContactInputs(anBoard: Board): Array[Double] = {
-    val inputs: Array[Double] = new Array[Double](contactInputsCount)
+  def calculateContactInputs(anBoard: Board): Array[Float] = {
+    val inputs: Array[Float] = new Array[Float](contactInputsCount)
     calculateHalfBoard(anBoard.anBoard(0), inputs, 0)
     calculateHalfBoard(anBoard.anBoard(1), inputs, inputs.length / 2)
     inputs
   }
 
-  private def calculateHalfBoard(halfBoard: Array[Int], inputs: Array[Double], offset: Int) {
+  private def calculateHalfBoard(halfBoard: Array[Int], inputs: Array[Float], offset: Int) {
     var point = 0
     while (point < Board.HALF_BOARD_SIZE - 1) {
       var i = 0

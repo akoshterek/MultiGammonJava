@@ -45,8 +45,8 @@ object Bearoff {
     val ar = new Array[Float](4)
 
     ReadTwoSidedBearoff(pbc, iPos, ar)
-    val reward = Reward.rewardArray
-    reward(OUTPUT_WIN) = ar(0) / 2.0 + 0.5
+    val reward = Reward.rewardArray[Float]
+    reward(OUTPUT_WIN) = ar(0) / 2.0f + 0.5f
     Reward(reward)
   }
 
@@ -90,7 +90,7 @@ object Bearoff {
         r += aarProb(1)(i) * aarProb(0)(j)
     }
 
-    val arOutput = Reward.rewardArray
+    val arOutput = Reward.rewardArray[Float]
     arOutput(OUTPUT_WIN) = r
 
     // calculate gammon chances

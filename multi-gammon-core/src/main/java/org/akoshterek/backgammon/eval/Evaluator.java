@@ -100,7 +100,7 @@ public class Evaluator {
     }
 
     public Reward evalOver(final Board anBoard) {
-        final double[] arOutput = Reward.rewardArray();
+        final float[] arOutput = new float[NUM_OUTPUTS()];
         final int CHEQUERS = 15;
 
         int i = anBoard.firstChequerIndex(Board.OPPONENT());
@@ -174,7 +174,7 @@ public class Evaluator {
         int[] anBackgammonCross = new int[2];
         int[] anMaxTurns = new int[2];
         boolean fContact;
-        double data[] = reward.toArray();
+        float data[] = reward.data().clone();
 
         if (data[OUTPUT_WIN()] < 0.0f) {
             data[OUTPUT_WIN()] = 0.0f;
@@ -304,7 +304,7 @@ public class Evaluator {
         if (data[OUTPUT_WINGAMMON()] > data[OUTPUT_WIN()])
             data[OUTPUT_WINGAMMON()] = data[OUTPUT_WIN()];
 
-        double lose = 1.0 - data[OUTPUT_WIN()];
+        float lose = 1.0f - data[OUTPUT_WIN()];
         if (data[OUTPUT_LOSEGAMMON()] > lose)
             data[OUTPUT_LOSEGAMMON()] = lose;
 
@@ -385,11 +385,10 @@ public class Evaluator {
                 p = evalBearoff2(dummy);
             }
 
-            double data[] = p.toArray();
-            return (float) (side == 1 ? data[0] : 1 - data[0]);
+            float data[] = p.data().clone();
+            return (side == 1 ? data[0] : 1 - data[0]);
         }
     }
-
 
     public Path getBasePath() {
         return basePath;

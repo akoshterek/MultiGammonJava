@@ -29,7 +29,7 @@ class GnubgAgent(override val path: Path) extends AbsAgent("Gnubg", path) {
 
   private def evalRaceInternal(board: Board): Reward = {
     val inputs = representation.calculateRaceInputs(board)
-    val reward = Reward.rewardArray
+    val reward = Reward.rewardArray[Float]
     GnuNeuralNets.nnRace.evaluate(inputs, reward)
     val (totMen0, totMen1) = board.chequersCount
 
@@ -51,22 +51,22 @@ class GnubgAgent(override val path: Path) extends AbsAgent("Gnubg", path) {
 
   private def evalCrashedInternal(board: Board): Reward = {
     val inputs = representation.calculateCrashedInputs(board)
-    val reward = Reward.rewardArray
+    val reward = Reward.rewardArray[Float]
     GnuNeuralNets.nnCrashed.evaluate(inputs, reward)
     Reward(reward)
   }
 
   private def evalContactInternal(board: Board): Reward = {
     val inputs = representation.calculateContactInputs(board)
-    val reward = Reward.rewardArray
+    val reward = Reward.rewardArray[Float]
     GnuNeuralNets.nnContact.evaluate(inputs, reward)
     Reward(reward)
   }
 }
 
 object GnubgAgent {
-  private[gnubg] def evaluatePossibleBackgammon(board: Board, gammonsFlag: Int, reward: Array[Double]): Unit = {
-    val reward = Reward.rewardArray
+  private[gnubg] def evaluatePossibleBackgammon(board: Board, gammonsFlag: Int, reward: Array[Float]): Unit = {
+    val reward = Reward.rewardArray[Float]
     if ((gammonsFlag & (BG_POSSIBLE | OBG_POSSIBLE)) != 0) {
       // side that can have the backgammon 
       val side = if ((gammonsFlag & BG_POSSIBLE) != 0) 1 else 0
@@ -86,9 +86,9 @@ object GnubgAgent {
         }
       } else {
         if (side == 1)
-          reward(OUTPUT_WINBACKGAMMON) = 0.0
+          reward(OUTPUT_WINBACKGAMMON) = 0.0f
         else
-          reward(OUTPUT_LOSEBACKGAMMON) = 0.0
+          reward(OUTPUT_LOSEBACKGAMMON) = 0.0f
       }
     }
   }

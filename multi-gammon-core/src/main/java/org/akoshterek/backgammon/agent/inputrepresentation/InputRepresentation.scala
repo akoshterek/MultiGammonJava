@@ -7,7 +7,7 @@ trait InputRepresentation {
   val crashedInputsCount: Int
   val contactInputsCount: Int
 
-  def calculateRaceInputs(anBoard: Board): Array[Double]
-  def calculateCrashedInputs(anBoard: Board): Array[Double]
-  def calculateContactInputs(anBoard: Board): Array[Double]
+  def calculateRaceInputs(anBoard: Board): Array[Float]
+  def calculateCrashedInputs(anBoard: Board): Array[Float]
+  def calculateContactInputs(anBoard: Board): Array[Float]
 }

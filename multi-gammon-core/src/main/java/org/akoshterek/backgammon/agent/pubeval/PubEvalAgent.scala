@@ -1,11 +1,11 @@
 package org.akoshterek.backgammon.agent.pubeval
 
+import java.nio.file.Path
+
 import org.akoshterek.backgammon.Constants
 import org.akoshterek.backgammon.agent.AbsAgent
-import org.akoshterek.backgammon.board.Board
-import org.akoshterek.backgammon.board.PositionClass
+import org.akoshterek.backgammon.board.{Board, PositionClass}
 import org.akoshterek.backgammon.eval.Reward
-import java.nio.file.Path
 
 object PubEvalAgent {
   def buildDefault(path: Path): PubEvalAgent = {
@@ -21,12 +21,12 @@ class PubEvalAgent(override val path: Path, val contactWeights: Array[Double], v
   def evalContact(board: Board): Reward = evaluate(board)
 
   private def evaluate(board: Board): Reward = {
-    val reward = Reward.rewardArray
+    val reward = Reward.rewardArray[Float]
     val pos: Array[Int] = new Array[Int](28)
     preparePos(board, pos)
 
     val race: Int = if (curPC.getValue <= PositionClass.CLASS_RACE.getValue) 1 else 0
-    reward(Constants.OUTPUT_WIN) = eval.evaluate(race, pos)
+    reward(Constants.OUTPUT_WIN) = eval.evaluate(race, pos).toFloat
     new Reward(reward)
   }
 

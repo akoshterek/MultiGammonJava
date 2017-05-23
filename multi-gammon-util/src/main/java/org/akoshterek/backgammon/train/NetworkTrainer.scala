@@ -98,7 +98,8 @@ class NetworkTrainer(val settings: AgentSettings, val networkType: PositionClass
 
     var i = 0
     while (i < data.length) {
-      val input: MLData = new BasicMLData(settings.representation.calculateContactInputs(Board.positionFromID(data(i).positionId)))
+      val input: MLData = new BasicMLData(
+        settings.representation.calculateContactInputs(Board.positionFromID(data(i).positionId)).map(_.toDouble))
       val ideal: MLData = new BasicMLData(data(i).reward)
       val pair: MLDataPair = new BasicMLDataPair(input, ideal)
       trainingSet.add(pair)

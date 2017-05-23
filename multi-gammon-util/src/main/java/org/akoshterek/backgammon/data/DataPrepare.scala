@@ -1,14 +1,12 @@
 package org.akoshterek.backgammon.data
 
+import java.io._
+import java.util.zip.{GZIPInputStream, GZIPOutputStream}
+
 import org.akoshterek.backgammon.Constants
-import org.akoshterek.backgammon.board.Board
-import org.akoshterek.backgammon.board.PositionId
+import org.akoshterek.backgammon.board.{Board, PositionId}
 import org.akoshterek.backgammon.eval.Reward
 import org.akoshterek.backgammon.move.AuchKey
-import java.io._
-import java.util.zip.GZIPInputStream
-import java.util.zip.GZIPOutputStream
-
 import resource.managed
 
 import scala.collection.{immutable, mutable}
@@ -34,11 +32,11 @@ object DataPrepare extends App {
         .foreach(line => {
           val tokens: Array[String] = line.split("\\s")
           val positionId: String = PositionId.positionIDFromKey(AuchKey.fromNnPosition(tokens(0)))
-          val reward: Array[Double] = Reward.rewardArray
+          val reward: Array[Double] = Reward.rewardArray[Double]
           for (i <- 0 until Constants.NUM_OUTPUTS) {
             reward(i) = tokens(i + 1).toDouble
           }
-          data += (positionId -> new Reward(reward))
+          data += (positionId -> Reward(reward))
         })
     })
 

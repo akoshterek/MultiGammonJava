@@ -1,7 +1,6 @@
 package org.akoshterek.backgammon.agent.gnubg.nn
 
-import java.io.DataInput
-import java.io.IOException
+import java.io.{DataInput, IOException}
 
 // While loops are much faster than for loops
 object NeuralNet {
@@ -39,7 +38,7 @@ final class NeuralNet private(val cInput: Int, val cHidden: Int, val cOutput: In
   private val arHiddenThreshold: Array[Float] = new Array[Float](cHidden)
   private val arOutputThreshold: Array[Float] = new Array[Float](cOutput)
 
-  def evaluate(arInput: Array[Double], arOutput: Array[Double]) {
+  def evaluate(arInput: Array[Float], arOutput: Array[Float]) {
     val ar: Array[Float] = arHiddenThreshold.clone
     evaluateHiddenNodes(ar, arInput)
     evaluateOutputNodes(ar, arOutput)
@@ -51,14 +50,14 @@ final class NeuralNet private(val cInput: Int, val cHidden: Int, val cOutput: In
     * @param ar      internal results
     * @param arInput input array
     */
-  def evaluateHiddenNodes(ar: Array[Float], arInput: Array[Double]): Unit = {
+  def evaluateHiddenNodes(ar: Array[Float], arInput: Array[Float]): Unit = {
     var prWeight: Int = 0
 
     //arHiddenWeight
     {
       var i = 0
       while (i < cInput) {
-        val ari: Float = arInput(i).toFloat
+        val ari = arInput(i)
         if (ari != 0) {
           var prIndex: Int = 0
           if (ari == 1.0f) {
@@ -103,7 +102,7 @@ final class NeuralNet private(val cInput: Int, val cHidden: Int, val cOutput: In
     * @param ar       internal results
     * @param arOutput output activity
     */
-  def evaluateOutputNodes(ar: Array[Float], arOutput: Array[Double]): Unit = {
+  def evaluateOutputNodes(ar: Array[Float], arOutput: Array[Float]): Unit = {
 
     var prWeight = 0
     //>arOutputWeight;

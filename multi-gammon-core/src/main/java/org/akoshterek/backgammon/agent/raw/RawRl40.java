@@ -1,5 +1,6 @@
 package org.akoshterek.backgammon.agent.raw;
 
+import org.akoshterek.backgammon.Constants;
 import org.akoshterek.backgammon.agent.AbsAgent;
 import org.akoshterek.backgammon.agent.ETraceEntry;
 import org.akoshterek.backgammon.agent.fa.NeuralNetworkFA;
@@ -30,8 +31,8 @@ public class RawRl40 extends AbsAgent implements Cloneable {
     private int step = 0;
     private ETraceEntry prevEntry;
 //    private Move prevMove;
-    private static final double gamma = 1.0;
-    private static final double lambda = 0.7;
+    private static final float gamma = 1.0f;
+    private static final float lambda = 0.7f;
 
     public RawRl40(Path path) {
         super("RawRl40", path);
@@ -42,7 +43,7 @@ public class RawRl40 extends AbsAgent implements Cloneable {
 
     @Override
     public Reward evalContact(Board board) {
-        double[] inputs = representation.calculateContactInputs(board);
+        float[] inputs = representation.calculateContactInputs(board);
         return fa.calculateReward(inputs);
     }
 
@@ -133,7 +134,7 @@ public class RawRl40 extends AbsAgent implements Cloneable {
         eligibilityTraces
                 .values()
                 .stream()
-                .sorted((o1, o2) -> Double.valueOf(o2.eTrace).compareTo(o1.eTrace))
+                .sorted((o1, o2) -> Float.valueOf(o2.eTrace).compareTo(o1.eTrace))
                 .forEach(entry -> updateTraceEntry(entry, deltaReward));
         eligibilityTraces
                 .values()
@@ -151,11 +152,11 @@ public class RawRl40 extends AbsAgent implements Cloneable {
     private Reward calcDeltaReward(final Move move) {
         //prev reward
         Board prevBoard = Board.positionFromKey(prevEntry.auch);
-        double prevQValue[] = evaluatePosition(prevBoard, prevEntry.pc).toArray();
+        float prevQValue[] = evaluatePosition(prevBoard, prevEntry.pc).data().clone();
 
         //Predicted greedy reward
-        double predictedGreedyReward[] = move.arEvalMove().toArray();
-        double deltaReward[] = Reward.rewardArray();
+        float predictedGreedyReward[] = move.arEvalMove().data().clone();
+        float deltaReward[] = new float[Constants.NUM_OUTPUTS()];
         for(int i = 0; i < 1/*Constants.NUM_OUTPUTS*/; i++) {
             deltaReward[i] = /*reward.data[i] +*/ predictedGreedyReward[i] * gamma - prevQValue[i];
             //deltaReward.data[i] *= 0.3;

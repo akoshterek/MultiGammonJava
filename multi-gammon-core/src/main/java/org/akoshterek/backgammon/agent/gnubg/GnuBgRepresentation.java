@@ -39,8 +39,8 @@ class GnuBgRepresentation implements InputRepresentation {
     }
 
     @Override
-    public double[] calculateRaceInputs(final Board anBoard) {
-        double[] inputs = new double[NUM_RACE_INPUTS];
+    public float[] calculateRaceInputs(final Board anBoard) {
+        float[] inputs = new float[NUM_RACE_INPUTS];
         for (int side = 0; side < 2; ++side) {
             int[] board = anBoard.anBoard()[side];
             int afInputIndex = side * HALF_RACE_INPUTS;
@@ -80,8 +80,8 @@ class GnuBgRepresentation implements InputRepresentation {
     }
 
     @Override
-    public double[] calculateCrashedInputs(final Board anBoard) {
-        double[] inputs = new double[NUM_INPUTS];
+    public float[] calculateCrashedInputs(final Board anBoard) {
+        float[] inputs = new float[NUM_INPUTS];
         baseInputs(anBoard, inputs);
 
         int index = 4 * 25 * 2;
@@ -96,8 +96,8 @@ class GnuBgRepresentation implements InputRepresentation {
     }
 
     @Override
-    public double[] calculateContactInputs(final Board anBoard) {
-        double[] inputs = new double[NUM_INPUTS];
+    public float[] calculateContactInputs(final Board anBoard) {
+        float[] inputs = new float[NUM_INPUTS];
         baseInputs(anBoard, inputs);
 
         int index = 4 * 25 * 2;
@@ -112,7 +112,7 @@ class GnuBgRepresentation implements InputRepresentation {
         return inputs;
     }
 
-    private static void calculateHalfInputs(final int[] anBoard, final int[] anBoardOpp, final double[] input, final int index) {
+    private static void calculateHalfInputs(final int[] anBoard, final int[] anBoardOpp, final float[] input, final int index) {
         int i, j, k, l, nOppBack, nBoard;
 
         HitIntermediate pi;
@@ -617,8 +617,8 @@ class GnuBgRepresentation implements InputRepresentation {
                     ++nAc;
             }
 
-            input[index + I_BACKG] = 0.0;
-            input[index + I_BACKG1] = 0.0;
+            input[index + I_BACKG] = 0.0f;
+            input[index + I_BACKG1] = 0.0f;
 
             if (nAc >= 1) {
                 int tot = 0;
@@ -636,7 +636,7 @@ class GnuBgRepresentation implements InputRepresentation {
         }
     }
 
-    private static void menOffAll(final int[] anBoard, final double[] afInput, final int index) {
+    private static void menOffAll(final int[] anBoard, final float[] afInput, final int index) {
         //* Men off
         int menOff = 15;
 
@@ -644,8 +644,8 @@ class GnuBgRepresentation implements InputRepresentation {
             menOff -= anBoard[i];
 
         if (menOff > 10) {
-            afInput[index + I_OFF1] = 1.0;
-            afInput[index + I_OFF2 - I_OFF1] = 1.0;
+            afInput[index + I_OFF1] = 1.0f;
+            afInput[index + I_OFF2 - I_OFF1] = 1.0f;
             afInput[index + I_OFF3 - I_OFF1] = (menOff - 10) / 5.0f;
         } else if (menOff > 5) {
             afInput[index+ I_OFF1] = 1.0f;
@@ -658,7 +658,7 @@ class GnuBgRepresentation implements InputRepresentation {
         }
     }
 
-    private static void menOffNonCrashed(final int[] anBoard, final double[] afInput, final int index) {
+    private static void menOffNonCrashed(final int[] anBoard, final float[] afInput, final int index) {
         int menOff = 15;
         int i;
 
@@ -682,7 +682,7 @@ class GnuBgRepresentation implements InputRepresentation {
         }
     }
 
-    private static void baseInputs(final Board anBoard, final double[] arInput) {
+    private static void baseInputs(final Board anBoard, final float[] arInput) {
         for (int j = 0; j < 2; ++j) {
             int afInput = j * 25 * 4;
             int[] board = anBoard.anBoard()[j];

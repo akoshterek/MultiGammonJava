@@ -47,15 +47,15 @@ class SimpleEncogFA(override val network: BasicNetwork) extends AbsNeuralNetwork
     EncogDirectoryPersistence.saveObject(file.toFile, network)
   }
 
-  override def calculateReward(input: Array[Double]): Reward = {
-    val reward = Reward.rewardArray
-    network.compute(input, reward)
-    new Reward(reward)
+  override def calculateReward(input: Array[Float]): Reward = {
+    val reward = Reward.rewardArray[Double]
+    network.compute(input.map(_.toDouble), reward)
+    Reward(reward)
   }
 
-  override def setReward(input: Array[Double], reward: Reward) {
-    trainingSet.get(0).getInput.setData(input)
-    trainingSet.get(0).getIdeal.setData(reward.data)
+  override def setReward(input: Array[Float], reward: Reward) {
+    trainingSet.get(0).getInput.setData(input.map(_.toDouble))
+    trainingSet.get(0).getIdeal.setData(reward.toArray)
     propagation.iteration()
   }
 }

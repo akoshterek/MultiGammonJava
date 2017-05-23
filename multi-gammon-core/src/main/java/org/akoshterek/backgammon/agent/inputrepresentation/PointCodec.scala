@@ -11,7 +11,7 @@ trait PointCodec {
     * @param index in range [0, inputsPerPoint)
     * @return encoded input
     */
-  def point(men: Int, index: Int): Double
+  def point(men: Int, index: Int): Float
 
   val self: this.type = this
 }

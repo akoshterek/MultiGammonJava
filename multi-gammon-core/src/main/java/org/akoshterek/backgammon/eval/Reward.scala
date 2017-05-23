@@ -2,14 +2,16 @@ package org.akoshterek.backgammon.eval
 
 import org.akoshterek.backgammon.Constants._
 
+import scala.reflect.ClassTag
+
 /**
   * @author Alex
   *         date 19.07.2015.
   *
   *         backgammon reward
   */
-final class Reward(input: Array[Double]) {
-  def data: Array[Double] = input
+final class Reward(input: Array[Float]) {
+  def data: Array[Float] = input
 
   require(data.length == NUM_OUTPUTS)
 
@@ -17,15 +19,15 @@ final class Reward(input: Array[Double]) {
     this(reward.data)
   }
 
-  def this(reward: Seq[Double]) {
+  def this(reward: Seq[Float]) {
     this(reward.toArray)
   }
 
   def this() {
-    this(Array.fill[Double](NUM_OUTPUTS)(0))
+    this(Array.fill[Float](NUM_OUTPUTS)(0))
   }
 
-  def apply(index: Int): Double = data.apply(index)
+  def apply(index: Int): Float = data.apply(index)
 
   /**
     * Move evaluation
@@ -34,16 +36,16 @@ final class Reward(input: Array[Double]) {
     *
     * @return money equity
     */
-  def equity: Double = {
-    (data(OUTPUT_WIN) * 2.0 - 1.0
+  def equity: Float = {
+    (data(OUTPUT_WIN) * 2.0f - 1.0f
       +(data(OUTPUT_WINGAMMON) - data(OUTPUT_LOSEGAMMON))
       +(data(OUTPUT_WINBACKGAMMON) - data(OUTPUT_LOSEBACKGAMMON)))
   }
 
   def invert: Reward = {
-    val res = Reward.rewardArray
-    var r: Double = .0
-    res(OUTPUT_WIN) = 1.0 - data(OUTPUT_WIN)
+    val res = Reward.rewardArray[Float]
+    var r: Float = 0.0f
+    res(OUTPUT_WIN) = 1.0f - data(OUTPUT_WIN)
     r = data(OUTPUT_WINGAMMON)
     res(OUTPUT_WINGAMMON) = data(OUTPUT_LOSEGAMMON)
     res(OUTPUT_LOSEGAMMON) = r
@@ -54,7 +56,7 @@ final class Reward(input: Array[Double]) {
   }
 
   def clamp(): Reward = {
-    def crop(minVal: Double, maxVal: Double, value: Double): Double = {
+    def crop(minVal: Float, maxVal: Float, value: Float): Float = {
       require(minVal <= maxVal, "min is greater than max")
       maxVal.min(minVal.max(value))
     }
@@ -62,19 +64,19 @@ final class Reward(input: Array[Double]) {
     new Reward(data.map(x => crop(0, 1, x)))
   }
 
-  def *(value: Double): Reward = {
+  def *(value: Float): Reward = {
     new Reward(data.map(_ * value))
   }
 
   def +(that: Reward): Reward = {
-    new Reward(Array.tabulate[Double](NUM_OUTPUTS)(i => data(i) + that.data(i)))
+    new Reward(Array.tabulate[Float](NUM_OUTPUTS)(i => data(i) + that.data(i)))
   }
 
   override def toString: String = {
     data.mkString(", ")
   }
 
-  def toArray : Array[Double] = data
+  def toArray[T: ClassTag] : Array[T] = data.map(_.asInstanceOf[T])
 
   override def equals(that: Any): Boolean = {
     that match {
@@ -89,7 +91,9 @@ final class Reward(input: Array[Double]) {
 }
 
 object Reward {
-  def apply(input: Array[Double]): Reward = new Reward(input)
+  def apply(input: Array[Float]): Reward = new Reward(input)
 
-  def rewardArray: Array[Double] = Array.ofDim[Double](NUM_OUTPUTS)
+  def apply(input: Array[Double]): Reward = new Reward(input.map(_.toFloat))
+
+  def rewardArray[T: ClassTag]: Array[T] = Array.ofDim[T](NUM_OUTPUTS)
 }
