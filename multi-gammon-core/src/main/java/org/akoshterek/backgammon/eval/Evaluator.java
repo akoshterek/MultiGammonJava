@@ -43,6 +43,14 @@ public class Evaluator {
         loadBearoff();
     }
 
+    BearoffContext getPbc1() {
+        return pbc1;
+    }
+
+    BearoffContext getPbc2() {
+        return pbc2;
+    }
+
     public int nextDice() {
         return distribution.sample();
     }
@@ -52,51 +60,7 @@ public class Evaluator {
     }
 
     public PositionClass classifyPosition(final Board anBoard) {
-        int nOppBack = anBoard.backChequerIndex(Board.OPPONENT());
-        int nBack = anBoard.backChequerIndex(Board.SELF());
-
-        if (nBack < 0 || nOppBack < 0) {
-            return PositionClass.CLASS_OVER;
-        }
-
-        // normal backgammon
-        if (nBack + nOppBack > 22) {
-            // contact position
-            final int N = 6;
-            int i;
-            int side;
-
-            for (side = 0; side < 2; ++side) {
-                int tot = 0;
-                int[] board = anBoard.anBoard()[side];
-
-                for (i = 0; i < 25; ++i)
-                    tot += anBoard.anBoard()[side][i];
-
-                if (tot <= N) {
-                    return PositionClass.CLASS_CRASHED;
-                } else {
-                    if (board[0] > 1) {
-                        if (tot <= (N + board[0])) {
-                            return PositionClass.CLASS_CRASHED;
-                        } else if (board[1] > 1 && (1 + tot - (board[0] + board[1])) <= N) {
-                            return PositionClass.CLASS_CRASHED;
-                        }
-                    } else if (tot <= (N + (board[1] - 1)))
-                        return PositionClass.CLASS_CRASHED;
-                }
-            }
-
-            return PositionClass.CLASS_CONTACT;
-        } else {
-            if (Bearoff.isBearoff(pbc2, anBoard))
-                return PositionClass.CLASS_BEAROFF2;
-
-            if (Bearoff.isBearoff(pbc1, anBoard))
-                return PositionClass.CLASS_BEAROFF1;
-
-            return PositionClass.CLASS_RACE;
-        }
+        return PositionClassificator.classifyPosition(anBoard);
     }
 
     public Reward evalOver(final Board anBoard) {
