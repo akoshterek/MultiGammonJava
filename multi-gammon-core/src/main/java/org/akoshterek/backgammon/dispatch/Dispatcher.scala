@@ -1,15 +1,12 @@
 package org.akoshterek.backgammon.dispatch
 
+import java.nio.file.{Path, Paths}
+
 import org.akoshterek.backgammon.License
-import org.akoshterek.backgammon.agent.AbsAgent
-import org.akoshterek.backgammon.agent.AgentFactory
-import org.akoshterek.backgammon.agent.Agent
+import org.akoshterek.backgammon.agent.{AbsAgent, Agent, AgentFactory}
 import org.akoshterek.backgammon.eval.Evaluator
-import org.akoshterek.backgammon.util.OptionsBean
-import org.akoshterek.backgammon.util.OptionsBuilder
+import org.akoshterek.backgammon.util.{OptionsBean, OptionsBuilder}
 import org.apache.commons.lang3.time.DurationFormatUtils
-import java.nio.file.Path
-import java.nio.file.Paths
 
 class Dispatcher {
   OptionsBuilder.build()
@@ -42,11 +39,13 @@ class Dispatcher {
       val agentNames: Vector[String] = options.agentNames
       val benchAgenName: String = options.benchmarkAgentName
 
-      agentNames.par.foreach { agentName => runAgentIteration(agentName,
-        benchAgenName,
-        options.trainingGames,
-        options.benchmarkGames,
-        options.benchmarkPeriod)
+      agentNames.foreach { agentName =>
+        runAgentIteration(agentName,
+          benchAgenName,
+          options.trainingGames,
+          options.benchmarkGames,
+          options.benchmarkPeriod
+        )
       }
     }
 
@@ -88,7 +87,7 @@ class Dispatcher {
     }
 
     if (trainGames > 0) {
-      for (game <- 0 until trainGames by benchmarkPeriod) {
+      for (_ <- 0 until trainGames by benchmarkPeriod) {
         //training
         gameDispatcher.playGames(Math.min(benchmarkPeriod, trainGames), learn = true)
         agent1.save()
