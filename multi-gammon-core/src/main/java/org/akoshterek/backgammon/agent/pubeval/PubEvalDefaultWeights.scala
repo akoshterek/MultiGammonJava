@@ -4,7 +4,7 @@ package org.akoshterek.backgammon.agent.pubeval
   * Default weights for Gerry Tesauro PubEval agent
   */
 object PubEvalDefaultWeights {
-    var contactWeights: Array[Double] = Array[Double](
+    var contactWeights: Array[Float] = Array[Float](
         .25696f, -.66937f, -1.66135f, -2.02487f, -2.53398f, -.16092f, -1.11725f,
         -1.06654f, -.92830f, -1.99558f, -1.10388f, -.80802f, .09856f, -.62086f,
         -1.27999f, -.59220f, -.73667f, .89032f, -.38933f, -1.59847f, -1.50197f,
@@ -23,7 +23,7 @@ object PubEvalDefaultWeights {
         1.23606f, -1.59529f, .10438f, -1.30206f, -4.11520f, 5.62596f, -2.75800f
     )
 
-    val raceWeights: Array[Double] = Array[Double](
+    val raceWeights: Array[Float] = Array[Float](
         .00000f, -.17160f, .27010f, .29906f, -.08471f, .00000f, -1.40375f,
         -1.05121f, .07217f, -.01351f, .00000f, -1.29506f, -2.16183f, .13246f,
         -1.03508f, .00000f, -2.29847f, -2.34631f, .17253f, .08302f, .00000f,

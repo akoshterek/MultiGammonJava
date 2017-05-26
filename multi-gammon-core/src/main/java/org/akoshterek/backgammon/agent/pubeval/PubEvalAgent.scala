@@ -13,7 +13,7 @@ object PubEvalAgent {
   }
 }
 
-class PubEvalAgent(override val path: Path, val contactWeights: Array[Double], val raceWeights: Array[Double])
+class PubEvalAgent(override val path: Path, val contactWeights: Array[Float], val raceWeights: Array[Float])
   extends AbsAgent("PubEval", path) with Cloneable {
 
   private val eval: PubEval = new PubEval(contactWeights, raceWeights)

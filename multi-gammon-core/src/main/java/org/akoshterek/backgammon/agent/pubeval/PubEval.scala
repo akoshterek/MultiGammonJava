@@ -3,16 +3,16 @@ package org.akoshterek.backgammon.agent.pubeval
 import java.util
 
 class PubEval {
-    private val _contactWeights: Array[Double] = new Array[Double](122)
-    private val _raceWeights: Array[Double] = new Array[Double](122)
+    private val _contactWeights: Array[Float] = new Array[Float](122)
+    private val _raceWeights: Array[Float] = new Array[Float](122)
 
-    def this(contactWeights: Array[Double], raceWeights: Array[Double]) {
+    def this(contactWeights: Array[Float], raceWeights: Array[Float]) {
        this()
         System.arraycopy(contactWeights, 0, this._contactWeights, 0, this._contactWeights.length)
         System.arraycopy(raceWeights, 0, this._raceWeights, 0, this._raceWeights.length)
     }
 
-    final private val x: Array[Double] = new Array[Double](122)
+    final private val x: Array[Float] = new Array[Float](122)
 
     /**
       * sets input vector x[] given board position pos[]
@@ -34,9 +34,9 @@ class PubEval {
             }
         }
         // encode opponent barmen
-        x(120) = -pos(0).toDouble / 2.0
+        x(120) = -pos(0).toFloat / 2.0f
         // encode computer's menoff
-        x(121) = pos(26).toDouble / 15.0
+        x(121) = pos(26).toFloat / 15.0f
     }
 
     /* Backgammon move-selection evaluation function
@@ -80,12 +80,12 @@ class PubEval {
             99999999.0
         } else {
             setx(pos)
-            val score = (x, if(race != 0) raceWeights else contactWeights).zipped.map(_ * _).sum
+            val score = (x, if(race != 0) _raceWeights else _contactWeights).zipped.map(_ * _).sum
             score
         }
     }
 
-    def contactWeights: Array[Double] = _contactWeights
+    def contactWeights: Array[Float] = _contactWeights
 
-    def raceWeights: Array[Double] = _raceWeights
+    def raceWeights: Array[Float] = _raceWeights
 }
