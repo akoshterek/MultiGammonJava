@@ -78,16 +78,23 @@ object Bearoff {
     val ar = Array.ofDim[Float](2, 4)
 
     // get bearoff probabilities
-    for (i <- 0 until 2) {
+    var i = 0
+    while (i < 2) {
       an(i) = PositionId.positionBearoff(anBoard.anBoard(i), pbc.points, pbc.chequers)
       bearoffDist(pbc, an(i), aarProb(i), aarGammonProb(i), ar(i), null)
+      i += 1
     }
 
     // calculate winning chance
     var r: Float = 0
-    for (i <- 0 until 32;
-         j <- i until 32) {
+    i = 0
+    while (i < 32) {
+      var j = i
+      while (j < 32) {
         r += aarProb(1)(i) * aarProb(0)(j)
+        j += 1
+      }
+      i += 1
     }
 
     val arOutput = Reward.rewardArray[Float]
