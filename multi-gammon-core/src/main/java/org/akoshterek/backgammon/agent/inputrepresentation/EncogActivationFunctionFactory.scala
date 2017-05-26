@@ -15,9 +15,7 @@ object EncogActivationFunctionFactory {
     case "elu" => new ActivationElu(10, -10, 10, -10, 0.1)
     case "softplus" => new ActivationSoftplus()
     case "elliot" => new ActivationElliottSymmetric()
-    case "gaussian" => new ActivationGaussian()
     case "log" => new ActivationLOG()
-    case "sin" => new ActivationSIN()
     case _ => throw new IllegalArgumentException(s"Unknown activation function $name")
   }
 }
