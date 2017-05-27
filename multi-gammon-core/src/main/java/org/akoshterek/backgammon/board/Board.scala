@@ -133,8 +133,8 @@ class Board extends Cloneable {
   
   def swapSides: Board = {
     val board: Array[Array[Int]] = Array.ofDim[Int](2, 25)
-    board(0) = this.anBoard(1).clone()
-    board(1) = this.anBoard(0).clone()
+    board(0) = this.anBoard(1)
+    board(1) = this.anBoard(0)
     Board(board)
   }
 
