@@ -40,8 +40,20 @@ class AuchKey() {
 
   override def equals(that: Any): Boolean = {
     that match {
-      case that: AuchKey => this.key.sameElements(that.key)
+      case that: AuchKey => sameElements(that.key)
       case _ => false
+    }
+  }
+
+  private def sameElements (thatKey: Array[Byte]): Boolean = {
+    if (this.key eq thatKey) {
+      true
+    } else if (this.key.length != thatKey.length) {
+      false
+    } else {
+      var i = 0
+      while (i < this.key.length && this.key(i) == thatKey(i)) i += 1
+      i == this.key.length
     }
   }
 

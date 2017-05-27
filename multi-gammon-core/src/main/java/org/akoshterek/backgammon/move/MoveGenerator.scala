@@ -59,7 +59,8 @@ object MoveGenerator {
       }
     }
     else {
-      for (i <- iPip to 0 by -1) {
+      var i = iPip
+      while (i >= 0) {
         if (anBoard(Board.SELF)(i) != 0 && board.isLegalMove(i, anRoll(nMoveDepth))) {
           anMoves.move(nMoveDepth).from = i
           anMoves.move(nMoveDepth).to = i - anRoll(nMoveDepth)
@@ -74,6 +75,8 @@ object MoveGenerator {
           }
           fUsed = true
         }
+
+        i -= 1
       }
 
       !fUsed
