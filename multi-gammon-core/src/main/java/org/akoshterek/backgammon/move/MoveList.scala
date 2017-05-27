@@ -32,7 +32,7 @@ class MoveList private[move]() {
       if (src.cMoves != 0) {
         if (src.cMoves > cMoves) {
           deleteMoves()
-          amMoves = Array.fill[Move](src.cMoves)(new Move)
+          amMoves = new Array[Move](src.cMoves)
         }
         System.arraycopy(src.amMoves, 0, amMoves, 0, src.cMoves)
       }

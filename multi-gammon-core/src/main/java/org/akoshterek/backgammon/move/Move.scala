@@ -28,7 +28,7 @@ class Move {
   var cMoves = 0
   var cPips = 0
   /** scores for this move */
-  def rScore: Double = arEvalMove.equity
+  def rScore: Float = arEvalMove.equity
   /** evaluation for this move */
   var arEvalMove: Reward = new Reward()
   var pc: PositionClass = PositionClass.CLASS_OVER

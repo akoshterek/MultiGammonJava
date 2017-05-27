@@ -7,12 +7,12 @@ import org.akoshterek.backgammon.move.{AuchKey, ChequersMove, Move, MoveList}
 import org.akoshterek.backgammon.util.Base64
 
 object Board {
-  val OPPONENT: Int = 0
-  val SELF: Int = 1
+  final val OPPONENT: Int = 0
+  final val SELF: Int = 1
 
-  val BAR: Int = 24
-  val TOTAL_MEN: Int = 15
-  val HALF_BOARD_SIZE = 25
+  final val BAR: Int = 24
+  final val TOTAL_MEN: Int = 15
+  final val HALF_BOARD_SIZE = 25
 
   def positionFromKey(auch: AuchKey): Board = {
     var i: Int = 0
@@ -155,32 +155,64 @@ class Board extends Cloneable {
     }
   }
 
-  def chequersCount(side: Int): Int = anBoard(side).sum
+  def chequersCount(side: Int): Int = {
+    var count = 0
+    var i = 0
+    while (i < anBoard(side).length) {
+      count += anBoard(side)(i)
+      i += 1
+    }
+    count
+  }
 
   def chequersCount: (Int, Int) = {
     (chequersCount(Board.OPPONENT), chequersCount(Board.SELF))
   }
 
   def backChequerIndex(side: Int): Int = {
-    anBoard(side).lastIndexWhere(_ > 0)
+    var i = anBoard(side).length - 1
+    while (i >= 0 && anBoard(side)(i) == 0) i -= 1
+    i
   }
 
   def firstChequerIndex(side: Int): Int = {
-    anBoard(side).indexWhere(_ > 0)
+    def negLength(n: Int) = if (n >= Board.HALF_BOARD_SIZE) -1 else n
+
+    def segmentLength: Int = {
+      var i = 0
+      while (i < Board.HALF_BOARD_SIZE && anBoard(side)(i) == 0) {
+        i += 1
+      }
+      i
+    }
+
+    negLength(segmentLength)
   }
+
+
+  //def firstChequerIndex(side: Int): Int = {
+  //  anBoard(side).indexWhere(_ > 0)
+  //}
 
   def calcPositionKey: AuchKey = {
     var iBit: Int = 0
     val auchKey: AuchKey = new AuchKey
-    anBoard.foreach(_.foreach(nc => {
-      if (nc != 0) {
-        Board.addBits(auchKey, iBit, nc)
-        iBit += nc + 1
+    var side = 0
+    while (side < 2) {
+      var i = 0
+      while (i < anBoard(side).length) {
+        val nc = anBoard(side)(i)
+        if (nc != 0) {
+          Board.addBits(auchKey, iBit, nc)
+          iBit += nc + 1
+        }
+        else {
+          iBit += 1
+        }
+        i += 1
       }
-      else {
-        iBit += 1
-      }
-    }))
+      side += 1
+    }
 
     auchKey
   }
@@ -249,10 +281,7 @@ class Board extends Cloneable {
       anBoard(Board.OPPONENT)(23 - iDest) < 2
     } else {
       // otherwise, attempting to bear off
-      var nBack = 0
-      for (i <- 1 until 25 if anBoard(Board.SELF)(i) > 0) {
-          nBack = i
-      }
+      val nBack = Math.max(0, backChequerIndex(Board.SELF))
       nBack <= 5 && (iSrc == nBack || iDest == -1)
     }
   }

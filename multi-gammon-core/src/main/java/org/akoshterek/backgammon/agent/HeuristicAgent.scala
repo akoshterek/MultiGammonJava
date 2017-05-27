@@ -22,13 +22,14 @@ class HeuristicAgent(override val path: Path) extends AbsAgent("Heuristic", path
 
   def evalContact(board: Board): Reward = {
     val reward = Reward.rewardArray[Float]
-    reward(Constants.OUTPUT_WIN) = evaluate(board.anBoard(Board.SELF))
+    reward(Constants.OUTPUT_WIN) = evaluate(board)
     new Reward(reward)
   }
 
-  private def evaluate(points: Array[Int]): Float = {
+  private def evaluate(board: Board): Float = {
+    val points: Array[Int] = board(Board.SELF)
     var equity: Float = 0.0f
-    val atHome: Int = 15 - points.sum
+    val atHome: Int = 15 - board.chequersCount(Board.SELF)
 
     // 1/15th of a point per man home
     equity += atHome / 15.0f

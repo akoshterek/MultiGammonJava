@@ -28,10 +28,13 @@ object Escapes {
 
   def escapes(anBoard: Array[Int], n: Int, anEscapes: Array[Int]): Int = {
     val m = if (n < 12) n else 12
-
     var af = 0
-    for (i <- 0 until m if anBoard(24 + i - n) > 1) {
-      af |= (1 << i)
+    var i = 0
+    while (i < m) {
+      if (anBoard(24 + i - n) > 1) {
+        af |= (1 << i)
+      }
+      i += 1
     }
 
     anEscapes(af)

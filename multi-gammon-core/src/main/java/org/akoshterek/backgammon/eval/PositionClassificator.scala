@@ -23,30 +23,29 @@ object PositionClassificator {
   }
 
   private def classifyContact(anBoard: Board): PositionClass = {
-    classifyContactSide(anBoard(Board.OPPONENT)) match {
-      case PositionClass.CLASS_CONTACT => classifyContactSide(anBoard(Board.SELF))
+    val (opp, self) = anBoard.chequersCount
+    classifyContactSide(anBoard(Board.OPPONENT), opp) match {
+      case PositionClass.CLASS_CONTACT => classifyContactSide(anBoard(Board.SELF), self)
       case res => res
     }
   }
 
-  private def classifyContactSide(board: Array[Int]): PositionClass = {
+  private def classifyContactSide(board: Array[Int], total: Int): PositionClass = {
     // contact position
-
     val N: Int = 6 //crashed edge
-    val tot = board.sum
     var res = PositionClass.CLASS_CONTACT
 
-    if (tot <= N) {
+    if (total <= N) {
       res = PositionClass.CLASS_CRASHED
     }
     else if (board(0) > 1) {
-      if (tot <= (N + board(0))) {
+      if (total <= (N + board(0))) {
         res = PositionClass.CLASS_CRASHED
-      } else if (board(1) > 1 && (1 + tot - (board(0) + board(1))) <= N) {
+      } else if (board(1) > 1 && (1 + total - (board(0) + board(1))) <= N) {
         res = PositionClass.CLASS_CRASHED
       }
     }
-    else if (tot <= (N + (board(1) - 1))) {
+    else if (total <= (N + (board(1) - 1))) {
       res = PositionClass.CLASS_CRASHED
     }
 
