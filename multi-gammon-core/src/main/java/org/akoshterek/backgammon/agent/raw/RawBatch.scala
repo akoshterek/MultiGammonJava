@@ -11,16 +11,16 @@ import org.akoshterek.backgammon.eval.Reward
 
 class RawBatch(override val path: Path,
                representation: InputRepresentation,
-               inputName: String,
+               contactName: String,
                crashedName: String,
                raceName: String) extends AbsFlexAgent("RawBatch", path) {
   contactRepresentation = representation
   raceRepresentation = representation
   crashedRepresentation = representation
 
-  contactFa = new SimpleEncogFA(SimpleEncogFA.loadNNFromResource("org/akoshterek/backgammon/agent/raw/Raw-Tesauro89-40-contact.eg"))
-  raceFa = new SimpleEncogFA(SimpleEncogFA.loadNNFromResource("org/akoshterek/backgammon/agent/raw/Raw-GnuBg-40-race.eg"))
-  crashedFa = new SimpleEncogFA(SimpleEncogFA.loadNNFromResource("org/akoshterek/backgammon/agent/raw/Raw-GnuBg-40-crashed.eg"))
+  contactFa = new SimpleEncogFA(SimpleEncogFA.loadNNFromResource(s"org/akoshterek/backgammon/agent/raw/$contactName.eg"))
+  raceFa = new SimpleEncogFA(SimpleEncogFA.loadNNFromResource(s"org/akoshterek/backgammon/agent/raw/$crashedName.eg"))
+  crashedFa = new SimpleEncogFA(SimpleEncogFA.loadNNFromResource(s"org/akoshterek/backgammon/agent/raw/$raceName.eg"))
 
   override def evalContact(board: Board): Reward = {
     super.evalContact(board)
