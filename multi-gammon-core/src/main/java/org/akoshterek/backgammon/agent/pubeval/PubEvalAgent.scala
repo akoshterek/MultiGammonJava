@@ -8,7 +8,7 @@ import org.akoshterek.backgammon.board.{Board, PositionClass}
 import org.akoshterek.backgammon.eval.Reward
 
 object PubEvalAgent {
-  def buildDefault(path: Path): PubEvalAgent = {
+  def apply(path: Path): PubEvalAgent = {
     new PubEvalAgent(path, PubEvalDefaultWeights.contactWeights, PubEvalDefaultWeights.raceWeights)
   }
 }
