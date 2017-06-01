@@ -8,9 +8,9 @@ import org.akoshterek.backgammon.board.Board
 import org.akoshterek.backgammon.eval.Reward
 
 abstract class AbsFlexAgent(override val fullName: String, override val path: Path) extends AbsAgent(fullName, path) {
-    protected var contactRepresentation: InputRepresentation = _
-    protected var raceRepresentation: InputRepresentation = _
-    protected var crashedRepresentation: InputRepresentation = _
+    protected val contactRepresentation: InputRepresentation
+    protected val raceRepresentation: InputRepresentation
+    protected val crashedRepresentation: InputRepresentation
     protected var contactFa: FunctionApproximator = _
     protected var raceFa: FunctionApproximator = _
     protected var crashedFa: FunctionApproximator = _
