@@ -44,7 +44,7 @@ object RawBatch {
     val representation = new RawRepresentation(createCodec(tokens(1)))
     val hidden = tokens(2).toInt
     val activation = tokens(3)
-    val prefix = "Raw-" + CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_CAMEL, tokens(1)) + hidden + activation
+    val prefix = "Raw-" + CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_CAMEL, tokens(1)) + "-" + hidden + "-" + activation
     new RawBatch(path, representation, prefix + "-contact", prefix + "-crashed", prefix + "-race")
   }
 

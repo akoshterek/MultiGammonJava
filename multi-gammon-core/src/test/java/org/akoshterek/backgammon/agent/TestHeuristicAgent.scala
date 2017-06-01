@@ -1,11 +1,10 @@
 package org.akoshterek.backgammon.agent
 
-import org.akoshterek.backgammon.board.Board
-import org.junit.Assert
-import org.junit.Test
 import java.nio.file.Paths
 
 import org.akoshterek.backgammon.agent.pubeval.PubEvalAgent
+import org.akoshterek.backgammon.board.Board
+import org.junit.{Assert, Test}
 
 /**
   * @author Alex
@@ -13,7 +12,7 @@ import org.akoshterek.backgammon.agent.pubeval.PubEvalAgent
   */
 class TestHeuristicAgent {
   @Test def testAgent(): Unit = {
-    val agent = PubEvalAgent.buildDefault(Paths.get("."))
+    val agent = PubEvalAgent(Paths.get("."))
     checkPosition(agent, "4HPwATDYZvDBAA")
   }
 

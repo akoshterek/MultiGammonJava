@@ -2,8 +2,7 @@ package org.akoshterek.backgammon.agent
 
 import org.akoshterek.backgammon.agent.gnubg.GnubgAgent
 import org.akoshterek.backgammon.agent.pubeval.PubEvalAgent
-import org.akoshterek.backgammon.agent.raw.RawBatch
-import org.akoshterek.backgammon.agent.raw.RawRl40
+import org.akoshterek.backgammon.agent.raw.{RawBatch, RawRl40}
 import org.akoshterek.backgammon.eval.Evaluator
 
 object AgentFactory {
@@ -12,7 +11,7 @@ object AgentFactory {
         val tokens = fullNameLower.split("-")
 
         var agent: Agent = null
-        tokens match {
+        tokens(0) match {
             case "random" =>
                 agent = new RandomAgent(Evaluator.getInstance.getBasePath)
             case "heuristic" =>
