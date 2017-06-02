@@ -38,8 +38,15 @@ class RawRepresentation(val codec: PointCodec) extends InputRepresentation {
       point += 1
     }
 
+    var totalMen = 0
+    point = 0
+    while (point < Board.HALF_BOARD_SIZE) {
+      totalMen += halfBoard(point)
+      point += 1
+    }
+
     inputs(offset + 96) = halfBoard(Board.BAR) / 15.0f
-    val home = Board.TOTAL_MEN - halfBoard.sum
+    val home = Board.TOTAL_MEN - totalMen
     inputs(offset + 97) = home / 15.0f
   }
 }
