@@ -300,7 +300,7 @@ class Board extends Cloneable {
 
       val auch: AuchKey = calcPositionKey
       pml.amMoves
-        .take(pml.cMoves)
+        .view(0, pml.cMoves)
         .filter(m => auch == m.auch && (cMoves > m.cMoves || cPip > m.cPips))
         .take(1).headOption match {
         case Some(m) =>
