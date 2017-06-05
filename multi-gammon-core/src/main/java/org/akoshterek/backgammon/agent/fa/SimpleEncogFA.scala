@@ -3,8 +3,9 @@ package org.akoshterek.backgammon.agent.fa
 import java.io.File
 import java.nio.file.Path
 
+import org.akoshterek.backgammon.Constants
 import org.akoshterek.backgammon.eval.Reward
-import org.encog.engine.network.activation.ActivationSigmoid
+import org.encog.engine.network.activation.{ActivationLinear, ActivationSigmoid}
 import org.encog.mathutil.randomize.RangeRandomizer
 import org.encog.ml.data.MLDataSet
 import org.encog.neural.data.basic.BasicNeuralDataSet
@@ -19,7 +20,7 @@ object SimpleEncogFA {
     val network: BasicNetwork = new BasicNetwork
     network.addLayer(new BasicLayer(null, false, inputNeurons))
     network.addLayer(new BasicLayer(new ActivationSigmoid, false, hiddenNeurons))
-    network.addLayer(new BasicLayer(new ActivationSigmoid, false, 1))
+    network.addLayer(new BasicLayer(new ActivationLinear, false, Constants.NUM_OUTPUTS))
     network.getStructure.finalizeStructure()
     new RangeRandomizer(-0.1, 0.1).randomize(network)
     network.reset()
@@ -55,7 +56,7 @@ class SimpleEncogFA(override val network: BasicNetwork) extends AbsNeuralNetwork
 
   override def setReward(input: Array[Float], reward: Reward) {
     trainingSet.get(0).getInput.setData(input.map(_.toDouble))
-    trainingSet.get(0).getIdeal.setData(reward.toArray)
+    trainingSet.get(0).getIdeal.setData(reward.toDoubleArray)
     propagation.iteration()
   }
 }

@@ -76,7 +76,9 @@ final class Reward(input: Array[Float]) {
     data.mkString(", ")
   }
 
-  def toArray[T: ClassTag] : Array[T] = data.map(_.asInstanceOf[T])
+  def toArray: Array[Float] = data
+
+  def toDoubleArray: Array[Double] = data.map(_.toDouble)
 
   override def equals(that: Any): Boolean = {
     that match {

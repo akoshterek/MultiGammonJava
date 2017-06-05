@@ -86,7 +86,7 @@ public class RawRl40 extends AbsAgent implements Cloneable {
         ETraceEntry entry = new ETraceEntry(representation.calculateContactInputs(board),
                 move.pc(),
                 move.auch());
-        eligibilityTraces.clear();
+        //eligibilityTraces.clear();
         eligibilityTraces.put(PositionId.positionIDFromKey(entry.auch), entry);
         updateETrace(deltaReward);
 
@@ -157,8 +157,8 @@ public class RawRl40 extends AbsAgent implements Cloneable {
         //Predicted greedy reward
         float predictedGreedyReward[] = move.arEvalMove().data().clone();
         float deltaReward[] = new float[Constants.NUM_OUTPUTS()];
-        for(int i = 0; i < 1/*Constants.NUM_OUTPUTS*/; i++) {
-            deltaReward[i] = /*reward.data[i] +*/ predictedGreedyReward[i] * gamma - prevQValue[i];
+        for(int i = 0; i < deltaReward.length; i++) {
+            deltaReward[i] = /*move.arEvalMove().data()[i]*/predictedGreedyReward[i] + predictedGreedyReward[i] * gamma - prevQValue[i];
             //deltaReward.data[i] *= 0.3;
         }
 
