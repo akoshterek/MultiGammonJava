@@ -3,13 +3,9 @@ package org.akoshterek.backgammon.nn
 import java.io._
 import java.nio.file.Path
 
-import scala.util.Random
 import resource.managed
 
 object NeuralNetwork {
-  // the random number generator
-  val random: Random = new Random()
-
   /**
     * Method which reads and returns a network from the given file
     *
@@ -88,15 +84,25 @@ class NeuralNetwork(input: Int, hidden: Int, output: Int) extends Serializable w
     Array.copy(input, 0, _input, 0, input.length)
 
     // Calculate hidden output
-    _hidden.foreach(
-      l => l.foreach(h => h.recompute())
-    )
-
-    {
-      for (j <- _hidden.last.indices) yield {
-        _hidden.last(j).value
+    var l = 0
+    while (l < _hidden.length) {
+      val layer = _hidden(l)
+      var h = 0
+      while (h < layer.length) {
+        layer(h).recompute()
+        h += 1
       }
-    }.toArray
+      l += 1
+    }
+
+    // Output
+    val out = Array[Double](_hidden.last.length)
+    var j = 0
+    while (j < _hidden.last.length) {
+      out(j) = _hidden.last(j).value
+      j += 1
+    }
+    out
   }
 
   /**
@@ -141,17 +147,20 @@ class NeuralNetwork(input: Int, hidden: Int, output: Int) extends Serializable w
       // ew[j][k] = (lambda * ew[j][k]) + (gradient(k) * hidden[0][j])
       et.Ew(j)(k) = (lambda * et.Ew(j)(k)) + (_hidden(1)(k).gradient * _hidden(0)(j).value)
 
-      for (i <- in.indices) {
+      var i = 0
+      while (i < in.length) {
         // ev[i][j][k] = (lambda * ev[i][j][k]) +
         // (gradient(k) * w[j][k] * gradient(j) * input[i])
         et.Ev(i)(j)(k) = (lambda * et.Ev(i)(j)(k)) +
           (_hidden(1)(k).gradient * _hidden(1)(k).weights(j) * _hidden(0)(j).gradient) * in(i)
+        i += 1
       }
     }
   }
 
-  final class EligibilityTrace(input: Int, hidden: Int, output: Int){
+  final class EligibilityTrace(input: Int, hidden: Int, output: Int) {
     val Ew: Array[Array[Double]] = Array.fill[Double](hidden, output)(0)
     var Ev: Array[Array[Array[Double]]] = Array.fill[Double](input, hidden, output)(0)
   }
+
 }
