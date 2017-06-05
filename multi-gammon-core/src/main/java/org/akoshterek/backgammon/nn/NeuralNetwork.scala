@@ -142,19 +142,26 @@ class NeuralNetwork(input: Int, hidden: Int, output: Int) extends Serializable w
   }
 
   private def computeEligibilityTraces(in: Array[Double], hidden: Int, output: Int, et: EligibilityTrace): Unit = {
-    for (j <- 0 until hidden;
-         k <- 0 until output) {
-      // ew[j][k] = (lambda * ew[j][k]) + (gradient(k) * hidden[0][j])
-      et.Ew(j)(k) = (lambda * et.Ew(j)(k)) + (_hidden(1)(k).gradient * _hidden(0)(j).value)
+    var j = 0
+    while (j < hidden) {
+      var k = 0
+      while (k < output) {
+        // ew[j][k] = (lambda * ew[j][k]) + (gradient(k) * hidden[0][j])
+        et.Ew(j)(k) = (lambda * et.Ew(j)(k)) + (_hidden(1)(k).gradient * _hidden(0)(j).value)
 
-      var i = 0
-      while (i < in.length) {
-        // ev[i][j][k] = (lambda * ev[i][j][k]) +
-        // (gradient(k) * w[j][k] * gradient(j) * input[i])
-        et.Ev(i)(j)(k) = (lambda * et.Ev(i)(j)(k)) +
-          (_hidden(1)(k).gradient * _hidden(1)(k).weights(j) * _hidden(0)(j).gradient) * in(i)
-        i += 1
+        var i = 0
+        while (i < in.length) {
+          // ev[i][j][k] = (lambda * ev[i][j][k]) +
+          // (gradient(k) * w[j][k] * gradient(j) * input[i])
+          et.Ev(i)(j)(k) = (lambda * et.Ev(i)(j)(k)) +
+            (_hidden(1)(k).gradient * _hidden(1)(k).weights(j) * _hidden(0)(j).gradient) * in(i)
+          i += 1
+        }
+
+        k += 1
       }
+
+      j += 1
     }
   }
 
@@ -162,5 +169,4 @@ class NeuralNetwork(input: Int, hidden: Int, output: Int) extends Serializable w
     val Ew: Array[Array[Double]] = Array.fill[Double](hidden, output)(0)
     var Ev: Array[Array[Array[Double]]] = Array.fill[Double](input, hidden, output)(0)
   }
-
 }
