@@ -32,10 +32,13 @@ object NeuralNetwork {
   * @param input  The number of input units
   * @param hidden The number of hidden units, as well as the number of layers
   */
-class NeuralNetwork(input: Int, hidden: Int, output: Int) extends Serializable with Cloneable {
-  val alpha = 0.1
-  val beta = 0.1
-  val lambda = 0.7
+class NeuralNetwork(input: Int, hidden: Int, output: Int,
+                    val hiddenActivation: Activation,
+                    val outputActivation: Activation) extends Serializable with Cloneable {
+  val alpha = 0.1f
+  val beta = 0.1f
+  val lambda = 0.7f
+  val et: EligibilityTrace = createEligibilityTrace
 
   // the layers of the network
   // Input layer
@@ -43,10 +46,10 @@ class NeuralNetwork(input: Int, hidden: Int, output: Int) extends Serializable w
 
   // Hidden layers
   val _hidden: Array[Array[HiddenUnit]] = Array.ofDim[Array[HiddenUnit]](2)
-  Array.fill[HiddenUnit](hidden)(new HiddenUnit(this._input.toVector))
+  _hidden(0) = Array.fill[HiddenUnit](hidden)(new HiddenUnit(this._input.toVector, hiddenActivation))
 
   //Output
-  Array.fill[HiddenUnit](output)(new HiddenUnit(this._hidden(0).toVector))
+  _hidden(1) = Array.fill[HiddenUnit](output)(new HiddenUnit(this._hidden(0).toVector, outputActivation))
 
   /**
     * Builds a neural network based on the provided network and
@@ -55,17 +58,20 @@ class NeuralNetwork(input: Int, hidden: Int, output: Int) extends Serializable w
     * @param net The network to base it off of
     */
   def this(net: NeuralNetwork) {
-    this(net._input.length, net._hidden(0).length, net._hidden(1).length)
+    this(net._input.length, net._hidden(0).length, net._hidden(1).length,
+      net.hiddenActivation, net.outputActivation)
 
     for (i <- net._hidden.indices;
-         j <- net._hidden.indices) {
+         j <- net._hidden(i).indices) {
       j match {
         case 0 => this._hidden(i)(j) = new HiddenUnit(
           this._input.toVector,
-          net._hidden(i)(j).weights.toVector)
+          net._hidden(i)(j).weights,
+          net.hiddenActivation)
         case _ => this._hidden(i)(j) = new HiddenUnit(
           this._hidden(i - 1).toVector,
-          net._hidden(i)(j).weights.toVector)
+          net._hidden(i)(j).weights,
+          net.outputActivation)
       }
     }
   }
@@ -119,29 +125,38 @@ class NeuralNetwork(input: Int, hidden: Int, output: Int) extends Serializable w
       })
   }
 
-  def createEligibilityTrace: EligibilityTrace = {
+  private def createEligibilityTrace: EligibilityTrace = {
     new EligibilityTrace(_input.length, _hidden(0).length, _hidden(1).length)
   }
 
-  def backpropWithEtraces(in: Array[Double], out: Array[Double], expected: Array[Double], et: EligibilityTrace): Unit = {
+  def backpropWithEtraces(in: Array[Float], out: Array[Float], expected: Array[Float]): Unit = {
     require(this.input == in.length && this.output == out.length && this.output == expected.length, "Wrong dimensions")
 
-    computeEligibilityTraces(in, _hidden(0).length, _hidden(1).length, et)
-    val error = Array.tabulate[Double](output)(k => expected(k) - out(k))
+    computeEligibilityTraces(in, _hidden(0).length, _hidden(1).length)
+    val error = Array.tabulate[Float](output)(k => expected(k) - out(k))
 
-    for (j <- _hidden(0).indices;
-         k <- out.indices) {
-      // weight from j to k, shown with learning parameter BETA
-      _hidden(1)(k).weights(j) += beta * error(k) * et.Ew(j)(k)
+    var j = 0
+    while (j < _hidden(0).length) {
+      var k = 0
+      while (k < out.length) {
+        // weight from j to k, shown with learning parameter BETA
+        _hidden(1)(k).weights(j) += beta * error(k) * et.Ew(j)(k)
 
-      for (i <- in.indices) {
-        // weight from i to j, shown with learning parameter ALPHA
-        _hidden(0)(j).weights(i) += alpha * error(k) * et.Ev(i)(j)(k)
+        var i = 0
+        while (i < in.length) {
+          // weight from i to j, shown with learning parameter ALPHA
+          _hidden(0)(j).weights(i) += alpha * error(k) * et.Ev(i)(j)(k)
+          i += 1
+        }
+
+        k += 1
       }
+
+      j += 1
     }
   }
 
-  private def computeEligibilityTraces(in: Array[Double], hidden: Int, output: Int, et: EligibilityTrace): Unit = {
+  private def computeEligibilityTraces(in: Array[Float], hidden: Int, output: Int): Unit = {
     var j = 0
     while (j < hidden) {
       var k = 0
@@ -166,7 +181,7 @@ class NeuralNetwork(input: Int, hidden: Int, output: Int) extends Serializable w
   }
 
   final class EligibilityTrace(input: Int, hidden: Int, output: Int) {
-    val Ew: Array[Array[Double]] = Array.fill[Double](hidden, output)(0)
-    var Ev: Array[Array[Array[Double]]] = Array.fill[Double](input, hidden, output)(0)
+    val Ew: Array[Array[Float]] = Array.fill[Float](hidden, output)(0)
+    var Ev: Array[Array[Array[Float]]] = Array.fill[Float](input, hidden, output)(0)
   }
 }

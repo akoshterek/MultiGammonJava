@@ -2,34 +2,15 @@ package org.akoshterek.backgammon.nn
 
 import java.util.concurrent.ThreadLocalRandom
 
-object HiddenUnit {
-  // the minimal and maximal initial values
-  private val MIN_INITIAL_WEIGHT: Double = -0.1
-  private val MAX_INITIAL_WEIGHT: Double = 0.1
-
-  /**
-    * Implements the sigmoid function to provide the non-linearity
-    * to this function.  Simply returns
-    * <p>
-    * 1 / (1 + e&#94;-x)
-    *
-    */
-  private val sigmoid : Double => Double = {
-    x => 1 / (1 + Math.exp(-x))
-  }
-}
-
 /**
   * Builds a hidden unit taking the provided number of
   * inputs.
   *
   * @param units  The input units to this unit
   */
-class HiddenUnit(var units: Vector[Neuron]) extends Neuron {
-  // the array of input weights
-  private val _weights: Array[Double] = Array[Double](units.length)
-  def weights: Array[Double] = _weights
-  randomizeWeights()
+class HiddenUnit(val units: Vector[Neuron],
+                 val weights: Array[Float],
+                 val activation: Activation) extends Neuron {
 
   /**
     * Builds a hidden unit taking the provided number of
@@ -37,21 +18,21 @@ class HiddenUnit(var units: Vector[Neuron]) extends Neuron {
     * the provided weights
     *
     * @param units   The input units to this unit
-    * @param weights The weights to use
     */
-  def this(units: Vector[Neuron], weights: Vector[Double]) {
-    this(units)
-    Array.copy(weights, 0, this._weights, 0, weights.length)
+  def this(units: Vector[Neuron], activation: Activation) {
+    this(units, Array.ofDim(units.length), activation)
+    randomizeWeights()
   }
 
   /**
     * Generates a new weight
     */
   def randomizeWeights(): Unit = {
-    ThreadLocalRandom.current().nextDouble(HiddenUnit.MIN_INITIAL_WEIGHT, HiddenUnit.MAX_INITIAL_WEIGHT)
-    _weights.transform(
-      _ => ThreadLocalRandom.current().nextDouble(HiddenUnit.MIN_INITIAL_WEIGHT, HiddenUnit.MAX_INITIAL_WEIGHT)
-    )
+    var i = 0
+    while (i < weights.length) {
+      weights(i) = ThreadLocalRandom.current().nextDouble(-0.1, 0.1).toFloat
+      i += 1
+    }
   }
 
   /**
@@ -59,8 +40,14 @@ class HiddenUnit(var units: Vector[Neuron]) extends Neuron {
     *
     * @return the sum
     */
-  def sum: Double = {
-    _weights.zip(units).map { case (w, u) => w * u.value }.sum
+  private def sum: Float = {
+    var i = 0
+    var value = 0.0f
+    while (i < weights.length) {
+      value += weights(i) * units(i).value
+      i += 1
+    }
+    value
   }
 
   /**
@@ -68,8 +55,8 @@ class HiddenUnit(var units: Vector[Neuron]) extends Neuron {
     * prior inputs.
     */
   override def recompute(): Unit = {
-    _value = HiddenUnit.sigmoid(sum)
+    _value = activation.f(sum)
   }
 
-  def gradient: Double = value * (1.0 - value)
+  def gradient: Float = activation.gradient(value)
 }
