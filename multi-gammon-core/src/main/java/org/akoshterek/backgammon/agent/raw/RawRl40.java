@@ -24,12 +24,12 @@ import java.util.Map;
  *         date: 05.12.2015
  */
 public class RawRl40 extends AbsAgent implements Cloneable {
-    private static final double MIN_ETRACE = 0.00000001;
+    private static final double MIN_ETRACE = 0.000001;
     private InputRepresentation representation = new RawRepresentation(Tesauro89Codec.self());
     private NeuralNetworkFA fa;
     private Map<String, ETraceEntry> eligibilityTraces;
-    private int step = 0;
-    private ETraceEntry prevEntry;
+    //private int step = 0;
+    //private ETraceEntry prevEntry;
 //    private Move prevMove;
     private static final float gamma = 1.0f;
     private static final float lambda = 0.7f;
@@ -65,11 +65,13 @@ public class RawRl40 extends AbsAgent implements Cloneable {
         return other;
     }
 
+    /*
     @Override
     public void startGame() {
         super.startGame();
         step = 0;
     }
+    */
 
     @Override
     public void doMove(Move move) {
@@ -77,29 +79,31 @@ public class RawRl40 extends AbsAgent implements Cloneable {
         if(!isLearnMode())
             return;
 
-        if(step == 0) {
-            prepareStep0();
-        }
+        //if(step == 0) {
+        //    prepareStep0();
+        //}
 
         Reward deltaReward = calcDeltaReward(move);
-        Board board = Board.positionFromKey(move.auch());
-        ETraceEntry entry = new ETraceEntry(representation.calculateContactInputs(board),
-                move.pc(),
-                move.auch());
-        //eligibilityTraces.clear();
+        //Board board = Board.positionFromKey(move.auch());
+        ETraceEntry entry = new ETraceEntry(representation.calculateContactInputs(currentBoard()),
+                /*move.pc()*/ curPC(),
+                /*move.auch()*/currentBoard().calcPositionKey());
+        eligibilityTraces.clear();
         eligibilityTraces.put(PositionId.positionIDFromKey(entry.auch), entry);
         updateETrace(deltaReward);
 
-        step++;
-        prevEntry = entry;
+        //step++;
+        //prevEntry = entry;
         //prevMove = move;
     }
 
+    /*
     public void endGame() {
         super.endGame();
         //doMove(prevMove);
         step = 0;
     }
+    */
 
     @Override
     public void load() {
@@ -151,24 +155,25 @@ public class RawRl40 extends AbsAgent implements Cloneable {
      */
     private Reward calcDeltaReward(final Move move) {
         //prev reward
-        Board prevBoard = Board.positionFromKey(prevEntry.auch);
-        float prevQValue[] = evaluatePosition(prevBoard, prevEntry.pc).data().clone();
+        Board prevBoard = currentBoard();
+        float prevQValue[] = evaluatePosition(prevBoard, Evaluator.getInstance().classifyPosition(prevBoard)).data();
 
         //Predicted greedy reward
-        float predictedGreedyReward[] = move.arEvalMove().data().clone();
+        float predictedGreedyReward[] = move.arEvalMove().data();
         float deltaReward[] = new float[Constants.NUM_OUTPUTS()];
         for(int i = 0; i < deltaReward.length; i++) {
-            deltaReward[i] = /*move.arEvalMove().data()[i]*/predictedGreedyReward[i] + predictedGreedyReward[i] * gamma - prevQValue[i];
-            //deltaReward.data[i] *= 0.3;
+            deltaReward[i] = predictedGreedyReward[i] + predictedGreedyReward[i] * gamma - prevQValue[i];
         }
 
         return new Reward(deltaReward);
     }
 
+    /*
     private void prepareStep0() {
         Board initBoard = Board.initialPosition();
         prevEntry = new ETraceEntry(representation.calculateContactInputs(initBoard),
                 Evaluator.getInstance().classifyPosition(initBoard),
                 initBoard.calcPositionKey());
     }
+    */
 }

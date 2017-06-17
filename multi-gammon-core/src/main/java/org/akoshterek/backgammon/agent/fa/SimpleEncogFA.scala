@@ -5,7 +5,7 @@ import java.nio.file.Path
 
 import org.akoshterek.backgammon.Constants
 import org.akoshterek.backgammon.eval.Reward
-import org.encog.engine.network.activation.{ActivationLinear, ActivationSigmoid}
+import org.encog.engine.network.activation.{ActivationElliottSymmetric, ActivationLinear}
 import org.encog.mathutil.randomize.RangeRandomizer
 import org.encog.ml.data.MLDataSet
 import org.encog.neural.data.basic.BasicNeuralDataSet
@@ -19,7 +19,7 @@ object SimpleEncogFA {
   def createNN(inputNeurons: Int, hiddenNeurons: Int): BasicNetwork = {
     val network: BasicNetwork = new BasicNetwork
     network.addLayer(new BasicLayer(null, false, inputNeurons))
-    network.addLayer(new BasicLayer(new ActivationSigmoid, false, hiddenNeurons))
+    network.addLayer(new BasicLayer(new ActivationElliottSymmetric, false, hiddenNeurons))
     network.addLayer(new BasicLayer(new ActivationLinear, false, Constants.NUM_OUTPUTS))
     network.getStructure.finalizeStructure()
     new RangeRandomizer(-0.1, 0.1).randomize(network)
