@@ -38,7 +38,6 @@ class NeuralNetwork(input: Int, hidden: Int, output: Int,
   val alpha = 0.1f
   val beta = 0.1f
   val lambda = 0.7f
-  val et: EligibilityTrace = createEligibilityTrace
 
   // the layers of the network
   // Input layer
@@ -50,6 +49,8 @@ class NeuralNetwork(input: Int, hidden: Int, output: Int,
 
   //Output
   _hidden(1) = Array.fill[HiddenUnit](output)(new HiddenUnit(this._hidden(0).toVector, outputActivation))
+
+  val et: EligibilityTrace = createEligibilityTrace
 
   /**
     * Builds a neural network based on the provided network and
@@ -87,7 +88,12 @@ class NeuralNetwork(input: Int, hidden: Int, output: Int,
   def calculate(input: Array[Float]): Array[Float] = {
     require(_input.length == input.length, "Wrong input size")
 
-    Array.copy(input, 0, _input, 0, input.length)
+    // fill input
+    var i = 0
+    while (i < input.length) {
+      _input(i).value = input(i)
+      i += 1
+    }
 
     // Calculate hidden output
     var l = 0
@@ -102,7 +108,7 @@ class NeuralNetwork(input: Int, hidden: Int, output: Int,
     }
 
     // Output
-    val out = Array[Float](_hidden.last.length)
+    val out = Array.ofDim[Float](_hidden.last.length)
     var j = 0
     while (j < _hidden.last.length) {
       out(j) = _hidden.last(j).value

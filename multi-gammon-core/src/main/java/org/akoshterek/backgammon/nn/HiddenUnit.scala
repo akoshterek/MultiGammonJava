@@ -42,12 +42,12 @@ class HiddenUnit(val units: Vector[Neuron],
     */
   private def sum: Float = {
     var i = 0
-    var value = 0.0f
+    var accum = 0.0f
     while (i < weights.length) {
-      value += weights(i) * units(i).value
+      accum += weights(i) * units(i).value
       i += 1
     }
-    value
+    accum
   }
 
   /**
