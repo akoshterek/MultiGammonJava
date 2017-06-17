@@ -45,10 +45,10 @@ class NeuralNetwork(input: Int, hidden: Int, output: Int,
 
   // Hidden layers
   val _hidden: Array[Array[HiddenUnit]] = Array.ofDim[Array[HiddenUnit]](2)
-  _hidden(0) = Array.fill[HiddenUnit](hidden)(new HiddenUnit(this._input.toVector, hiddenActivation))
+  _hidden(0) = Array.fill[HiddenUnit](hidden)(new HiddenUnit(this._input.toArray, hiddenActivation))
 
   //Output
-  _hidden(1) = Array.fill[HiddenUnit](output)(new HiddenUnit(this._hidden(0).toVector, outputActivation))
+  _hidden(1) = Array.fill[HiddenUnit](output)(new HiddenUnit(this._hidden(0).toArray, outputActivation))
 
   val et: EligibilityTrace = createEligibilityTrace
 
@@ -66,11 +66,11 @@ class NeuralNetwork(input: Int, hidden: Int, output: Int,
          j <- net._hidden(i).indices) {
       j match {
         case 0 => this._hidden(i)(j) = new HiddenUnit(
-          this._input.toVector,
+          this._input.toArray,
           net._hidden(i)(j).weights,
           net.hiddenActivation)
         case _ => this._hidden(i)(j) = new HiddenUnit(
-          this._hidden(i - 1).toVector,
+          this._hidden(i - 1).toArray,
           net._hidden(i)(j).weights,
           net.outputActivation)
       }

@@ -8,7 +8,7 @@ import java.util.concurrent.ThreadLocalRandom
   *
   * @param units  The input units to this unit
   */
-class HiddenUnit(val units: Vector[Neuron],
+class HiddenUnit(val units: Array[Neuron],
                  val weights: Array[Float],
                  val activation: Activation) extends Neuron {
 
@@ -19,7 +19,7 @@ class HiddenUnit(val units: Vector[Neuron],
     *
     * @param units   The input units to this unit
     */
-  def this(units: Vector[Neuron], activation: Activation) {
+  def this(units: Array[Neuron], activation: Activation) {
     this(units, Array.ofDim(units.length), activation)
     randomizeWeights()
   }

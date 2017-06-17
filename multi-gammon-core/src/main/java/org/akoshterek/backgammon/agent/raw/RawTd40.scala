@@ -7,14 +7,14 @@ import org.akoshterek.backgammon.agent.inputrepresentation.GnuBgCodec
 import org.akoshterek.backgammon.board.{Board, PositionClass}
 import org.akoshterek.backgammon.eval.Reward
 import org.akoshterek.backgammon.move.Move
-import org.akoshterek.backgammon.nn.{Linear, NeuralNetwork, Sigmoid}
+import org.akoshterek.backgammon.nn.{Elliott, Linear, NeuralNetwork}
 
 /**
   * Created by Alex on 17-06-17.
   */
 class RawTd40(override val path: Path) extends AbsAgent("RawTd40", path) with Cloneable {
   private val representation = new RawRepresentation(GnuBgCodec)
-  private var nn = new NeuralNetwork(representation.contactInputsCount, 40, 5, Sigmoid, Linear)
+  private var nn = new NeuralNetwork(representation.contactInputsCount, 40, 5, Elliott, Linear)
 
   override def evaluatePosition(board: Board, pc: PositionClass): Reward = {
     pc match {
@@ -46,6 +46,11 @@ class RawTd40(override val path: Path) extends AbsAgent("RawTd40", path) with Cl
   }
 
   private def doLearnMove(move: Move): Unit = {
-
+    val newBoard = Board.positionFromKey(move.auch)
+    val nextOutput = evaluatePosition(newBoard, move.pc).data
+    val originalBoard = currentBoard
+    val currentInput = representation.calculateContactInputs(originalBoard)
+    val currentOutput = nn.calculate(currentInput)
+    nn.backpropWithEtraces(currentInput, currentOutput, nextOutput)
   }
 }

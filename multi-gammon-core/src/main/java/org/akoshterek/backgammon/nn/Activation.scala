@@ -15,5 +15,16 @@ object Linear extends Activation {
 
 object Sigmoid extends Activation {
   override def f(x: Float): Float = 1.0f / (1.0f + Math.exp(-x).toFloat)
-  override def gradient(x: Float): Float = x * (1.0f - x)
+  override def gradient(x: Float): Float = {
+    val a = f(x)
+    a * (1.0f - a)
+  }
+}
+
+object Elliott extends Activation {
+  override def f(x: Float): Float = x / (1.0f + Math.abs(x))
+  override def gradient(x: Float): Float = {
+    val d = 1.0f + Math.abs(x)
+    1.0f / (d * d)
+  }
 }
