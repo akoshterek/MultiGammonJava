@@ -84,7 +84,7 @@ class NeuralNetwork(input: Int, hidden: Int, output: Int,
     * @param input The input to check
     * @return The network value from this input
     */
-  def calculate(input: Array[Double]): Array[Double] = {
+  def calculate(input: Array[Float]): Array[Float] = {
     require(_input.length == input.length, "Wrong input size")
 
     Array.copy(input, 0, _input, 0, input.length)
@@ -102,7 +102,7 @@ class NeuralNetwork(input: Int, hidden: Int, output: Int,
     }
 
     // Output
-    val out = Array[Double](_hidden.last.length)
+    val out = Array[Float](_hidden.last.length)
     var j = 0
     while (j < _hidden.last.length) {
       out(j) = _hidden.last(j).value
