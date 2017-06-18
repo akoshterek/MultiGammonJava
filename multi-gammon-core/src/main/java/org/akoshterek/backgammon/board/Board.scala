@@ -139,10 +139,10 @@ class Board extends Cloneable {
   }
 
   def gameResult: GameResult = {
-    if (Evaluator.getInstance.classifyPosition(this) != PositionClass.CLASS_OVER) {
+    if (Evaluator.classifyPosition(this) != PositionClass.CLASS_OVER) {
       GameResult.PLAYING
     } else {
-      val ar: Reward = Evaluator.getInstance.evalOver(this)
+      val ar: Reward = Evaluator.evalOver(this)
       if (ar(OUTPUT_WINBACKGAMMON) != 0 || ar(OUTPUT_LOSEBACKGAMMON) != 0) {
         GameResult.BACKGAMMON
       }

@@ -42,8 +42,8 @@ trait Agent {
       case PositionClass.CLASS_RACE => evalRace(board)
       case PositionClass.CLASS_CRASHED => evalCrashed(board)
       case PositionClass.CLASS_CONTACT => evalContact(board)
-      case PositionClass.CLASS_BEAROFF1 => Evaluator.getInstance.evalBearoff1(board)
-      case PositionClass.CLASS_BEAROFF2 => Evaluator.getInstance.evalBearoff2(board)
+      case PositionClass.CLASS_BEAROFF1 => Evaluator.evalBearoff1(board)
+      case PositionClass.CLASS_BEAROFF2 => Evaluator.evalBearoff2(board)
       case _ => throw new RuntimeException("Unknown class. How did we get here?")
     }
   }
@@ -52,7 +52,7 @@ trait Agent {
 
   def scoreMove(pm: Move): Reward = {
     val board: Board = Board.positionFromKey(pm.auch)
-    pm.pc = Evaluator.getInstance.classifyPosition(board)
+    pm.pc = Evaluator.classifyPosition(board)
     evaluatePositionFull(board, pm.pc)
   }
 
@@ -63,14 +63,14 @@ trait Agent {
 
   private def applySanityCheck(anBoard: Board, reward: Reward, pc: PositionClass): Reward = {
     if (!PositionClass.isExact(pc) && supportsSanityCheck && !isLearnMode) {
-      Evaluator.getInstance.sanityCheck(anBoard, reward)
+      Evaluator.sanityCheck(anBoard, reward)
     } else {
       reward
     }
   }
 
   def evalOver(board: Board): Reward = {
-    Evaluator.getInstance.evalOver(board)
+    Evaluator.evalOver(board)
   }
 
   def evalRace(board: Board): Reward = {
@@ -87,7 +87,7 @@ trait Agent {
 
   def currentBoard_=(board: Board): Unit = {
     _currentBoard = board.clone()
-    curPC = Evaluator.getInstance.classifyPosition(currentBoard)
+    curPC = Evaluator.classifyPosition(currentBoard)
   }
 
   def load() {

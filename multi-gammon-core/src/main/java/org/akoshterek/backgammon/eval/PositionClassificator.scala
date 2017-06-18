@@ -53,9 +53,9 @@ object PositionClassificator {
   }
 
   private def classifyBearoff(anBoard: Board): PositionClass = {
-    if (Bearoff.isBearoff(Evaluator.getInstance().getPbc2, anBoard)) {
+    if (Bearoff.isBearoff(Evaluator.pbc2, anBoard)) {
       PositionClass.CLASS_BEAROFF2
-    } else if (Bearoff.isBearoff(Evaluator.getInstance().getPbc1, anBoard)) {
+    } else if (Bearoff.isBearoff(Evaluator.pbc1, anBoard)) {
       PositionClass.CLASS_BEAROFF1
     } else {
       PositionClass.CLASS_RACE

@@ -13,7 +13,7 @@ class TestEvalOver {
   def testEvalOverWinSingle(): Unit = {
     val board = new Board
     board(Board.OPPONENT)(1) = 1
-    val reward: Reward = Evaluator.getInstance().evalOver(board)
+    val reward: Reward = Evaluator.evalOver(board)
     assertEquals(GameResult.SINGLE, board.gameResult)
     assertEquals(Reward(Array[Double](1, 0, 0, 0, 0)), reward)
   }
@@ -22,7 +22,7 @@ class TestEvalOver {
   def testEvalOverLoseSingle(): Unit = {
     val board = new Board
     board(Board.SELF)(1) = 1
-    val reward: Reward = Evaluator.getInstance().evalOver(board)
+    val reward: Reward = Evaluator.evalOver(board)
     assertEquals(GameResult.SINGLE, board.gameResult)
     assertEquals(Reward(Array[Double](0, 0, 0, 0, 0)), reward)
   }
@@ -31,7 +31,7 @@ class TestEvalOver {
   def testEvalWinGammon(): Unit = {
     val board = new Board
     board(Board.OPPONENT)(1) = 15
-    val reward: Reward = Evaluator.getInstance().evalOver(board)
+    val reward: Reward = Evaluator.evalOver(board)
     assertEquals(GameResult.GAMMON, board.gameResult)
     assertEquals(Reward(Array[Double](1, 1, 0, 0, 0)), reward)
   }
@@ -40,7 +40,7 @@ class TestEvalOver {
   def testEvalLoseGammon(): Unit = {
     val board = new Board
     board(Board.SELF)(1) = 15
-    val reward: Reward = Evaluator.getInstance().evalOver(board)
+    val reward: Reward = Evaluator.evalOver(board)
     assertEquals(GameResult.GAMMON, board.gameResult)
     assertEquals(Reward(Array[Double](0, 0, 0, 1, 0)), reward)
   }
@@ -49,7 +49,7 @@ class TestEvalOver {
   def testEvalWinBackgammon(): Unit = {
     val board = new Board
     board(Board.OPPONENT)(20) = 15
-    val reward: Reward = Evaluator.getInstance().evalOver(board)
+    val reward: Reward = Evaluator.evalOver(board)
     assertEquals(GameResult.BACKGAMMON, board.gameResult)
     assertEquals(Reward(Array[Double](1, 1, 1, 0, 0)), reward)
   }
@@ -58,7 +58,7 @@ class TestEvalOver {
   def testEvalLoseBackgammon(): Unit = {
     val board = new Board
     board(Board.SELF)(20) = 15
-    val reward: Reward = Evaluator.getInstance().evalOver(board)
+    val reward: Reward = Evaluator.evalOver(board)
     assertEquals(GameResult.BACKGAMMON, board.gameResult)
     assertEquals(Reward(Array[Double](0, 0, 0, 1, 1)), reward)
   }

@@ -70,7 +70,7 @@ object GnubgAgent {
     if ((gammonsFlag & (BG_POSSIBLE | OBG_POSSIBLE)) != 0) {
       // side that can have the backgammon 
       val side = if ((gammonsFlag & BG_POSSIBLE) != 0) 1 else 0
-      val pr = Evaluator.getInstance().raceBGprob(board, side)
+      val pr = Evaluator.raceBGprob(board, side)
 
       if (pr > 0.0) {
         if (side == 1) {

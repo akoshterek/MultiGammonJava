@@ -13,17 +13,17 @@ import org.junit.{Assert, BeforeClass, Test}
 object TestGnuBg {
   @BeforeClass def init(): Unit = {
     val currentPath = Paths.get("").toAbsolutePath.normalize
-    Evaluator.getInstance.setSeed(16000000L)
-    Evaluator.getInstance.load(currentPath)
+    Evaluator.setSeed(16000000L)
+    Evaluator.basePath = currentPath
   }
 }
 
 class TestGnuBg {
   @Test def testRace(): Unit = {
-    val agent = new GnubgAgent(Evaluator.getInstance.getBasePath)
+    val agent = new GnubgAgent(Evaluator.basePath)
     val positionId = "4PPBQRCw58gBMA"
     val board = Board.positionFromID(positionId)
-    val pc = Evaluator.getInstance.classifyPosition(board)
+    val pc = Evaluator.classifyPosition(board)
     Assert.assertTrue(pc == PositionClass.CLASS_CONTACT)
     agent.evaluatePosition(board, pc)
   }

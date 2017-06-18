@@ -12,21 +12,21 @@ object AgentFactory {
 
     tokens(0) match {
       case "random" =>
-        new RandomAgent(Evaluator.getInstance.getBasePath)
+        new RandomAgent(Evaluator.basePath)
       case "heuristic" =>
-        new HeuristicAgent(Evaluator.getInstance.getBasePath)
+        new HeuristicAgent(Evaluator.basePath)
       case "pubeval" =>
-        PubEvalAgent(Evaluator.getInstance.getBasePath)
+        PubEvalAgent(Evaluator.basePath)
       case "gnubg" =>
-        new GnubgAgent(Evaluator.getInstance.getBasePath)
+        new GnubgAgent(Evaluator.basePath)
       case "raw" =>
-        RawBatch(Evaluator.getInstance.getBasePath, fullNameLower)
+        RawBatch(Evaluator.basePath, fullNameLower)
       case "rawrl40" =>
-        val agent = new RawRl40(Evaluator.getInstance.getBasePath)
+        val agent = new RawRl40(Evaluator.basePath)
         agent.load()
         agent
       case "rawtd40" =>
-        new RawTd40(Evaluator.getInstance.getBasePath)
+        new RawTd40(Evaluator.basePath)
       case _ =>
         throw new IllegalArgumentException("Unknown agent name " + fullName)
     }

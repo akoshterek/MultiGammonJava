@@ -28,8 +28,8 @@ class Dispatcher {
       false
     } else {
       val currentPath: Path = Paths.get("").toAbsolutePath.normalize
-      Evaluator.getInstance.setSeed(16000000L)
-      Evaluator.getInstance.load(currentPath)
+      Evaluator.setSeed(16000000L)
+      Evaluator.basePath = currentPath
       true
     }
   }

@@ -156,7 +156,7 @@ public class RawRl40 extends AbsAgent implements Cloneable {
     private Reward calcDeltaReward(final Move move) {
         //prev reward
         Board prevBoard = currentBoard();
-        float prevQValue[] = evaluatePosition(prevBoard, Evaluator.getInstance().classifyPosition(prevBoard)).data();
+        float prevQValue[] = evaluatePosition(prevBoard, Evaluator.classifyPosition(prevBoard)).data();
 
         //Predicted greedy reward
         float predictedGreedyReward[] = move.arEvalMove().data();

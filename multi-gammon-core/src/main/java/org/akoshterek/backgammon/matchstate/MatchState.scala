@@ -16,6 +16,6 @@ class MatchState {
   var gs: GameState = GameState.GAME_NONE
 
   def rollDice() {
-    anDice = (Evaluator.getInstance.nextDice, Evaluator.getInstance.nextDice)
+    anDice = (Evaluator.nextDice, Evaluator.nextDice)
   }
 }
