@@ -12,6 +12,7 @@ class HiddenUnit(val units: Array[Neuron],
                  val weights: Array[Float],
                  val activation: Activation) extends Neuron {
 
+  private var _sum = 0.0f
   /**
     * Builds a hidden unit taking the provided number of
     * inputs.  Sets the initial weights to be a copy of
@@ -42,12 +43,12 @@ class HiddenUnit(val units: Array[Neuron],
     */
   private def sum: Float = {
     var i = 0
-    var accum = 0.0f
+    var accumulator = 0.0f
     while (i < weights.length) {
-      accum += weights(i) * units(i).value
+      accumulator += weights(i) * units(i).value
       i += 1
     }
-    accum
+    accumulator
   }
 
   /**
@@ -55,8 +56,9 @@ class HiddenUnit(val units: Array[Neuron],
     * prior inputs.
     */
   override def recompute(): Unit = {
-    _value = activation.f(sum)
+    _sum = sum
+    _value = activation.f(_sum)
   }
 
-  def gradient: Float = activation.gradient(value)
+  def gradient: Float = activation.gradient(_sum, _value)
 }
