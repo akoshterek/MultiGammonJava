@@ -8,7 +8,8 @@ import org.apache.commons.math3.distribution.UniformIntegerDistribution
 import org.apache.commons.math3.random.Well19937c
 
 /**
-  * Created by Alex on 18-06-17.
+  * @author Alex
+  *         date: 18-06-17.
   */
 object Evaluator {
   private val rng = new Well19937c
