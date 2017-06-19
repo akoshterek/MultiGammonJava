@@ -1,7 +1,8 @@
 package org.akoshterek.backgammon.nn
 
 /**
-  * Created by Alex on 06-06-17.
+  * @author Alex
+  *         date: 06-06-17.
   */
 sealed trait Activation {
   def f(x: Float): Float
