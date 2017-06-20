@@ -162,6 +162,7 @@ public class RawRl40 extends AbsAgent implements Cloneable {
         float predictedGreedyReward[] = move.arEvalMove().data();
         float deltaReward[] = new float[Constants.NUM_OUTPUTS()];
         for(int i = 0; i < deltaReward.length; i++) {
+            //TODO 0 + predictedGreedyReward[i] * gamma - prevQValue[i] reward only after a win, current reward is zero
             deltaReward[i] = predictedGreedyReward[i] + predictedGreedyReward[i] * gamma - prevQValue[i];
         }
 
