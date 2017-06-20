@@ -187,7 +187,7 @@ class NeuralNetwork(input: Int, hidden: Int, output: Int,
   }
 
   final class EligibilityTrace(input: Int, hidden: Int, output: Int) {
-    val Ew: Array[Array[Float]] = Array.fill[Float](hidden, output)(1.0f)
-    var Ev: Array[Array[Array[Float]]] = Array.fill[Float](input, hidden, output)(1.0f)
+    val Ew: Array[Array[Float]] = Array.fill[Float](hidden, output)(0.0f)
+    var Ev: Array[Array[Array[Float]]] = Array.fill[Float](input, hidden, output)(0.0f)
   }
 }
