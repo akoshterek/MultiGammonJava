@@ -77,7 +77,7 @@ object Board {
     anBoard
   }
 
-  private def addBits(auchKey: AuchKey, bitPos: Int, nBits: Int) {
+  private def addBits(auchKey: AuchKey, bitPos: Int, nBits: Int): Unit = {
     val k: Int = bitPos >> 3
     val r: Int = bitPos & 0x7
     val b: Long = ((0x1 << nBits) - 1) << r
@@ -286,7 +286,7 @@ class Board extends Cloneable {
     }
   }
 
-  def saveMoves(pml: MoveList, cMoves: Int, cPip: Int, anMoves: ChequersMove) {
+  def saveMoves(pml: MoveList, cMoves: Int, cPip: Int, anMoves: ChequersMove): Unit = {
     //Save only legal moves: if the current move moves plays less
     //chequers or pips than those already found, it is illegal; if
     //it plays more, the old moves are illegal.

@@ -25,7 +25,7 @@ trait Agent {
   protected var _currentBoard: Board = _
   protected var curPC: PositionClass = PositionClass.CLASS_OVER
 
-  def startGame() {}
+  def startGame(): Unit = {}
 
   def endGame(): Unit = {
     if (isLearnMode) {
@@ -33,7 +33,7 @@ trait Agent {
     }
   }
 
-  def doMove(move: Move) {}
+  def doMove(move: Move): Unit = {}
 
   def evaluatePosition(board: Board, pc: PositionClass): Reward = {
     val effectivePc: PositionClass = if (PositionClass.isBearoff(pc) && !supportsBearoff) PositionClass.CLASS_RACE else pc
@@ -48,7 +48,7 @@ trait Agent {
     }
   }
 
-  def scoreMoves(moves: Seq[Move]): Unit = moves.foreach(m => m.arEvalMove = scoreMove(m))
+  def scoreMoves(moves: Array[Move]): Unit = moves.foreach(m => m.arEvalMove = scoreMove(m))
 
   def scoreMove(pm: Move): Reward = {
     val board: Board = Board.positionFromKey(pm.auch)
@@ -90,9 +90,9 @@ trait Agent {
     curPC = Evaluator.classifyPosition(currentBoard)
   }
 
-  def load() {
+  def load(): Unit = {
   }
 
-  def save() {
+  def save(): Unit = {
   }
 }
