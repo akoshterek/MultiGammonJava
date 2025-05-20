@@ -35,7 +35,7 @@ object NetworkHolder {
       Some(
         managed(new FileInputStream(file)).acquireFor(is => {
           SerializationUtils.deserialize[NetworkHolder](is)
-        }).either.right.get
+        }).either.toOption.get
       )
     }
   }
@@ -65,7 +65,7 @@ class NetworkHolder private[train](val network: BasicNetwork, val networkType: P
     })
   }
 
-  private[train] def serializeTrainedNetwork(agentSettings: AgentSettings) {
+  private[train] def serializeTrainedNetwork(agentSettings: AgentSettings): Unit = {
     val file: File = new File(NetworkHolder.getTrainedNetworkFileName(agentSettings, networkType))
     if (!file.getParentFile.exists) {
       file.getParentFile.mkdirs

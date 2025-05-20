@@ -1,0 +1,50 @@
+plugins {
+    id 'application'
+}
+
+application {
+    mainClass = 'backgammon.MultiGammon'
+}
+
+dependencies {
+    implementation "com.michaelpollmeier:scala-arm_2.13:${scalaArmVersion}"
+    implementation "commons-cli:commons-cli:${commonsCliVersion}"
+    implementation "commons-io:commons-io:${commonsIoVersion}"
+    implementation "org.apache.commons:commons-lang3:${commonsLangVersion}"
+    implementation "org.apache.commons:commons-math3:${commonsMathVersion}"
+    implementation "com.google.guava:guava:${guavaVersion}"
+    implementation "org.encog:encog-core:${encogVersion}"
+}
+
+// Create the fat JAR task here
+task fatJar(type: Jar) {
+    manifest {
+        attributes 'Main-Class': 'backgammon.MultiGammon'
+    }
+
+    archiveBaseName = 'multi-gammon'
+    archiveClassifier = 'all'
+
+    // Include all runtime dependencies
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+
+    // Include compiled classes from this project
+    from sourceSets.main.output
+
+    // Include resources
+    from(sourceSets.main.resources) {
+        include '**/*'
+    }
+
+    // Include the multi-gammon-util project output
+    from project(':multi-gammon-util').sourceSets.main.output
+
+    // Exclude signature files from dependencies
+    exclude 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA'
+
+    with jar
+}

@@ -1,0 +1,164 @@
+// Top-level build file for multi-gammon project
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'org.scala-lang:scala-library:2.13.12'
+    }
+}
+
+plugins {
+    id 'base'  // Changed from 'java-library' to 'base' for the root project
+    id 'maven-publish'
+}
+
+allprojects {
+    // Define dependency versions BEFORE they're used
+    ext {
+        scalaVersion = '2.13.12'
+        scalaArmVersion = '2.1'
+        commonsCliVersion = '1.6.0'
+        commonsMathVersion = '3.6.1'
+        commonsIoVersion = '2.15.1'
+        commonsLangVersion = '3.14.0'
+        guavaVersion = '32.1.3-jre'
+        encogVersion = '3.4'
+        junitVersion = '4.13.2'
+    }
+
+    group = 'multi-gammon'
+    version = '0.1'
+
+    repositories {
+        mavenCentral()
+    }
+
+    // Make the ext properties available to all projects
+    ext {
+        scalaVersion = rootProject.ext.scalaVersion
+        scalaArmVersion = rootProject.ext.scalaArmVersion
+        commonsCliVersion = rootProject.ext.commonsCliVersion
+        commonsMathVersion = rootProject.ext.commonsMathVersion
+        commonsIoVersion = rootProject.ext.commonsIoVersion
+        commonsLangVersion = rootProject.ext.commonsLangVersion
+        guavaVersion = rootProject.ext.guavaVersion
+        encogVersion = rootProject.ext.encogVersion
+        junitVersion = rootProject.ext.junitVersion
+    }
+}
+
+subprojects {
+    apply plugin: 'java-library'
+    apply plugin: 'scala'
+    apply plugin: 'maven-publish'
+
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(17)
+        }
+    }
+
+    tasks.withType(ScalaCompile) {
+        scalaCompileOptions.additionalParameters = ["-target:jvm-17"]
+        scalaCompileOptions.forkOptions.with {
+            memoryMaximumSize = '1g'
+        }
+    }
+
+    tasks.withType(JavaCompile) {
+        options.encoding = 'UTF-8'
+        options.compilerArgs += ['-parameters']
+    }
+
+    sourceSets {
+        main {
+            scala {
+                srcDirs = ['src/main/scala', 'src/main/java']
+            }
+            java {
+                srcDirs = []
+            }
+        }
+        test {
+            scala {
+                srcDirs = ['src/test/scala', 'src/test/java']
+            }
+            java {
+                srcDirs = []
+            }
+        }
+    }
+
+    tasks.withType(Test) {
+        useJUnit()
+
+        // Parallel test execution
+        maxParallelForks = Runtime.runtime.availableProcessors().intdiv(2) ?: 1
+
+        // Skip tests if property is set
+        onlyIf { !project.hasProperty('skipTests') }
+
+        testLogging {
+            events "passed", "skipped", "failed"
+            exceptionFormat "full"
+        }
+    }
+
+    dependencies {
+        // Use direct version references to avoid property resolution issues
+        implementation "org.scala-lang:scala-library:2.13.12"
+        testImplementation "junit:junit:4.13.2"
+    }
+
+    // Generate sources jar
+    task sourcesJar(type: Jar) {
+        archiveClassifier = 'sources'
+        from sourceSets.main.allSource
+    }
+
+    // Generate javadoc jar
+    task javadocJar(type: Jar) {
+        archiveClassifier = 'javadoc'
+        from tasks.javadoc
+    }
+
+    // Publishing configuration
+    publishing {
+        publications {
+            mavenJava(MavenPublication) {
+                from components.java
+                // Add artifacts as separate elements, not as components
+                artifact sourcesJar
+                artifact javadocJar
+            }
+        }
+    }
+}
+
+// Configuration for the wrapper task
+wrapper {
+    gradleVersion = '8.4'
+    distributionType = Wrapper.DistributionType.BIN
+}
+
+// Custom task to clean build directories
+task cleanAll(type: Delete) {
+    delete 'build', 'out', '.gradle'
+    subprojects.each { subproject ->
+        delete subproject.buildDir, "${subproject.projectDir}/out"
+    }
+}
+
+// Output project structure and dependency information
+task projectReport {
+    doLast {
+        println "\n=== Project Report ==="
+        println "Project: ${project.name} (version: ${project.version})"
+        println "Subprojects: ${subprojects.collect { it.name }}"
+        println "======================="
+    }
+}

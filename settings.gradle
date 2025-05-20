@@ -1,0 +1,4 @@
+rootProject.name = 'multi-gammon'
+
+include 'multi-gammon-core'
+include 'multi-gammon-util'

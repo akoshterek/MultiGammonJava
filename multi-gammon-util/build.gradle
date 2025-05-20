@@ -1,0 +1,6 @@
+dependencies {
+    implementation project(':multi-gammon-core')
+    implementation "com.michaelpollmeier:scala-arm_2.13:${scalaArmVersion}"
+    implementation "org.encog:encog-core:${encogVersion}"
+    implementation "org.apache.commons:commons-lang3:${commonsLangVersion}"
+}
