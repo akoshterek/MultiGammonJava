@@ -1,12 +1,20 @@
 package org.akoshterek.backgammon.nn
 
-/**
-  * @author Alex
-  *         date: 06-06-17.
-  */
 sealed trait Activation {
   def f(x: Float): Float
   def gradient(before: Float, after: Float): Float
+}
+
+object LeakyReLU extends Activation {
+  private val alpha = 0.01f // Standard leakage coefficient
+
+  override def f(x: Float): Float = {
+    if (x > 0) x else alpha * x
+  }
+
+  override def gradient(before: Float, after: Float): Float = {
+    if (before > 0) 1.0f else alpha
+  }
 }
 
 object Linear extends Activation {

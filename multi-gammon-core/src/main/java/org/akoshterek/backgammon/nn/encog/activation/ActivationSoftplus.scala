@@ -38,4 +38,6 @@ class ActivationSoftplus extends ActivationFunction {
   }
 
   override def getFactoryCode: String = ActivationUtil.generateActivationFactory("softplus", this)
+
+  override def getLabel: String = "softplus"
 }

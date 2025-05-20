@@ -300,7 +300,7 @@ class Board extends Cloneable {
 
       val auch: AuchKey = calcPositionKey
       pml.amMoves
-        .view(0, pml.cMoves)
+        .view.slice(0, pml.cMoves)
         .filter(m => auch == m.auch && (cMoves > m.cMoves || cPip > m.cPips))
         .take(1).headOption match {
         case Some(m) =>
@@ -360,12 +360,11 @@ class Board extends Cloneable {
 
   override def equals(that: Any): Boolean = {
     that match {
-      case that: Board => anBoard.deep == that.anBoard.deep
+      case that: Board => java.util.Arrays.deepEquals(anBoard.asInstanceOf[Array[Object]], that.anBoard.asInstanceOf[Array[Object]])
       case _ => false
     }
   }
 
   override def hashCode: Int = {
-    31 + anBoard.deep.hashCode()
-  }
-}
+    31 + java.util.Arrays.deepHashCode(anBoard.asInstanceOf[Array[Object]])
+  }}
