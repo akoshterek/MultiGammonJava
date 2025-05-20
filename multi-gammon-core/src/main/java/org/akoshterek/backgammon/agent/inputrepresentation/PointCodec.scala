@@ -2,12 +2,12 @@ package org.akoshterek.backgammon.agent.inputrepresentation
 
 sealed trait PointCodec {
   /**
-    * @return amount of inputs per point
+    * @return number of inputs per point
     */
   def inputsPerPoint: Int = 4
 
   /**
-    * @param men   amount of men on the point
+    * @param men   number of men on the point
     * @param index in range [0, inputsPerPoint)
     * @return encoded input
     */

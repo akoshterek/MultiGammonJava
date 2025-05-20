@@ -31,7 +31,7 @@ final class Reward(input: Array[Float]) {
 
   /**
     * Move evaluation
-    * let's keep things simple as I don't want to go into cube handling
+    * lets keep things simple as I don't want to go into cube handling
     * At least for now
     *
     * @return money equity

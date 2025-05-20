@@ -8,6 +8,7 @@ import org.encog.util.obj.ActivationUtil
   */
 @SerialVersionUID(1L)
 class ActivationLeakingRelu(thresholdHigh: Double, thresholdLow: Double, high: Double, low: Double, leak: Double) extends ActivationFunction {
+  override def getLabel(): String = "LEAKYRELU"
   private val params = Array[Double] (thresholdHigh, thresholdLow, high, low, leak)
   require(leak >= 0 && leak <= 1, "Leak must be in [0, 1] range")
 

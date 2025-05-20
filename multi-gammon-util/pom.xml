@@ -18,8 +18,8 @@
         </dependency>
 		
         <dependency>
-            <groupId>com.jsuereth</groupId>
-            <artifactId>scala-arm_2.12</artifactId>
+            <groupId>com.michaelpollmeier</groupId>
+            <artifactId>scala-arm_2.13</artifactId>
         </dependency>
 		
         <dependency>

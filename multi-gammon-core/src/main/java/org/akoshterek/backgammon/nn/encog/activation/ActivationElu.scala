@@ -67,4 +67,6 @@ class ActivationElu(thresholdHigh: Double, thresholdLow: Double, high: Double, l
   }
 
   override def getFactoryCode: String = ActivationUtil.generateActivationFactory("elu", this)
+
+  override def getLabel(): String = "elu"
 }

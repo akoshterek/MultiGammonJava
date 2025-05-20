@@ -8,7 +8,7 @@ import org.encog.mathutil.randomize.RangeRandomizer
 import org.encog.ml.data.basic.{BasicMLData, BasicMLDataPair, BasicMLDataSet}
 import org.encog.ml.data.{MLData, MLDataPair, MLDataSet}
 import org.encog.ml.train.strategy.StopTrainingStrategy
-import org.encog.ml.train.strategy.end.SimpleEarlyStoppingStrategy
+import org.encog.ml.train.strategy.end.EarlyStoppingStrategy
 import org.encog.neural.networks.BasicNetwork
 import org.encog.neural.networks.layers.BasicLayer
 import org.encog.neural.networks.training.propagation.Propagation
@@ -36,7 +36,7 @@ object NetworkTrainer {
     val train: ResilientPropagation = new ResilientPropagation(holder.network, trainingSet)
     train.setRPROPType(RPROPType.iRPROPp)
     val stop: StopTrainingStrategy = new StopTrainingStrategy(0.00001, 100)
-    train.addStrategy(new SimpleEarlyStoppingStrategy(trainingSet, 10))
+    train.addStrategy(new EarlyStoppingStrategy(trainingSet, 1, 10))
     train.addStrategy(stop)
     if (holder.continuation != null) {
       train.resume(holder.continuation)
