@@ -1,8 +1,8 @@
 package org.akoshterek.backgammon.agent.gnubg
 
 import java.nio.file.Paths
-
 import org.akoshterek.backgammon.board.{Board, PositionClass}
+import org.akoshterek.backgammon.dice.PseudoRandomDiceRoller
 import org.akoshterek.backgammon.eval.Evaluator
 import org.junit.{Assert, BeforeClass, Test}
 
@@ -13,7 +13,7 @@ import org.junit.{Assert, BeforeClass, Test}
 object TestGnuBg {
   @BeforeClass def init(): Unit = {
     val currentPath = Paths.get("").toAbsolutePath.normalize
-    Evaluator.setSeed(16000000L)
+    Evaluator.diceRoller = PseudoRandomDiceRoller()
     Evaluator.basePath = currentPath
   }
 }

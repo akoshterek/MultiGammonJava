@@ -32,7 +32,15 @@ object Sigmoid extends Activation {
 object Elliott extends Activation {
   override def f(x: Float): Float = x / (1.0f + Math.abs(x))
   override def gradient(before: Float, after: Float): Float = {
-    val d = 1.0f + Math.abs(before)
+    val d = 1.0f + math.abs(before)
     1.0f / (d * d)
+  }
+}
+
+object Tanh extends Activation {
+  override def f(x: Float): Float = math.tanh(x.toDouble).toFloat
+
+  override def gradient(before: Float, after: Float): Float = {
+    1.0f - after * after // tanh' = 1 - tanh^2(x)
   }
 }

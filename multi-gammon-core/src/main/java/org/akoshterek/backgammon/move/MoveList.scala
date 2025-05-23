@@ -1,9 +1,5 @@
 package org.akoshterek.backgammon.move
 
-/**
-  * @author Alex
-  *         date 20.07.2015.
-  */
 object MoveList {
   /* A trivial upper bound on the number of (complete or incomplete)
     * legal moves of a single roll: if all 15 chequers are spread out,
@@ -18,9 +14,9 @@ object MoveList {
   val MAX_MOVES: Int = 3060
 }
 
-class MoveList private[move]() {
+class MoveList private[move] {
   var cMoves: Int = 0
-  /* and current move when building list */
+  // and current move when building list
   var cMaxMoves: Int = 0
   var cMaxPips: Int = 0
   var amMoves: Array[Move] = _
@@ -46,7 +42,7 @@ class MoveList private[move]() {
     }
   }
 
-  def deleteMoves() {
+  def deleteMoves(): Unit = {
     amMoves = null
     cMoves = 0
   }

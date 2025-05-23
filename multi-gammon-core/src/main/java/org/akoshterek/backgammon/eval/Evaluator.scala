@@ -1,29 +1,20 @@
 package org.akoshterek.backgammon.eval
 
 import java.nio.file.Path
-
 import org.akoshterek.backgammon.bearoff.{Bearoff, BearoffContext}
 import org.akoshterek.backgammon.board.{Board, PositionClass}
-import org.apache.commons.math3.distribution.UniformIntegerDistribution
-import org.apache.commons.math3.random.Well19937c
+import org.akoshterek.backgammon.dice.{DiceRoller, PseudoRandomDiceRoller}
 
 /**
   * @author Alex
   *         date: 18-06-17.
   */
 object Evaluator {
-  private val rng = new Well19937c
-  private val distribution = new UniformIntegerDistribution(rng, 1, 6)
   var basePath: Path = _
+  var diceRoller: DiceRoller = _
 
   var pbc1: BearoffContext = BearoffContext("/org/akoshterek/backgammon/agent/gnubg/gnubg_os0.bd")
   var pbc2: BearoffContext = BearoffContext("/org/akoshterek/backgammon/agent/gnubg/gnubg_ts0.bd")
-
-  def nextDice: Int = distribution.sample
-
-  def setSeed(seed: Long): Unit = {
-    rng.setSeed(seed)
-  }
 
   def classifyPosition(anBoard: Board): PositionClass = PositionClassificator.classifyPosition(anBoard)
 
