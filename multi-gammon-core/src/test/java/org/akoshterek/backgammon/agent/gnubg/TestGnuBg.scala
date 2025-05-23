@@ -13,7 +13,7 @@ import org.junit.{Assert, BeforeClass, Test}
 object TestGnuBg {
   @BeforeClass def init(): Unit = {
     val currentPath = Paths.get("").toAbsolutePath.normalize
-    Evaluator.setSeed(16000000L)
+    Evaluator.diceRoller.setSeed(16000000L)
     Evaluator.basePath = currentPath
   }
 }

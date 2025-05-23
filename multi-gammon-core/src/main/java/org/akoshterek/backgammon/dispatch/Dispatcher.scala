@@ -1,9 +1,9 @@
 package org.akoshterek.backgammon.dispatch
 
 import java.nio.file.{Path, Paths}
-
 import org.akoshterek.backgammon.License
 import org.akoshterek.backgammon.agent.{AbsAgent, Agent, AgentFactory}
+import org.akoshterek.backgammon.dice.PseudoRandomDiceRoller
 import org.akoshterek.backgammon.eval.Evaluator
 import org.akoshterek.backgammon.util.{OptionsBean, OptionsBuilder}
 import org.apache.commons.lang3.time.DurationFormatUtils
@@ -28,13 +28,13 @@ class Dispatcher {
       false
     } else {
       val currentPath: Path = Paths.get("").toAbsolutePath.normalize
-      Evaluator.setSeed(16000000L)
+      Evaluator.diceRoller = PseudoRandomDiceRoller(16000000L)
       Evaluator.basePath = currentPath
       true
     }
   }
 
-  def run() {
+  def run(): Unit = {
     val elapsedTime: Long = time {
       val agentNames: Vector[String] = options.agentNames
       val benchAgenName: String = options.benchmarkAgentName
@@ -60,7 +60,7 @@ class Dispatcher {
 
 
   private def runAgentIteration(agentName: String, benchAgentName: String, trainingGames: Int,
-                                benchmarkGames: Int, benchmarkPeriod: Int) {
+                                benchmarkGames: Int, benchmarkPeriod: Int): Unit = {
     val agent1: Agent = AgentFactory.createAgent(agentName)
     val benchAgent: Agent = AgentFactory.createAgent(benchAgentName)
 
@@ -77,7 +77,7 @@ class Dispatcher {
     runIteration(agent1, benchAgent, agent2, trainingGames, benchmarkGames, benchmarkPeriod)
   }
 
-  private def runIteration(agent1: Agent, benchAgent: Agent, agent2: Agent, trainGames: Int, benchmarkGames: Int, benchmarkPeriod: Int) {
+  private def runIteration(agent1: Agent, benchAgent: Agent, agent2: Agent, trainGames: Int, benchmarkGames: Int, benchmarkPeriod: Int): Unit = {
     val gameDispatcher: GameDispatcher = new GameDispatcher(agent1, agent2)
     gameDispatcher.showLog = options.isVerbose
 
@@ -92,20 +92,19 @@ class Dispatcher {
         gameDispatcher.playGames(Math.min(benchmarkPeriod, trainGames), learn = true)
         agent1.save()
 
-        //benchmark
-        val benchDispatcher: GameDispatcher = new GameDispatcher(agent1, benchAgent)
-        benchDispatcher.showLog = options.isVerbose
-        benchDispatcher.playGames(benchmarkGames, learn = false)
-        benchDispatcher.printStatistics()
+        benchmark(agent1, benchAgent, benchmarkGames)
       }
     }
     else {
-      //benchmark
-      val benchDispatcher: GameDispatcher = new GameDispatcher(agent1, benchAgent)
-      benchDispatcher.showLog = options.isVerbose
-      benchDispatcher.playGames(benchmarkGames, learn = false)
-      benchDispatcher.printStatistics()
+      benchmark(agent1, benchAgent, benchmarkGames)
     }
+  }
+
+  private def benchmark(agent1: Agent, benchAgent: Agent, benchmarkGames: Int): Unit = {
+    val benchDispatcher: GameDispatcher = new GameDispatcher(agent1, benchAgent)
+    benchDispatcher.showLog = options.isVerbose
+    benchDispatcher.playGames(benchmarkGames, learn = false)
+    benchDispatcher.printStatistics()
   }
 
   private def formatTime(millis: Long): String = {
