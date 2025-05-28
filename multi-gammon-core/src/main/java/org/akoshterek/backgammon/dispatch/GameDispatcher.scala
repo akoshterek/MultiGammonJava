@@ -28,7 +28,7 @@ class GameDispatcher(val agent1: Agent, val agent2: Agent) {
   private val lMatch: ArrayBuffer[MatchMove] = ArrayBuffer()
   private var pmrHint: MoveRecord = _
 
-  def playGames(games: Int, learn: Boolean) {
+  def playGames(games: Int, learn: Boolean): Unit = {
     agents(0).agent.isLearnMode = learn
     agents(1).agent.isLearnMode = learn
     for (i <- numGames + 1 until numGames + games + 1) {
@@ -47,7 +47,7 @@ class GameDispatcher(val agent1: Agent, val agent2: Agent) {
     agents(if (currentMatch.fMove == 1) 0 else 1).agent
   }
 
-  def playGame() {
+  def playGame(): Unit = {
     agents.foreach(a => a.agent.startGame())
     startGame()
 
@@ -67,7 +67,7 @@ class GameDispatcher(val agent1: Agent, val agent2: Agent) {
 
   def printStatistics(): Unit = GameInfoPrinter.printStatistics(agents, numGames)
 
-  private def startGame() {
+  private def startGame(): Unit = {
     currentMatch = new MatchState
     currentMatch.board = Board.initialPosition
 
@@ -101,13 +101,13 @@ class GameDispatcher(val agent1: Agent, val agent2: Agent) {
     diceRolled()
   }
 
-  private def diceRolled() {
+  private def diceRolled(): Unit = {
     if (showLog) {
       GameInfoPrinter.printBoard(agents, currentMatch, lMatch)
     }
   }
 
-  private def addMoveRecord(pmr: MoveRecord) {
+  private def addMoveRecord(pmr: MoveRecord): Unit = {
     var pmrOld: MoveRecord = null
     addMoveRecordGetCur(pmr)
     addMoverecordSanityCheck(pmr)
@@ -126,7 +126,7 @@ class GameDispatcher(val agent1: Agent, val agent2: Agent) {
     applyMoveRecord(pmr)
   }
 
-  private def applyMoveRecord(pmr: MoveRecord) {
+  private def applyMoveRecord(pmr: MoveRecord): Unit = {
     val lGame = lMatch.last.moveRecords
 
     val pmrx: MoveRecord = lGame.head
@@ -181,7 +181,7 @@ class GameDispatcher(val agent1: Agent, val agent2: Agent) {
     }
   }
 
-  private def playMove(anMove: ChequersMove, fPlayer: Int) {
+  private def playMove(anMove: ChequersMove, fPlayer: Int): Unit = {
     if (currentMatch.fMove != -1 && fPlayer != currentMatch.fMove) {
       currentMatch.board = currentMatch.board.swapSides
     }
@@ -191,7 +191,7 @@ class GameDispatcher(val agent1: Agent, val agent2: Agent) {
         val nSrc: Int = anMove.move(i).from
         val nDest: Int = anMove.move(i).to
         if (nSrc < 0) {
-          break
+          break()
         }
 
         val board = currentMatch.board.anBoard
@@ -215,7 +215,7 @@ class GameDispatcher(val agent1: Agent, val agent2: Agent) {
     currentMatch.board = currentMatch.board.swapSides
   }
 
-  private def applyGameOver() {
+  private def applyGameOver(): Unit = {
     val pmr: MoveRecord = lMatch.last.moveRecords.head
     val pmgi: XMoveGameInfo = pmr.g
 
@@ -231,7 +231,7 @@ class GameDispatcher(val agent1: Agent, val agent2: Agent) {
     }
   }
 
-  private def addMoverecordSanityCheck(pmr: MoveRecord) {
+  private def addMoverecordSanityCheck(pmr: MoveRecord): Unit = {
     require(pmr.fPlayer >= 0 && pmr.fPlayer <= 1)
     require(pmr.ml.cMoves < MoveList.MAX_MOVES)
 
@@ -248,7 +248,7 @@ class GameDispatcher(val agent1: Agent, val agent2: Agent) {
     }
   }
 
-  private def copyFromPmrCur(pmr: MoveRecord, getMove: Boolean) {
+  private def copyFromPmrCur(pmr: MoveRecord, getMove: Boolean): Unit = {
     getCurrentMoveRecord match {
       case null =>
       case pmr_cur: MoveRecord =>
@@ -259,7 +259,7 @@ class GameDispatcher(val agent1: Agent, val agent2: Agent) {
     }
   }
 
-  private def addMoveRecordGetCur(pmr: MoveRecord) {
+  private def addMoveRecordGetCur(pmr: MoveRecord): Unit = {
     pmr.mt match {
       case MoveType.MOVE_NORMAL =>
         copyFromPmrCur(pmr, getMove = true)
@@ -298,7 +298,7 @@ class GameDispatcher(val agent1: Agent, val agent2: Agent) {
     }
   }
 
-  private def fixMatchState(pmr: MoveRecord) {
+  private def fixMatchState(pmr: MoveRecord): Unit = {
     pmr.mt match {
       case MoveType.MOVE_NORMAL =>
         if (currentMatch.fTurn != pmr.fPlayer) {
@@ -311,7 +311,7 @@ class GameDispatcher(val agent1: Agent, val agent2: Agent) {
     }
   }
 
-  private def nextTurn() {
+  private def nextTurn(): Unit = {
     val ms: MatchState = currentMatch
     if (ms.board.gameResult != GameResult.PLAYING) {
       val pmr: MoveRecord = lMatch.last.moveRecords.last
@@ -325,7 +325,7 @@ class GameDispatcher(val agent1: Agent, val agent2: Agent) {
     computerTurn()
   }
 
-  private def computerTurn() {
+  private def computerTurn(): Unit = {
     val ms: MatchState = currentMatch
     if (ms.gs == GameState.GAME_PLAYING) {
 
@@ -378,7 +378,7 @@ class GameDispatcher(val agent1: Agent, val agent2: Agent) {
     }
   }
 
-  private def forceMove(endMove: Move) {
+  private def forceMove(endMove: Move): Unit = {
     val board: Board = Board.positionFromKey(endMove.auch).swapSides
     endMove.auch = board.calcPositionKey
     endMove.arEvalMove = endMove.arEvalMove.invert

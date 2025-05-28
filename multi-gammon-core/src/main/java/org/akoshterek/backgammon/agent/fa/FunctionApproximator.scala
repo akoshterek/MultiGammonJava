@@ -9,9 +9,9 @@ import org.akoshterek.backgammon.eval.Reward
 trait FunctionApproximator {
     def calculateReward(input: Array[Float]): Reward
 
-    def setReward(input: Array[Float], reward: Reward)
+    def setReward(input: Array[Float], reward: Reward): Unit
 
-    def updateAddToReward(input: Array[Float], deltaReward: Reward) {
+    def updateAddToReward(input: Array[Float], deltaReward: Reward): Unit = {
         val currentReward: Reward = calculateReward(input)
         setReward(input, (currentReward + deltaReward).clamp())
     }

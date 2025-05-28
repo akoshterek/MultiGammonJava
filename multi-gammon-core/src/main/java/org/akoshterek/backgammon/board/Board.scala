@@ -113,7 +113,7 @@ object Board {
 class Board extends Cloneable {
   val anBoard: Array[Array[Int]] = Array.ofDim[Int](2, 25)
 
-  def this(board: Array[Array[Int]]) {
+  def this(board: Array[Array[Int]]) = {
     this()
     require(board.length == 2
       && board(0).length == Board.HALF_BOARD_SIZE

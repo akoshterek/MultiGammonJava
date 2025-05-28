@@ -2,7 +2,7 @@ package org.akoshterek.backgammon.dispatch
 
 import java.nio.file.{Path, Paths}
 import org.akoshterek.backgammon.License
-import org.akoshterek.backgammon.agent.{AbsAgent, Agent, AgentFactory}
+import org.akoshterek.backgammon.agent.{Agent, AgentFactory, CopyableAgent}
 import org.akoshterek.backgammon.dice.PseudoRandomDiceRoller
 import org.akoshterek.backgammon.eval.Evaluator
 import org.akoshterek.backgammon.util.{OptionsBean, OptionsBuilder}
@@ -66,12 +66,11 @@ class Dispatcher {
 
     assert(agent1 != null && benchAgent != null)
 
-    var agent2: Agent = null
-    if (agent1.isInstanceOf[Cloneable]) {
-      agent2 = agent1.asInstanceOf[AbsAgent].clone
-    }
-    else {
-      agent2 = AgentFactory.createAgent(agentName)
+    val agent2: Agent = agent1 match {
+      case copyableAgent: CopyableAgent[_] =>
+        copyableAgent.copyAgent()
+      case _ =>
+        AgentFactory.createAgent(agentName)
     }
 
     runIteration(agent1, benchAgent, agent2, trainingGames, benchmarkGames, benchmarkPeriod)

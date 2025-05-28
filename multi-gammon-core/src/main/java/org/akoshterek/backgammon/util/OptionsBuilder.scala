@@ -16,7 +16,7 @@ object OptionsBuilder {
   private val options: Options = new Options
   private var commandLine: CommandLine = _
 
-  def build() {
+  def build(): Unit = {
     options.addOption("h", HELP_OPTION, false, "produce help message")
     options.addOption("c", LICENSE_OPTION, false, "show license")
     options.addOption("w", WARRANTY_OPTION, false, "show warranty")
@@ -50,7 +50,7 @@ object OptionsBuilder {
     bean
   }
 
-  def printHelp(cmdLineSyntax: String) {
+  def printHelp(cmdLineSyntax: String): Unit = {
     val formatter: HelpFormatter = new HelpFormatter
     formatter.printHelp(cmdLineSyntax, options, true)
   }

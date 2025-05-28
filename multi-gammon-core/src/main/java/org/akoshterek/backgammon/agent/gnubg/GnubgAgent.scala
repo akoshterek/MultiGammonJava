@@ -1,7 +1,6 @@
 package org.akoshterek.backgammon.agent.gnubg
 
 import java.nio.file.Path
-
 import org.akoshterek.backgammon.Constants._
 import org.akoshterek.backgammon.agent.AbsAgent
 import org.akoshterek.backgammon.agent.gnubg.nn.GnuNeuralNets
@@ -18,6 +17,10 @@ class GnubgAgent(override val path: Path) extends AbsAgent("Gnubg", path) {
   override val supportsSanityCheck = true
   override val supportsBearoff = true
   override val needsInvertedEval = true
+
+  override def copyAgent(): GnubgAgent = {
+    new GnubgAgent(path)
+  }
 
   private def evalWithInvert(eval: (Board) => Reward)(board: Board): Reward = eval(board.swapSides).invert
 
