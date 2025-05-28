@@ -27,7 +27,7 @@ class RawRepresentation(val codec: PointCodec) extends InputRepresentation {
     inputs
   }
 
-  private def calculateHalfBoard(halfBoard: Array[Int], inputs: Array[Float], offset: Int) {
+  private def calculateHalfBoard(halfBoard: Array[Int], inputs: Array[Float], offset: Int): Unit = {
     var point = 0
     while (point < Board.HALF_BOARD_SIZE - 1) {
       var i = 0

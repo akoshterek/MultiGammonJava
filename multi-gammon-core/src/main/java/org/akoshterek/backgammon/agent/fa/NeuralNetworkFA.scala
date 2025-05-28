@@ -7,5 +7,5 @@ import java.nio.file.Path
   *         date 26.09.2015.
   */
 trait NeuralNetworkFA extends FunctionApproximator {
-    def saveNN(path: Path)
+    def saveNN(path: Path): Unit
 }

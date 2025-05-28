@@ -24,7 +24,7 @@ object AuchKey {
 class AuchKey() {
   final val key: Array[Byte] = new Array[Byte](10)
 
-  def this(src: AuchKey) {
+  def this(src: AuchKey) = {
     this()
     System.arraycopy(src.key, 0, key, 0, 10)
   }

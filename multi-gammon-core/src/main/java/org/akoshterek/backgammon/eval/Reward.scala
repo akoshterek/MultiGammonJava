@@ -15,16 +15,16 @@ final class Reward(input: Array[Float]) {
 
   require(data.length == NUM_OUTPUTS)
 
-  def this(reward: Reward) {
+  def this(reward: Reward) = {
     this(reward.data)
   }
 
-  def this(reward: Seq[Float]) {
+  def this(reward: Seq[Float]) = {
     this(reward.toArray)
   }
 
-  def this() {
-    this(Array.fill[Float](NUM_OUTPUTS)(0))
+  def this() = {
+    this(Array.ofDim[Float](NUM_OUTPUTS))
   }
 
   def apply(index: Int): Float = data.apply(index)

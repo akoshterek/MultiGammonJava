@@ -14,11 +14,15 @@ object PubEvalAgent {
 }
 
 class PubEvalAgent(override val path: Path, val contactWeights: Array[Float], val raceWeights: Array[Float])
-  extends AbsAgent("PubEval", path) with Cloneable {
+  extends AbsAgent("PubEval", path) {
 
   private val eval: PubEval = new PubEval(contactWeights, raceWeights)
 
   def evalContact(board: Board): Reward = evaluate(board)
+
+  override def copyAgent(): PubEvalAgent = {
+    new PubEvalAgent(path, contactWeights, raceWeights)
+  }
 
   private def evaluate(board: Board): Reward = {
     val reward = Reward.rewardArray[Float]
@@ -30,7 +34,7 @@ class PubEvalAgent(override val path: Path, val contactWeights: Array[Float], va
     new Reward(reward)
   }
 
-  private def preparePos(board: Board, pos: Array[Int]) {
+  private def preparePos(board: Board, pos: Array[Int]): Unit = {
     val (opponent, self) = board.chequersCount
 
     for (i <- 0 until Board.HALF_BOARD_SIZE - 1) {

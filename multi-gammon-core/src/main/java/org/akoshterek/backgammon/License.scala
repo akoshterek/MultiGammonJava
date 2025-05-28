@@ -21,7 +21,7 @@ object License {
     printResourse("/org/akoshterek/backgammon/BANNER")
   }
 
-  private def printResourse(resourceName: String) {
+  private def printResourse(resourceName: String): Unit = {
     managed(this.getClass.getResourceAsStream(resourceName)).acquireAndGet(inputStream => {
       IOUtils.copy(inputStream, System.out)
     })

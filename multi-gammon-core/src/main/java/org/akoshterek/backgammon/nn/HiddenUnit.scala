@@ -20,7 +20,7 @@ class HiddenUnit(val units: Array[Neuron],
     *
     * @param units   The input units to this unit
     */
-  def this(units: Array[Neuron], activation: Activation) {
+  def this(units: Array[Neuron], activation: Activation) = {
     this(units, Array.ofDim(units.length), activation)
     randomizeWeights()
   }

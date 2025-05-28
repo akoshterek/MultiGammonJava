@@ -27,7 +27,7 @@ object GnuNeuralNets {
 
   @throws[IOException]
   @throws[IllegalArgumentException]("Invalid weights file")
-  private def checkBinaryWeights(is: DataInput) {
+  private def checkBinaryWeights(is: DataInput): Unit = {
     val magic: Float = is.readFloat
     val version: Float = is.readFloat
     if (magic != 472.3782f || version != 1.0f) {

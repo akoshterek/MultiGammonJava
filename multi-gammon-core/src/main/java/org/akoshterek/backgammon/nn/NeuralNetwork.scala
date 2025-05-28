@@ -58,7 +58,7 @@ class NeuralNetwork(input: Int, hidden: Int, output: Int,
     *
     * @param net The network to base it off of
     */
-  def this(net: NeuralNetwork) {
+  def this(net: NeuralNetwork) = {
     this(net._input.length, net._hidden(0).length, net._hidden(1).length,
       net.hiddenActivation, net.outputActivation)
 
@@ -123,7 +123,7 @@ class NeuralNetwork(input: Int, hidden: Int, output: Int,
     * @param path The file to write to
     */
   @throws(classOf[IOException])
-  def writeTo(path: Path) {
+  def writeTo(path: Path): Unit = {
     managed(new ObjectOutputStream(new FileOutputStream(path.toFile)))
       .acquireAndGet(stream => {
         stream.writeObject(this)

@@ -6,10 +6,6 @@ object AbsAgent {
   private val AGENTS_SUBFOLDER: String = "bin/agents"
 }
 
-abstract class AbsAgent(override val fullName: String, basePath: Path) extends Agent {
+abstract class AbsAgent(override val fullName: String, basePath: Path) extends Agent with CopyableAgent[AbsAgent] {
   override val path: Path = Paths.get(basePath.toString, AbsAgent.AGENTS_SUBFOLDER)
-
-  override def clone: AbsAgent = {
-    super.clone.asInstanceOf[AbsAgent]
-  }
 }

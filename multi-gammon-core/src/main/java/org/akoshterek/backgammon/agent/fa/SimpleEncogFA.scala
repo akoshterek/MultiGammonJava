@@ -44,7 +44,7 @@ class SimpleEncogFA(override val network: BasicNetwork) extends AbsNeuralNetwork
 
   private val propagation: Propagation = new Backpropagation(network, trainingSet, 0.05, 0)
 
-  override def saveNN(file: Path) {
+  override def saveNN(file: Path): Unit = {
     EncogDirectoryPersistence.saveObject(file.toFile, network)
   }
 
@@ -54,7 +54,7 @@ class SimpleEncogFA(override val network: BasicNetwork) extends AbsNeuralNetwork
     Reward(reward)
   }
 
-  override def setReward(input: Array[Float], reward: Reward) {
+  override def setReward(input: Array[Float], reward: Reward): Unit = {
     trainingSet.get(0).getInput.setData(input.map(_.toDouble))
     trainingSet.get(0).getIdeal.setData(reward.toDoubleArray)
     propagation.iteration()

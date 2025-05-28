@@ -15,7 +15,7 @@ object GameInfoPrinter {
   private val signs: Array[Char] = Array[Char]('O', 'X')
   private val gameResult: Array[String] = Array[String]("single game", "gammon", "backgammon")
 
-  def printStatistics(agents: Array[AgentEntry], numGames: Int) {
+  def printStatistics(agents: Array[AgentEntry], numGames: Int): Unit = {
     System.out.println("\tStatistics after %d game(s)".format(numGames))
 
     for (i <- agents.indices) {
@@ -26,7 +26,7 @@ object GameInfoPrinter {
         agents(i).wonPoints.asInstanceOf[Float] / (agents(0).wonPoints + agents(1).wonPoints) * 100))
     }
 
-    val pointDiff: Float = agents(0).wonPoints - agents(1).wonPoints
+    val pointDiff: Float = (agents(0).wonPoints - agents(1).wonPoints).toFloat
     System.out.println("%c:%s: won %+5.3f ppg\n".format(signs(0), agents(0).agent.fullName, pointDiff / numGames))
 
     val logPath: Path = Paths.get(agents(0).agent.path.toString, "log", getLogFileName(agents))
@@ -35,11 +35,11 @@ object GameInfoPrinter {
     })
   }
 
-  def printRoll(agents: Array[AgentEntry], dice: (Int, Int)) {
+  def printRoll(agents: Array[AgentEntry], dice: (Int, Int)): Unit = {
     System.out.println("%s rolls %d, %s rolls %d.".format(agents(0).agent.fullName, dice._1, agents(1).agent.fullName, dice._2))
   }
 
-  def printBoard(agents: Array[AgentEntry], matchState: MatchState, matchMoves: ArrayBuffer[MatchMove]) {
+  def printBoard(agents: Array[AgentEntry], matchState: MatchState, matchMoves: ArrayBuffer[MatchMove]): Unit = {
     val apch: Array[String] = new Array[String](7)
 
     val an: Board = if (matchState.fMove == 0) matchState.board.clone().swapSides else matchState.board.clone()
@@ -67,14 +67,14 @@ object GameInfoPrinter {
     }
   }
 
-  def printWin(agents: Array[AgentEntry], matchState: MatchState, fWinner: Int, nPoints: Int) {
+  def printWin(agents: Array[AgentEntry], matchState: MatchState, fWinner: Int, nPoints: Int): Unit = {
     val n: Int = matchState.board.gameResult.value
     System.out.println("%s wins a %s and %d point(s).\n".format(
       agents(fWinner).agent.fullName,
       gameResult(n - 1), nPoints))
   }
 
-  def printScore(agents: Array[AgentEntry], matchState: MatchState, playedGames: Int) {
+  def printScore(agents: Array[AgentEntry], matchState: MatchState, playedGames: Int): Unit = {
     val template: String = if (playedGames == 1) "The score (after %d game) is: %s %d, %s %d"
     else "The score (after %d games) is: %s %d, %s %d"
     val str: String = template.format(
@@ -83,7 +83,7 @@ object GameInfoPrinter {
     System.out.println(str)
   }
 
-  def showAutoMove(anMove: ChequersMove, agents: Array[AgentEntry], matchState: MatchState) {
+  def showAutoMove(anMove: ChequersMove, agents: Array[AgentEntry], matchState: MatchState): Unit = {
     val symbol: Char = if (matchState.fTurn != 0) 'X'
     else 'O'
     if (anMove.move(0).from == -1) {
@@ -97,7 +97,7 @@ object GameInfoPrinter {
     }
   }
 
-  def printGameOver(agents: Array[AgentEntry], fWinner: Int, nPoints: Int, result: GameResult) {
+  def printGameOver(agents: Array[AgentEntry], fWinner: Int, nPoints: Int, result: GameResult): Unit = {
     val sign: Char = if (fWinner != 0) 'X' else 'O'
     System.out.println("Game over.\n%c:%s wins a %s and %d point(s)\n".format(
       sign, agents(fWinner).agent.fullName, gameResult(result.value - 1), nPoints))

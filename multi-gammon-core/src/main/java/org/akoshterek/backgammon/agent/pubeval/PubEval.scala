@@ -6,7 +6,7 @@ class PubEval {
   private val _contactWeights: Array[Float] = new Array[Float](122)
   private val _raceWeights: Array[Float] = new Array[Float](122)
 
-  def this(contactWeights: Array[Float], raceWeights: Array[Float]) {
+  def this(contactWeights: Array[Float], raceWeights: Array[Float]) = {
     this()
     System.arraycopy(contactWeights, 0, this._contactWeights, 0, this._contactWeights.length)
     System.arraycopy(raceWeights, 0, this._raceWeights, 0, this._raceWeights.length)
@@ -17,7 +17,7 @@ class PubEval {
   /**
     * sets input vector x[] given board position pos[]
     */
-  private def setx(pos: Array[Int]) {
+  private def setx(pos: Array[Int]): Unit = {
     // initialize
     util.Arrays.fill(x, 0)
 

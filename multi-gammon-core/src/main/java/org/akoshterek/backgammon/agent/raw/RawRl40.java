@@ -23,11 +23,11 @@ import java.util.Map;
  * @author Alex
  *         date: 05.12.2015
  */
-public class RawRl40 extends AbsAgent implements Cloneable {
+public class RawRl40 extends AbsAgent {
     private static final double MIN_ETRACE = 0.000001;
     private InputRepresentation representation = new RawRepresentation(Tesauro89Codec.self());
     private NeuralNetworkFA fa;
-    private Map<String, ETraceEntry> eligibilityTraces;
+    private final Map<String, ETraceEntry> eligibilityTraces;
     //private int step = 0;
     //private ETraceEntry prevEntry;
 //    private Move prevMove;
@@ -57,11 +57,10 @@ public class RawRl40 extends AbsAgent implements Cloneable {
         return evalContact(board);
     }
 
-    public RawRl40 clone() {
-        RawRl40 other = (RawRl40)super.clone();
+    public RawRl40 copyAgent() {
+        RawRl40 other = new RawRl40(super.path());
         other.fa = fa;
         other.representation = representation;
-        other.eligibilityTraces = new HashMap<>();
         return other;
     }
 
@@ -138,7 +137,7 @@ public class RawRl40 extends AbsAgent implements Cloneable {
         eligibilityTraces
                 .values()
                 .stream()
-                .sorted((o1, o2) -> Float.valueOf(o2.eTrace).compareTo(o1.eTrace))
+                .sorted((o1, o2) -> Float.compare(o2.eTrace, o1.eTrace))
                 .forEach(entry -> updateTraceEntry(entry, deltaReward));
         eligibilityTraces
                 .values()
@@ -156,11 +155,11 @@ public class RawRl40 extends AbsAgent implements Cloneable {
     private Reward calcDeltaReward(final Move move) {
         //prev reward
         Board prevBoard = currentBoard();
-        float prevQValue[] = evaluatePosition(prevBoard, Evaluator.classifyPosition(prevBoard)).data();
+        float[] prevQValue = evaluatePosition(prevBoard, Evaluator.classifyPosition(prevBoard)).data();
 
         //Predicted greedy reward
-        float predictedGreedyReward[] = move.arEvalMove().data();
-        float deltaReward[] = new float[Constants.NUM_OUTPUTS()];
+        float[] predictedGreedyReward = move.arEvalMove().data();
+        float[] deltaReward = new float[Constants.NUM_OUTPUTS()];
         for(int i = 0; i < deltaReward.length; i++) {
             //TODO 0 + predictedGreedyReward[i] * gamma - prevQValue[i] reward only after a win, current reward is zero
             deltaReward[i] = predictedGreedyReward[i] + predictedGreedyReward[i] * gamma - prevQValue[i];

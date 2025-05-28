@@ -1,9 +1,8 @@
 package org.akoshterek.backgammon.agent.raw
 
 import java.nio.file.Path
-
 import com.google.common.base.CaseFormat
-import org.akoshterek.backgammon.agent.AbsFlexAgent
+import org.akoshterek.backgammon.agent.{AbsAgent, AbsFlexAgent}
 import org.akoshterek.backgammon.agent.fa.SimpleEncogFA
 import org.akoshterek.backgammon.agent.inputrepresentation._
 import org.akoshterek.backgammon.board.Board
@@ -31,6 +30,14 @@ class RawBatch(override val path: Path,
 
   override def evalCrashed(board: Board): Reward = {
     super.evalCrashed(board)
+  }
+
+  override def copyAgent(): RawBatch = {
+    val other = new RawBatch(path, contactRepresentation, crashedRepresentation, raceRepresentation, contactName, crashedName, raceName)
+    other.contactFa = contactFa
+    other.raceFa = raceFa
+    other.crashedFa = crashedFa
+    other
   }
 }
 

@@ -23,7 +23,7 @@ object NeuralNet {
   }
 
   @throws[IOException]
-  private def readArray(arr: Array[Float], inputStream: DataInput) {
+  private def readArray(arr: Array[Float], inputStream: DataInput): Unit = {
     var i: Int = 0
     while (i < arr.length) {
       arr(i) = inputStream.readFloat
@@ -38,7 +38,7 @@ final class NeuralNet private(val cInput: Int, val cHidden: Int, val cOutput: In
   private val arHiddenThreshold: Array[Float] = new Array[Float](cHidden)
   private val arOutputThreshold: Array[Float] = new Array[Float](cOutput)
 
-  def evaluate(arInput: Array[Float], arOutput: Array[Float]) {
+  def evaluate(arInput: Array[Float], arOutput: Array[Float]): Unit = {
     val ar: Array[Float] = arHiddenThreshold.clone
     evaluateHiddenNodes(ar, arInput)
     evaluateOutputNodes(ar, arOutput)

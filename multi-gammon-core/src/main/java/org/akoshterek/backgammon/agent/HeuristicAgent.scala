@@ -1,8 +1,8 @@
 package org.akoshterek.backgammon.agent
 
 import java.nio.file.Path
-
 import org.akoshterek.backgammon.Constants
+import org.akoshterek.backgammon.agent.raw.RawTd40
 import org.akoshterek.backgammon.board.Board
 import org.akoshterek.backgammon.eval.Reward
 
@@ -11,6 +11,10 @@ import org.akoshterek.backgammon.eval.Reward
   *         date 03.08.2015.
   */
 class HeuristicAgent(override val path: Path) extends AbsAgent("Heuristic", path) {
+
+  override def copyAgent(): HeuristicAgent = {
+    new HeuristicAgent(path)
+  }
 
   override def evalRace(board: Board): Reward = {
     evalContact(board)
