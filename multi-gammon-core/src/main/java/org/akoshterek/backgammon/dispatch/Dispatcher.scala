@@ -1,6 +1,6 @@
 package org.akoshterek.backgammon.dispatch
 
-import java.nio.file.{Path, Paths}
+import java.nio.file.{Files, Path, Paths}
 import org.akoshterek.backgammon.License
 import org.akoshterek.backgammon.agent.{Agent, AgentFactory, CopyableAgent}
 import org.akoshterek.backgammon.dice.PseudoRandomDiceRoller
@@ -80,10 +80,8 @@ class Dispatcher {
     val gameDispatcher: GameDispatcher = new GameDispatcher(agent1, agent2)
     gameDispatcher.showLog = options.isVerbose
 
-    val dir = Paths.get(gameDispatcher.agent1.path.toString, "log").toFile
-    if (!dir.exists()) {
-      dir.mkdirs()
-    }
+    val dir = Paths.get(gameDispatcher.agent1.path.toString, "log")
+    Files.createDirectories(dir)
 
     if (trainGames > 0) {
       for (_ <- 0 until trainGames by benchmarkPeriod) {
