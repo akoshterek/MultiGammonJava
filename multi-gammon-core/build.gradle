@@ -17,7 +17,7 @@ dependencies {
 
     // Add Scala logging dependencies
     implementation "com.typesafe.scala-logging:scala-logging_2.13:3.9.5"
-    implementation "ch.qos.logback:logback-classic:1.2.11"
+    implementation "ch.qos.logback:logback-classic:1.2.13"
 }
 
 // Create the fat JAR task here
