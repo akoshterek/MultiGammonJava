@@ -1,6 +1,7 @@
 # Initial training run.
 Training 100K games
-Benchmark 1K games every 10K
+Benchmark 1K games every 10K against Random agent
+Run 0 was initial parameters guess
 
 | Run | alpha | lambda | gamma |
 |-----|-------|--------|-------|
