@@ -31,7 +31,8 @@ object GameInfoPrinter {
 
     val logPath: Path = Paths.get(agents(0).agent.path.toString, "log", getLogFileName(agents))
     managed(new PrintWriter(Files.newBufferedWriter(logPath, StandardOpenOption.APPEND, StandardOpenOption.CREATE))).acquireAndGet(writer => {
-      writer.println("%d;%f".format(agents(0).agent.playedGames, pointDiff / numGames))
+      val avgPointDiff = pointDiff / numGames
+      writer.println(f"${agents(0).agent.playedGames}, $avgPointDiff%.3f")
     })
   }
 

@@ -52,3 +52,14 @@ task fatJar(type: Jar) {
 
     with jar
 }
+
+task runMultiGammon(type: JavaExec) {
+    group = 'application'
+    description = 'Run MultiGammon with command-line arguments.'
+
+    classpath = sourceSets.main.runtimeClasspath
+    main = 'org.akoshterek.backgammon.MultiGammon'
+
+    // Example arguments – change or override at runtime with --args=""
+    args = ['--config', 'config.yml']
+}

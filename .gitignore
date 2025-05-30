@@ -37,6 +37,7 @@ buildNumber.properties
 
 # Logs
 *.log
+/log/
 
 # =========================
 # Operating System Files

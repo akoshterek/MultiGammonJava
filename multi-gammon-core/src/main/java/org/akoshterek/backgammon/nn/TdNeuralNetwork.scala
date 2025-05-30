@@ -4,9 +4,9 @@ package org.akoshterek.backgammon.nn
 class TdNeuralNetwork(inputSize: Int,
                       hiddenSize: Int,
                       outputSize: Int,
-                      val alpha: Float = 0.01f,
-                      val lambda: Float = 0.7f,
-                      val gamma: Float = 1.0f,
+                      val alpha: Float = 0.01f, //0.01f,
+                      val lambda: Float = 0.7f, //0.7f,
+                      val gamma: Float = 0.99f,  //1.0f
                       val hiddenActivation: Activation = LeakyReLU,
                       val outputActivation: Activation = Sigmoid
                      ) {
@@ -31,13 +31,28 @@ class TdNeuralNetwork(inputSize: Int,
   private val gradOut = Array.ofDim[Float](outputSize)
   private val gradHidden = Array.ofDim[Float](hiddenSize)
 
+  // TD(λ) learning statistics
+  private var cumulativeTDError: Float = 0f
+  private var tdErrorCount: Int = 0
+
   def createEligibilityTrace() = new EligibilityTrace2D(inputSize, hiddenSize, outputSize)
+
+  def weightsCopy: Weights2D = new Weights2D(inputSize, hiddenSize, outputSize, wInputHidden, wHiddenOutput)
+
+  def getAverageTDError(reset: Boolean = false): Float = {
+    val avg = if (tdErrorCount > 0) cumulativeTDError / tdErrorCount else 0f
+    if (reset) {
+      cumulativeTDError = 0f
+      tdErrorCount = 0
+    }
+    avg
+  }
 
   // Forward pass (updates internal hiddenRaw and hiddenActivated)
   def forward(input: Array[Float], output: Array[Float]): Unit = {
     computeHiddenLayer(input)
     computeOutputLayer(output)
-    Array.copy(output, 0, lastOutput, 0, output.length);
+    Array.copy(output, 0, lastOutput, 0, output.length.min(lastOutput.length));
   }
 
   private def computeHiddenLayer(input: Array[Float]): Unit = {
@@ -95,10 +110,15 @@ class TdNeuralNetwork(inputSize: Int,
 
   // Error = TD error (target - output)
   private def computeError(target: Array[Float]): Unit = {
-    val error = Array.ofDim[Float](outputSize)
+    var tdErrorSum = 0f
     for (o <- 0 until outputSize) {
       error(o) = target(o) - clippedOutput(o)
+      tdErrorSum += error(o).abs
     }
+
+    // Compute TD error and accumulate absolute error for progress tracking
+    cumulativeTDError += tdErrorSum
+    tdErrorCount += 1
   }
 
   // Clip output values to avoid exact 0 or 1 (for sigmoid stability)

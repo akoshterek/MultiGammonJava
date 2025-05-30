@@ -1,24 +1,37 @@
 package org.akoshterek.backgammon.agent.raw
 
-import java.nio.file.Path
-import org.akoshterek.backgammon.agent.{AbsAgent, CopyableAgent}
-import org.akoshterek.backgammon.agent.inputrepresentation.{GnuBgCodec, Tesauro92Codec}
+import java.nio.file.{Files, Path, Paths}
+import org.akoshterek.backgammon.agent.AbsAgent
+import org.akoshterek.backgammon.agent.inputrepresentation.Tesauro92Codec
 import org.akoshterek.backgammon.board.{Board, PositionClass}
 import org.akoshterek.backgammon.eval.Reward
 import org.akoshterek.backgammon.move.Move
-import org.akoshterek.backgammon.nn.{Elliott, Linear, NeuralNetwork}
+import org.akoshterek.backgammon.nn.{EligibilityTrace2D, TdNeuralNetwork, Weights2D}
 
-/**
-  * Created by Alex on 17-06-17.
-  */
-//TODO: keep eligibility trace for TD(lambda) per player
-class RawTd40(override val path: Path) extends AbsAgent("RawTd40", path) {
+import scala.util.Using
+
+
+class RawTd40(override val path: Path, val isCopy: Boolean = false) extends AbsAgent("RawTd40", path) {
   private val representation = new RawRepresentation(Tesauro92Codec)
-  private var nn = new NeuralNetwork(representation.contactInputsCount, 40, 5, Elliott, Linear)
+  // shared NN
+  private var tdNN = new TdNeuralNetwork(representation.contactInputsCount, 40, 1)
+  private var eligibilityTrace: EligibilityTrace2D = _
+  private var weights: Weights2D = _
+
+  private val filePath: Path = path.resolve(s"log/${fullName}_td_metrics.csv")
+  Files.createDirectories(filePath.getParent) // ensures ./log exists
+  private val metricsFile = filePath.toFile
+
+
+  if (!metricsFile.exists()) {
+    val writer = new java.io.PrintWriter(metricsFile)
+    writer.println("gamesPlayed, averageTDError, weightDelta")
+    writer.close()
+  }
 
   override def copyAgent(): RawTd40 = {
-        val other: RawTd40 = new RawTd40(path)
-        other.nn = nn
+        val other: RawTd40 = new RawTd40(path, true)
+        other.tdNN = tdNN
         other
   }
 
@@ -30,7 +43,9 @@ class RawTd40(override val path: Path) extends AbsAgent("RawTd40", path) {
   }
 
   override def evalContact(board: Board): Reward = {
-    Reward(nn.calculate(representation.calculateContactInputs(board)))
+    val output = Reward.rewardArray[Float]
+    tdNN.forward(representation.calculateContactInputs(board), output)
+    Reward(output)
   }
 
   override def evalRace(board: Board): Reward = evalContact(board)
@@ -38,11 +53,30 @@ class RawTd40(override val path: Path) extends AbsAgent("RawTd40", path) {
   override def evalCrashed(board: Board): Reward = evalContact(board)
 
   override def startGame(): Unit = {
+    eligibilityTrace = tdNN.createEligibilityTrace()
 
+    if (isLearnMode && playedGames % 1000 == 0) {
+      weights = tdNN.weightsCopy
+    }
   }
 
   override def endGame(): Unit = {
     super.endGame()
+
+    if (isLearnMode && !isCopy && playedGames % 1000 == 0) {
+      // calculate metrics
+      val snapshot = tdNN.weightsCopy
+      val averageTdError = tdNN.getAverageTDError(reset = true)
+      val delta = calculateWeightDelta(weights, snapshot)
+
+      // Append metrics to CSV
+      Using(new java.io.PrintWriter(new java.io.FileOutputStream(metricsFile, true))) { writer =>
+        writer.println(s"$playedGames, $averageTdError, $delta")
+      }
+
+      weights = snapshot
+    }
+
     playedGames
   }
 
@@ -53,41 +87,33 @@ class RawTd40(override val path: Path) extends AbsAgent("RawTd40", path) {
     }
   }
 
-  /**
-   * For clarity
-   * Let's imagine board state S1 before move and S2 after move
-   * currentInput = boardRepresentation(S1)
-   * currentOutput = nn.forward(currentInput)
-   * target =  nn.forward(boardRepresentation(S2))
-   *
-   * is it correct?
-   *
-   *
-   * ChatGPT said:
-   * Exactly right! That’s a solid way to frame it for TD learning with a neural net:
-   *
-   * currentInput = representation of the current board state S1 (before move)
-   *
-   * currentOutput = network’s predicted value for S1 (usually a win probability or value estimate)
-   *
-   * target = network’s predicted value for the next state S2 (after the move), which serves as the target for updating the prediction at S1
-   *
-   * Then the TD error is:
-   * target - currentOutput
-   *
-   * This lets you train the network to better approximate the expected future reward starting from S1, bootstrapping from the prediction of S2.
-   *
-   * If S2 is a terminal state (win/loss), target can be 1 or 0 directly instead of a forward pass.
-   *
-   * So your intuition is perfect — using forward passes for both current and next states as inputs to train makes the process explicit and clearer.
-   *
-   */
+
   private def doLearnMove(move: Move): Unit = {
     val boardAfterMove = Board.positionFromKey(move.auch)
-    val nextOutput = evaluatePosition(boardAfterMove, move.pc).data
+    val afterMoveOutput = evaluatePosition(boardAfterMove, move.pc).data
     val boardBeforeMove = currentBoard
-    val currentInput = representation.calculateContactInputs(boardBeforeMove)
-    val currentOutput = nn.calculate(currentInput)
-    nn.backpropWithEtraces(currentInput, currentOutput, nextOutput)
+
+    // to call forward()
+    val input = representation.calculateContactInputs(boardBeforeMove)
+    val currentOutput = Reward.rewardArray[Float]
+    tdNN.forward(input, currentOutput)
+
+    tdNN.train(afterMoveOutput, eligibilityTrace)
+  }
+
+  def calculateWeightDelta(w1: Weights2D, w2: Weights2D): Float = {
+    var sumSq = 0f
+
+    for (h <- w1.inputHiddenWeights.indices; i <- w1.inputHiddenWeights(h).indices) {
+      val diff = w1.inputHiddenWeights(h)(i) - w2.inputHiddenWeights(h)(i)
+      sumSq += diff * diff
+    }
+
+    for (o <- w1.hiddenOutputWeights.indices; h <- w1.hiddenOutputWeights(o).indices) {
+      val diff = w1.hiddenOutputWeights(o)(h) - w2.hiddenOutputWeights(o)(h)
+      sumSq += diff * diff
+    }
+
+    math.sqrt(sumSq).toFloat
   }
 }
