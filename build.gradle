@@ -21,7 +21,7 @@ allprojects {
         commonsCliVersion = '1.6.0'
         commonsMathVersion = '3.6.1'
         commonsIoVersion = '2.15.1'
-        commonsLangVersion = '3.14.0'
+        commonsLangVersion = '3.18.0'
         guavaVersion = '32.1.3-jre'
         encogVersion = '3.4'
         junitVersion = '4.13.2'
