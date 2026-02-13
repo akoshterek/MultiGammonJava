@@ -1,6 +1,6 @@
 package org.akoshterek.backgammon.agent.raw
 
-import java.nio.file.{Files, Path, Paths}
+import java.nio.file.{Files, Path}
 import org.akoshterek.backgammon.agent.AbsAgent
 import org.akoshterek.backgammon.agent.inputrepresentation.Tesauro92Codec
 import org.akoshterek.backgammon.board.{Board, PositionClass}
@@ -11,26 +11,31 @@ import org.akoshterek.backgammon.nn.{EligibilityTrace2D, TdNeuralNetwork, Weight
 import scala.util.Using
 
 
-class RawTd40(override val path: Path, val isCopy: Boolean = false) extends AbsAgent("RawTd40", path) {
+class RawTd40(override val path: Path,
+              val alpha: Float = 0.01f,
+              val lambda: Float = 0.7f,
+              val gamma: Float = 1.0f,
+              val experimentTag: String = "",
+              val isCopy: Boolean = false
+             ) extends AbsAgent("RawTd40", path) {
   private val representation = new RawRepresentation(Tesauro92Codec)
   // shared NN
   private var tdNN = new TdNeuralNetwork(representation.contactInputsCount, 40, 1)
   private var eligibilityTrace: EligibilityTrace2D = _
   private var weights: Weights2D = _
 
-  private val filePath: Path = path.resolve(s"log/${fullName}_td_metrics.csv")
-  Files.createDirectories(filePath.getParent) // ensures ./log exists
+  private val filePath: Path = path.resolve(s"${if (experimentTag.nonEmpty) experimentTag + "_" else ""}${fullName}_td_metrics.csv")
+  Files.createDirectories(filePath.getParent) // ensures path exists
   private val metricsFile = filePath.toFile
-
 
   if (!metricsFile.exists()) {
     val writer = new java.io.PrintWriter(metricsFile)
-    writer.println("gamesPlayed, averageTDError, weightDelta")
+    writer.println("gamesPlayed,averageTDError,weightDelta")
     writer.close()
   }
 
   override def copyAgent(): RawTd40 = {
-        val other: RawTd40 = new RawTd40(path, true)
+        val other: RawTd40 = new RawTd40(path, alpha, lambda, gamma, experimentTag, isCopy = true)
         other.tdNN = tdNN
         other
   }

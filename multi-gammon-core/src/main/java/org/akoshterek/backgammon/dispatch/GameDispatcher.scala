@@ -5,6 +5,7 @@ import org.akoshterek.backgammon.board.{Board, PositionClass}
 import org.akoshterek.backgammon.matchstate.{GameResult, GameState, MatchMove, MatchState}
 import org.akoshterek.backgammon.move._
 
+import java.nio.file.Path
 import scala.collection.mutable.ArrayBuffer
 import scala.util.control.Breaks._
 
@@ -65,7 +66,9 @@ class GameDispatcher(val agent1: Agent, val agent2: Agent) {
     }
   }
 
-  def printStatistics(): Unit = GameInfoPrinter.printStatistics(agents, numGames)
+  def printStatistics(path: Path, experimentTag: String): Unit = {
+    GameInfoPrinter.printStatistics(agents, numGames, path, experimentTag)
+  }
 
   private def startGame(): Unit = {
     currentMatch = new MatchState

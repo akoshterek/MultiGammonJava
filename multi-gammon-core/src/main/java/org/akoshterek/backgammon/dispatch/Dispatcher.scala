@@ -27,7 +27,12 @@ class Dispatcher {
       License.printWarranty()
       false
     } else {
-      val currentPath: Path = Paths.get("").toAbsolutePath.normalize
+      val currentPath: Path = {
+        val basePath = Paths.get("").toAbsolutePath.normalize
+        val experimentPath = if (options.experimentPath.isBlank) basePath else basePath.resolve(options.experimentPath)
+        Files.createDirectories(experimentPath)
+        experimentPath
+      }
       Evaluator.diceRoller = PseudoRandomDiceRoller(16000000L)
       Evaluator.basePath = currentPath
       true
@@ -61,8 +66,8 @@ class Dispatcher {
 
   private def runAgentIteration(agentName: String, benchAgentName: String, trainingGames: Int,
                                 benchmarkGames: Int, benchmarkPeriod: Int): Unit = {
-    val agent1: Agent = AgentFactory.createAgent(agentName)
-    val benchAgent: Agent = AgentFactory.createAgent(benchAgentName)
+    val agent1: Agent = AgentFactory.createAgent(agentName, options)
+    val benchAgent: Agent = AgentFactory.createAgent(benchAgentName, options)
 
     assert(agent1 != null && benchAgent != null)
 
@@ -70,7 +75,7 @@ class Dispatcher {
       case copyableAgent: CopyableAgent[_] =>
         copyableAgent.copyAgent()
       case _ =>
-        AgentFactory.createAgent(agentName)
+        AgentFactory.createAgent(agentName, options)
     }
 
     runIteration(agent1, benchAgent, agent2, trainingGames, benchmarkGames, benchmarkPeriod)
@@ -79,8 +84,10 @@ class Dispatcher {
   private def runIteration(agent1: Agent, benchAgent: Agent, agent2: Agent, trainGames: Int, benchmarkGames: Int, benchmarkPeriod: Int): Unit = {
     val gameDispatcher: GameDispatcher = new GameDispatcher(agent1, agent2)
     gameDispatcher.showLog = options.isVerbose
+    val randomAgent = AgentFactory.createAgent("random", options);
+    //val pubEvalAgent = AgentFactory.createAgent("pubeval", options);
 
-    val dir = Paths.get(gameDispatcher.agent1.path.toString, "log")
+    val dir = Paths.get(gameDispatcher.agent1.path.toString)
     Files.createDirectories(dir)
 
     if (trainGames > 0) {
@@ -89,7 +96,9 @@ class Dispatcher {
         gameDispatcher.playGames(Math.min(benchmarkPeriod, trainGames), learn = true)
         agent1.save()
 
+        benchmark(agent1, randomAgent, benchmarkGames)
         benchmark(agent1, benchAgent, benchmarkGames)
+        //benchmark(agent1, pubEvalAgent, benchmarkGames)
       }
     }
     else {
@@ -101,7 +110,7 @@ class Dispatcher {
     val benchDispatcher: GameDispatcher = new GameDispatcher(agent1, benchAgent)
     benchDispatcher.showLog = options.isVerbose
     benchDispatcher.playGames(benchmarkGames, learn = false)
-    benchDispatcher.printStatistics()
+    benchDispatcher.printStatistics(Evaluator.basePath, options.experimentRunTag)
   }
 
   private def formatTime(millis: Long): String = {

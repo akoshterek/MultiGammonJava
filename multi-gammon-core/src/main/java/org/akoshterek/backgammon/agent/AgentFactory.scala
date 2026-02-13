@@ -4,9 +4,10 @@ import org.akoshterek.backgammon.agent.gnubg.GnubgAgent
 import org.akoshterek.backgammon.agent.pubeval.PubEvalAgent
 import org.akoshterek.backgammon.agent.raw.{RawBatch, RawRl40, RawTd40}
 import org.akoshterek.backgammon.eval.Evaluator
+import org.akoshterek.backgammon.util.OptionsBean
 
 object AgentFactory {
-  def createAgent(fullName: String): Agent = {
+  def createAgent(fullName: String, options: OptionsBean): Agent = {
     val fullNameLower: String = fullName.toLowerCase
     val tokens = fullNameLower.split("-")
 
@@ -26,7 +27,7 @@ object AgentFactory {
         agent.load()
         agent
       case "rawtd40" =>
-        new RawTd40(Evaluator.basePath)
+        new RawTd40(Evaluator.basePath, options.alpha, options.lambda, options.gamma, options.experimentRunTag)
       case _ =>
         throw new IllegalArgumentException("Unknown agent name " + fullName)
     }

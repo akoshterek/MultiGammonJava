@@ -13,6 +13,13 @@ object OptionsBuilder {
   private val TRAIN_GAMES_OPTION: String = "train-games"
   private val BENCH_GAMES_OPTION: String = "bench-games"
   private val BENCH_PERIOD_OPTION: String = "bench-period"
+  // New options
+  private val ALPHA_OPTION: String = "alpha"
+  private val LAMBDA_OPTION: String = "lambda"
+  private val GAMMA_OPTION: String = "gamma"
+  private val EXPERIMENT_PATH_OPTION: String = "experiment-path"
+  private val EXPERIMENT_TAG_OPTION: String = "experiment-tag"
+
   private val options: Options = new Options
   private var commandLine: CommandLine = _
 
@@ -26,6 +33,12 @@ object OptionsBuilder {
     options.addOption(Option.builder("T").longOpt(TRAIN_GAMES_OPTION).argName("training games").desc("number of games for training").hasArg.`type`(classOf[Number]).build)
     options.addOption(Option.builder("G").longOpt(BENCH_GAMES_OPTION).argName("benchmark games").desc("number of games for benchmark").hasArg.`type`(classOf[Number]).build)
     options.addOption(Option.builder("P").longOpt(BENCH_PERIOD_OPTION).argName("benchmark period").desc("benchmark every n games").hasArg.`type`(classOf[Number]).build)
+    // New options
+    options.addOption(Option.builder().longOpt(ALPHA_OPTION).argName("alpha").desc("learning rate alpha").hasArg.`type`(classOf[Number]).build)
+    options.addOption(Option.builder().longOpt(LAMBDA_OPTION).argName("lambda").desc("TD eligibility trace lambda").hasArg.`type`(classOf[Number]).build)
+    options.addOption(Option.builder().longOpt(GAMMA_OPTION).argName("gamma").desc("TD discount factor gamma").hasArg.`type`(classOf[Number]).build)
+    options.addOption(Option.builder().longOpt(EXPERIMENT_PATH_OPTION).argName("experiment path").desc("experiment output path").hasArg.build)
+    options.addOption(Option.builder().longOpt(EXPERIMENT_TAG_OPTION).argName("experiment run tag").desc("experiment run tag").hasArg.build)
   }
 
   def parse(args: Array[String]): OptionsBean = {
@@ -42,6 +55,12 @@ object OptionsBuilder {
       bean.trainingGames = getIntOption(TRAIN_GAMES_OPTION, 0)
       bean.benchmarkGames = getIntOption(BENCH_GAMES_OPTION, 1000)
       bean.benchmarkPeriod = getIntOption(BENCH_PERIOD_OPTION, 10000)
+      // New options
+      bean.alpha = getFloatOption(ALPHA_OPTION, 0.01f)
+      bean.lambda = getFloatOption(LAMBDA_OPTION, 0.7f)
+      bean.gamma = getFloatOption(GAMMA_OPTION, 1.0f)
+      bean.experimentPath = commandLine.getOptionValue(EXPERIMENT_PATH_OPTION, "")
+      bean.experimentRunTag = commandLine.getOptionValue(EXPERIMENT_TAG_OPTION, "")
     }
     catch {
       case e: ParseException =>
@@ -55,7 +74,7 @@ object OptionsBuilder {
     formatter.printHelp(cmdLineSyntax, options, true)
   }
 
-  private def getIntOption(optionName: String, defaultValue: Int): Int = {
+  private def getNumberOption[T](optionName: String, defaultValue: T, converter: Number => T): T = {
     var number: Number = null
     try {
       number = commandLine.getParsedOptionValue(optionName).asInstanceOf[Number]
@@ -67,6 +86,14 @@ object OptionsBuilder {
     if (number == null)
       defaultValue
     else
-      number.intValue
+      converter(number)
+  }
+
+  private def getIntOption(optionName: String, defaultValue: Int): Int = {
+    getNumberOption(optionName, defaultValue, _.intValue)
+  }
+
+  private def getFloatOption(optionName: String, defaultValue: Float): Float = {
+    getNumberOption(optionName, defaultValue, _.floatValue)
   }
 }

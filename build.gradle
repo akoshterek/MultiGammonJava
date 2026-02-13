@@ -63,9 +63,8 @@ subprojects {
     }
 
     tasks.withType(ScalaCompile) {
-        scalaCompileOptions.additionalParameters = ["-target:jvm-17"]
         scalaCompileOptions.forkOptions.with {
-            memoryMaximumSize = '1g'
+            memoryMaximumSize = '2g'
         }
     }
 
