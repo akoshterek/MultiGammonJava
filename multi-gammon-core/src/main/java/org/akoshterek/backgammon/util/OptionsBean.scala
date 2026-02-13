@@ -10,8 +10,13 @@ class OptionsBean {
   var benchmarkGames: Int = 0
   var benchmarkPeriod: Int = 0
   var isVerbose: Boolean = false
+  var alpha: Float = 0.01f
+  var lambda: Float = 0.7f
+  var gamma: Float = 1.0f
+  var experimentPath: String = ""
+  var experimentRunTag: String = ""
 
-  def agentNames = _agentNames
+  def agentNames: Vector[String] = _agentNames
   def agentNames_= (agents: Array[String]): Unit = {
     agents match {
       case null => _agentNames = Vector()

@@ -4,9 +4,9 @@ package org.akoshterek.backgammon.nn
 class TdNeuralNetwork(inputSize: Int,
                       hiddenSize: Int,
                       outputSize: Int,
-                      val alpha: Float = 0.01f, //0.01f,
-                      val lambda: Float = 0.7f, //0.7f,
-                      val gamma: Float = 0.99f,  //1.0f
+                      val alpha: Float = 0.01f,
+                      val lambda: Float = 0.7f,
+                      val gamma: Float = 1.0f,
                       val hiddenActivation: Activation = LeakyReLU,
                       val outputActivation: Activation = Sigmoid
                      ) {
@@ -58,15 +58,9 @@ class TdNeuralNetwork(inputSize: Int,
   private def computeHiddenLayer(input: Array[Float]): Unit = {
     var h = 0
     while (h < hiddenSize) {
-      var sum = 0f
-      var i = 0
-      while (i < inputSize) {
-        sum += wInputHidden(h)(i) * input(i)
-        i += 1
-      }
-      sum += bHidden(h)
-      hiddenRaw(h) = sum
-      hiddenActivated(h) = hiddenActivation.f(sum)
+      var sum = DotProductUtils.dotProduct(wInputHidden(h), input, useSIMD = true)
+      hiddenRaw(h) = sum + bHidden(h)
+      hiddenActivated(h) = hiddenActivation.f(hiddenRaw(h))
       h += 1
     }
   }
@@ -74,14 +68,8 @@ class TdNeuralNetwork(inputSize: Int,
   private def computeOutputLayer(output: Array[Float]): Unit = {
     var o = 0
     while (o < outputSize) {
-      var sum = 0f
-      var h = 0
-      while (h < hiddenSize) {
-        sum += wHiddenOutput(o)(h) * hiddenActivated(h)
-        h += 1
-      }
-      sum += bOutput(o)
-      output(o) = outputActivation.f(sum)
+      val sum = DotProductUtils.dotProduct(wHiddenOutput(o), hiddenActivated, useSIMD = true)
+      output(o) = outputActivation.f(sum + bOutput(o))
       o += 1
     }
   }
@@ -179,15 +167,18 @@ class TdNeuralNetwork(inputSize: Int,
   private def updateInputHiddenWeights(eligibilityTrace: EligibilityTrace2D): Unit = {
     var h = 0
     while (h < hiddenSize) {
-      // Sum over outputs for backpropagation once per hidden neuron
-      var sum = 0f
+      // Extract column of wHiddenOutput for this h
+      val column = Array.ofDim[Float](outputSize)
       var o = 0
       while (o < outputSize) {
-        sum += error(o) * wHiddenOutput(o)(h)
+        column(o) = wHiddenOutput(o)(h)
         o += 1
       }
 
-      // Update weights and eligibility traces for all inputs of this hidden neuron
+      // Use SIMD to compute sum = dot(error, column)
+      val sum = DotProductUtils.dotProduct(error, column, useSIMD = true)
+
+      // Update weights and traces for all inputs of this hidden neuron
       var i = 0
       while (i < inputSize) {
         val delta = gradHidden(h) * lastInput(i)
@@ -195,8 +186,10 @@ class TdNeuralNetwork(inputSize: Int,
         wInputHidden(h)(i) += alpha * sum * eligibilityTrace.eInputHidden(h)(i)
         i += 1
       }
+
       // Bias update for hidden neuron
       bHidden(h) += alpha * sum * gradHidden(h)
+
       h += 1
     }
   }

@@ -57,7 +57,7 @@ class NetworkTrainer(val settings: AgentSettings, val networkType: PositionClass
     holder
   }
 
-  private def trainingLoop(holder: NetworkHolder, train: Propagation) {
+  private def trainingLoop(holder: NetworkHolder, train: Propagation): Unit = {
     do {
       train.iteration()
       System.out.println("Epoch #" + holder.epoch + " Error:" + train.getError)

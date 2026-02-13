@@ -1,21 +1,20 @@
 package org.akoshterek.backgammon.dispatch
 
 import java.io.PrintWriter
-import java.nio.file.{Files, Path, Paths, StandardOpenOption}
-
+import java.nio.file.{Files, Path, StandardOpenOption}
 import org.akoshterek.backgammon.board.{Board, BoardFormatter}
 import org.akoshterek.backgammon.matchstate.{GameResult, MatchMove, MatchState}
 import org.akoshterek.backgammon.move.{ChequersMove, MoveRecord}
 import org.apache.commons.lang3.StringUtils
-import resource.managed
 
 import scala.collection.mutable.ArrayBuffer
+import scala.util.Using
 
 object GameInfoPrinter {
   private val signs: Array[Char] = Array[Char]('O', 'X')
   private val gameResult: Array[String] = Array[String]("single game", "gammon", "backgammon")
 
-  def printStatistics(agents: Array[AgentEntry], numGames: Int): Unit = {
+  def printStatistics(agents: Array[AgentEntry], numGames: Int, path: Path, experimentTag: String): Unit = {
     System.out.println("\tStatistics after %d game(s)".format(numGames))
 
     for (i <- agents.indices) {
@@ -29,10 +28,11 @@ object GameInfoPrinter {
     val pointDiff: Float = (agents(0).wonPoints - agents(1).wonPoints).toFloat
     System.out.println("%c:%s: won %+5.3f ppg\n".format(signs(0), agents(0).agent.fullName, pointDiff / numGames))
 
-    val logPath: Path = Paths.get(agents(0).agent.path.toString, "log", getLogFileName(agents))
-    managed(new PrintWriter(Files.newBufferedWriter(logPath, StandardOpenOption.APPEND, StandardOpenOption.CREATE))).acquireAndGet(writer => {
+    val fileName = if (experimentTag.nonEmpty) s"${experimentTag}_${getLogFileName(agents)}" else getLogFileName(agents)
+    val logPath: Path = path.resolve(fileName)
+    Using(new PrintWriter(Files.newBufferedWriter(logPath, StandardOpenOption.APPEND, StandardOpenOption.CREATE)))(writer => {
       val avgPointDiff = pointDiff / numGames
-      writer.println(f"${agents(0).agent.playedGames}, $avgPointDiff%.3f")
+      writer.println(s"${agents(0).agent.playedGames}, $avgPointDiff")
     })
   }
 

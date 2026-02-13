@@ -20,6 +20,10 @@ dependencies {
     implementation "ch.qos.logback:logback-classic:1.2.13"
 }
 
+test {
+    jvmArgs '--add-modules', 'jdk.incubator.vector', '--enable-preview'
+}
+
 // Create the fat JAR task here
 task fatJar(type: Jar) {
     manifest {
@@ -58,8 +62,17 @@ task runMultiGammon(type: JavaExec) {
     description = 'Run MultiGammon with command-line arguments.'
 
     classpath = sourceSets.main.runtimeClasspath
-    main = 'org.akoshterek.backgammon.MultiGammon'
+    mainClass = 'org.akoshterek.backgammon.MultiGammon'
+    workingDir = rootProject.projectDir
+    jvmArgs = [
+            '-Xmx4g',
+            '-Xms2g',
+            '-XX:+UseG1GC',
+            '--add-modules',
+            'jdk.incubator.vector',
+            '--enable-preview'
+    ]
 
     // Example arguments – change or override at runtime with --args=""
-    args = ['--config', 'config.yml']
+    args = ['-A', 'RawTd40', '-B', 'random', '-G', '1000', '-T', '100000']
 }
