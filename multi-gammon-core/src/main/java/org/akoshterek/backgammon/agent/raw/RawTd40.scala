@@ -30,7 +30,7 @@ class RawTd40(override val path: Path,
 
   if (!metricsFile.exists()) {
     val writer = new java.io.PrintWriter(metricsFile)
-    writer.println("gamesPlayed,averageTDError,weightDelta")
+    writer.println("gamesPlayed,averageTDError,weightDelta,weightMean,weightStdDev,weightMaxAbs,weightNearZero,weightLarge")
     writer.close()
   }
 
@@ -73,13 +73,21 @@ class RawTd40(override val path: Path,
       val snapshot = tdNN.weightsCopy
       val averageTdError = tdNN.getAverageTDError(reset = true)
       val delta = calculateWeightDelta(weights, snapshot)
+      val weightStats = tdNN.analyzeWeights()
 
       // Append metrics to CSV
       Using(new java.io.PrintWriter(new java.io.FileOutputStream(metricsFile, true))) { writer =>
-        writer.println(s"$playedGames, $averageTdError, $delta")
+        writer.println(s"$playedGames, $averageTdError, $delta, ${weightStats.mean}, ${weightStats.stdDev}, ${weightStats.maxAbs}, ${weightStats.nearZeroCount}, ${weightStats.largeCount}")
       }
 
       weights = snapshot
+
+      // Console output every 50K games (less verbose)
+      if (playedGames % 50000 == 0) {
+        println(s"\n[$playedGames games] ${weightStats.prettyPrint}")
+        weightStats.healthWarnings.foreach(println)
+        println()
+      }
     }
 
     playedGames

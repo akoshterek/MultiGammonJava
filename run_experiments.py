@@ -57,10 +57,10 @@ def parse_arguments():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  python run_experiments.py                   # Run all experiments
-  python run_experiments.py --run A           # Run only experiment A
-  python run_experiments.py --run A B C       # Run experiments A, B, and C
-  python run_experiments.py --list            # List available experiments
+  python3 run_experiments.py                   # Run all experiments
+  python3 run_experiments.py --run A           # Run only experiment A
+  python3 run_experiments.py --run A B C       # Run experiments A, B, and C
+  python3 run_experiments.py --list            # List available experiments
         """
     )
 
@@ -103,17 +103,14 @@ def main():
         "-A", "RawTd40",
         "-B", "Heuristic",
         "-G", "1000",
-        "-T", "400000",
-        "-P", "20000",
-        "--experiment-path", "experiments/004_lower_alpha2",
+        "-T", "1500000",
+        "-P", "50000",
+        "--experiment-path", "experiments/006_long_training_leaky_relu",
     ]
 
-    # Variable parameters table
+    # Variable parameters table - Long training run with optimal LeakyReLU config
     experiments = {
-        "N": {"alpha": 0.006, "lambda": 0.7, "gamma": 0.99},
-        "O": {"alpha": 0.004, "lambda": 0.7, "gamma": 0.99},
-        "P": {"alpha": 0.005, "lambda": 0.5, "gamma": 0.95},
-        "Q": {"alpha": 0.006, "lambda": 0.6, "gamma": 1.00}
+        "LONG": {"alpha": 0.003, "lambda": 0.8, "gamma": 0.99},  # Best config from experiments
     }
 
     # Handle --list option
