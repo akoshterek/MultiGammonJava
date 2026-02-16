@@ -29,6 +29,12 @@ class GameDispatcher(val agent1: Agent, val agent2: Agent) {
   private val lMatch: ArrayBuffer[MatchMove] = ArrayBuffer()
   private var pmrHint: MoveRecord = _
 
+  // Initialize numGames from agent's current progress (for checkpoint resume in training)
+  // Only if both agents have same playedGames (self-play training), not during evaluation
+  if (agent1.playedGames == agent2.playedGames && agent1.playedGames > 0) {
+    numGames = agent1.playedGames
+  }
+
   def playGames(games: Int, learn: Boolean): Unit = {
     agents(0).agent.isLearnMode = learn
     agents(1).agent.isLearnMode = learn

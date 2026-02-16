@@ -20,6 +20,10 @@ trait Agent {
 
   def playedGames: Int = _playedGames
 
+  protected def setPlayedGames(value: Int): Unit = {
+    _playedGames = value
+  }
+
   protected var fixed: Boolean = true
 
   protected var _currentBoard: Board = _

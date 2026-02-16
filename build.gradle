@@ -25,6 +25,7 @@ allprojects {
         guavaVersion = '32.1.3-jre'
         encogVersion = '3.4'
         junitVersion = '4.13.2'
+        json4sVersion = '4.0.6'
     }
 
     group = 'multi-gammon'
@@ -45,6 +46,7 @@ allprojects {
         guavaVersion = rootProject.ext.guavaVersion
         encogVersion = rootProject.ext.encogVersion
         junitVersion = rootProject.ext.junitVersion
+        json4sVersion = rootProject.ext.json4sVersion
     }
 }
 

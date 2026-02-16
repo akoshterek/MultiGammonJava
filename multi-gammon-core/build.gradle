@@ -15,9 +15,13 @@ dependencies {
     implementation "com.google.guava:guava:${guavaVersion}"
     implementation "org.encog:encog-core:${encogVersion}"
 
+    // JSON serialization for checkpoints
+    implementation "org.json4s:json4s-native_2.13:${json4sVersion}"
+    implementation "org.json4s:json4s-core_2.13:${json4sVersion}"
+
     // Add Scala logging dependencies
     implementation "com.typesafe.scala-logging:scala-logging_2.13:3.9.5"
-    implementation "ch.qos.logback:logback-classic:1.2.13"
+    implementation 'ch.qos.logback:logback-classic:1.5.13'
 }
 
 test {

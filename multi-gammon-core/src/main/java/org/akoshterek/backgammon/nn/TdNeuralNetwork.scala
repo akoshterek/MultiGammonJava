@@ -67,6 +67,64 @@ class TdNeuralNetwork(inputSize: Int,
     WeightStatistics(mean, stdDev, maxAbs, nearZero, large, allWeights.length)
   }
 
+  def saveWeights(): NetworkWeights = {
+    // Deep copy arrays to prevent external modification
+    val wInputHiddenCopy = wInputHidden.map(_.clone())
+    val wHiddenOutputCopy = wHiddenOutput.map(_.clone())
+    val bHiddenCopy = bHidden.clone()
+    val bOutputCopy = bOutput.clone()
+
+    NetworkWeights(wInputHiddenCopy, wHiddenOutputCopy, bHiddenCopy, bOutputCopy)
+  }
+
+  def loadWeights(weights: NetworkWeights): Unit = {
+    // Validate dimensions
+    if (weights.wInputHidden.length != hiddenSize ||
+        weights.wInputHidden(0).length != inputSize) {
+      throw new IllegalArgumentException(
+        s"wInputHidden dimension mismatch: expected ($hiddenSize, $inputSize), " +
+        s"got (${weights.wInputHidden.length}, ${weights.wInputHidden(0).length})"
+      )
+    }
+
+    if (weights.wHiddenOutput.length != outputSize ||
+        weights.wHiddenOutput(0).length != hiddenSize) {
+      throw new IllegalArgumentException(
+        s"wHiddenOutput dimension mismatch: expected ($outputSize, $hiddenSize), " +
+        s"got (${weights.wHiddenOutput.length}, ${weights.wHiddenOutput(0).length})"
+      )
+    }
+
+    if (weights.bHidden.length != hiddenSize) {
+      throw new IllegalArgumentException(
+        s"bHidden dimension mismatch: expected $hiddenSize, got ${weights.bHidden.length}"
+      )
+    }
+
+    if (weights.bOutput.length != outputSize) {
+      throw new IllegalArgumentException(
+        s"bOutput dimension mismatch: expected $outputSize, got ${weights.bOutput.length}"
+      )
+    }
+
+    // Copy weights into network
+    for (h <- 0 until hiddenSize; i <- 0 until inputSize) {
+      wInputHidden(h)(i) = weights.wInputHidden(h)(i)
+    }
+
+    for (o <- 0 until outputSize; h <- 0 until hiddenSize) {
+      wHiddenOutput(o)(h) = weights.wHiddenOutput(o)(h)
+    }
+
+    for (h <- 0 until hiddenSize) {
+      bHidden(h) = weights.bHidden(h)
+    }
+
+    for (o <- 0 until outputSize) {
+      bOutput(o) = weights.bOutput(o)
+    }
+  }
+
   // Forward pass (updates internal hiddenRaw and hiddenActivated)
   def forward(input: Array[Float], output: Array[Float]): Unit = {
     computeHiddenLayer(input)
@@ -176,8 +234,9 @@ class TdNeuralNetwork(inputSize: Int,
         wHiddenOutput(o)(h) += alpha * error(o) * eligibilityTrace.eHiddenOutput(o)(h)
         h += 1
       }
-      // Bias update for output layer
-      bOutput(o) += alpha * error(o) * gradOut(o)
+      // Bias update for output layer with L2 decay to prevent drift
+      val biasDecay = 0.000001f  // Very small decay - just prevents runaway growth
+      bOutput(o) += alpha * error(o) * gradOut(o) - biasDecay * bOutput(o)
       o += 1
     }
   }
@@ -223,13 +282,13 @@ case class WeightStatistics(
   totalCount: Int
 ) {
   def prettyPrint: String = {
-    val nearZeroPct = (nearZeroCount.toFloat / totalCount * 100).formatted("%.1f")
-    val largePct = (largeCount.toFloat / totalCount * 100).formatted("%.1f")
+    val nearZeroPct = nearZeroCount.toFloat / totalCount * 100
+    val largePct = largeCount.toFloat / totalCount * 100
 
     f"""Weight Statistics:
        |  Mean: $mean%.4f, StdDev: $stdDev%.4f, MaxAbs: $maxAbs%.4f
-       |  Near-zero (<0.01): $nearZeroCount ($nearZeroPct%%)
-       |  Large (>5.0): $largeCount ($largePct%%)""".stripMargin
+       |  Near-zero (<0.01): $nearZeroCount ($nearZeroPct%.1f%%)
+       |  Large (>5.0): $largeCount ($largePct%.1f%%)""".stripMargin
   }
 
   def healthWarnings: List[String] = {

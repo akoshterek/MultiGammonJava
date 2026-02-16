@@ -49,9 +49,9 @@ experiments/{experiment_path}/checkpoints/{experimentTag}_checkpoint_{gamesPlaye
 ```
 experiments/006_long_training_leaky_relu/
 ├── checkpoints/
-│   ├── run_LONG_checkpoint_050000.json
-│   ├── run_LONG_checkpoint_100000.json
-│   ├── run_LONG_checkpoint_150000.json
+│   ├── run_LONG_checkpoint_00050000.json
+│   ├── run_LONG_checkpoint_00100000.json
+│   ├── run_LONG_checkpoint_00150000.json
 │   └── ...
 ├── run_LONG_RawTd40_td_metrics.csv
 ├── run_LONG_RawTd40 vs Random.csv
@@ -61,7 +61,7 @@ experiments/006_long_training_leaky_relu/
 **Naming components:**
 - `{experimentTag}`: From `--experiment-tag` parameter (e.g., "run_LONG")
 - `{gamesPlayed}`: Checkpoint point (e.g., 50000, 100000, ...)
-- Format: Zero-padded 6 digits for sorting
+- Format: Zero-padded 8 digits for sorting
 
 ### Discovery Logic
 ```python
@@ -378,7 +378,7 @@ Action: Use same lambda value, or delete checkpoint to start fresh
 rm -rf experiments/006_long_training_leaky_relu/checkpoints/
 
 # Or delete specific checkpoint
-rm experiments/006_long_training_leaky_relu/checkpoints/run_LONG_checkpoint_200000.json
+rm experiments/006_long_training_leaky_relu/checkpoints/run_LONG_checkpoint_00200000.json
 ```
 
 **No command-line flag needed:**

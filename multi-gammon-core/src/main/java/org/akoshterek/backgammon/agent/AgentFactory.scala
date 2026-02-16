@@ -27,7 +27,7 @@ object AgentFactory {
         agent.load()
         agent
       case "rawtd40" =>
-        new RawTd40(Evaluator.basePath, options.alpha, options.lambda, options.gamma, options.experimentRunTag)
+        new RawTd40(Evaluator.basePath, options.alpha, options.lambda, options.gamma, options.experimentRunTag, isCopy = false, originalSeed = 16000000L)
       case _ =>
         throw new IllegalArgumentException("Unknown agent name " + fullName)
     }
