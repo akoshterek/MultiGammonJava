@@ -34,8 +34,11 @@ class GameDispatcher(val agent1: Agent, val agent2: Agent, val opponentSelector:
   private var pmrHint: MoveRecord = _
 
   // Initialize numGames from agent's current progress (for checkpoint resume in training)
-  // Only if both agents have same playedGames (self-play training), not during evaluation
-  if (agent2 != null && agent1.playedGames == agent2.playedGames && agent1.playedGames > 0) {
+  // For OpponentSelector case, use agent1's playedGames directly
+  // For fixed agent2 case, only resume if both agents have same playedGames (self-play)
+  if (opponentSelector.isDefined && agent1.playedGames > 0) {
+    numGames = agent1.playedGames
+  } else if (agent2 != null && agent1.playedGames == agent2.playedGames && agent1.playedGames > 0) {
     numGames = agent1.playedGames
   }
 
