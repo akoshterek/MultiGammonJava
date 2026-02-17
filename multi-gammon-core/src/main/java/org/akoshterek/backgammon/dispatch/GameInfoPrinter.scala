@@ -25,14 +25,13 @@ object GameInfoPrinter {
         agents(i).wonPoints.asInstanceOf[Float] / (agents(0).wonPoints + agents(1).wonPoints) * 100))
     }
 
-    val pointDiff: Float = (agents(0).wonPoints - agents(1).wonPoints).toFloat
-    System.out.println("%c:%s: won %+5.3f ppg\n".format(signs(0), agents(0).agent.fullName, pointDiff / numGames))
+    val ppg: Float = agents(0).wonPoints.toFloat / numGames
+    System.out.println("%c:%s: won %+5.3f ppg\n".format(signs(0), agents(0).agent.fullName, ppg))
 
     val fileName = if (experimentTag.nonEmpty) s"${experimentTag}_${getLogFileName(agents)}" else getLogFileName(agents)
     val logPath: Path = path.resolve(fileName)
     Using(new PrintWriter(Files.newBufferedWriter(logPath, StandardOpenOption.APPEND, StandardOpenOption.CREATE)))(writer => {
-      val avgPointDiff = pointDiff / numGames
-      writer.println(s"${agents(0).agent.playedGames}, $avgPointDiff")
+      writer.println(s"${agents(0).agent.playedGames}, $ppg")
     })
   }
 

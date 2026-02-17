@@ -19,6 +19,9 @@ object OptionsBuilder {
   private val GAMMA_OPTION: String = "gamma"
   private val EXPERIMENT_PATH_OPTION: String = "experiment-path"
   private val EXPERIMENT_TAG_OPTION: String = "experiment-tag"
+  private val TRAINING_OPPONENTS_OPTION: String = "training-opponents"
+  private val BENCHMARK_OPPONENTS_OPTION: String = "benchmark-opponents"
+  private val USE_OUTPUT_BIAS_OPTION: String = "use-output-bias"
 
   private val options: Options = new Options
   private var commandLine: CommandLine = _
@@ -39,6 +42,9 @@ object OptionsBuilder {
     options.addOption(Option.builder().longOpt(GAMMA_OPTION).argName("gamma").desc("TD discount factor gamma").hasArg.`type`(classOf[Number]).build)
     options.addOption(Option.builder().longOpt(EXPERIMENT_PATH_OPTION).argName("experiment path").desc("experiment output path").hasArg.build)
     options.addOption(Option.builder().longOpt(EXPERIMENT_TAG_OPTION).argName("experiment run tag").desc("experiment run tag").hasArg.build)
+    options.addOption(Option.builder().longOpt(TRAINING_OPPONENTS_OPTION).argName("training opponents").desc("training opponent mix (e.g. 'self:50,SimpleHeuristic:25,Random:25')").hasArg.build)
+    options.addOption(Option.builder().longOpt(BENCHMARK_OPPONENTS_OPTION).argName("benchmark opponents").desc("comma-separated benchmark opponents (e.g. 'Random,SimpleHeuristic,Heuristic')").hasArg.build)
+    options.addOption(Option.builder().longOpt(USE_OUTPUT_BIAS_OPTION).argName("use output bias").desc("enable output bias (default true, set to false for diverse opponents)").hasArg.build)
   }
 
   def parse(args: Array[String]): OptionsBean = {
@@ -61,6 +67,9 @@ object OptionsBuilder {
       bean.gamma = getFloatOption(GAMMA_OPTION, 1.0f)
       bean.experimentPath = commandLine.getOptionValue(EXPERIMENT_PATH_OPTION, "")
       bean.experimentRunTag = commandLine.getOptionValue(EXPERIMENT_TAG_OPTION, "")
+      bean.trainingOpponents = commandLine.getOptionValue(TRAINING_OPPONENTS_OPTION, "self:100")
+      bean.benchmarkOpponents = commandLine.getOptionValue(BENCHMARK_OPPONENTS_OPTION, "SimpleHeuristic")
+      bean.useOutputBias = commandLine.getOptionValue(USE_OUTPUT_BIAS_OPTION, "true").toBoolean
     }
     catch {
       case e: ParseException =>

@@ -130,6 +130,8 @@ class TdNeuralNetwork(inputSize: Int,
 
   // Forward pass (updates internal hiddenRaw and hiddenActivated)
   def forward(input: Array[Float], output: Array[Float]): Unit = {
+    // Cache input for use in train() method
+    Array.copy(input, 0, lastInput, 0, input.length.min(lastInput.length))
     computeHiddenLayer(input)
     computeOutputLayer(output)
     Array.copy(output, 0, lastOutput, 0, output.length.min(lastOutput.length));
@@ -138,7 +140,7 @@ class TdNeuralNetwork(inputSize: Int,
   private def computeHiddenLayer(input: Array[Float]): Unit = {
     var h = 0
     while (h < hiddenSize) {
-      var sum = DotProductUtils.dotProduct(wInputHidden(h), input, useSIMD = true)
+      val sum = DotProductUtils.dotProduct(wInputHidden(h), input, useSIMD = true)
       hiddenRaw(h) = sum + bHidden(h)
       hiddenActivated(h) = hiddenActivation.f(hiddenRaw(h))
       h += 1

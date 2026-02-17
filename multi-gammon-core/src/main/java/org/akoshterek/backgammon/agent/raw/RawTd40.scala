@@ -1,5 +1,6 @@
 package org.akoshterek.backgammon.agent.raw
 
+import java.io.{File, FileOutputStream}
 import java.nio.file.{Files, Path}
 import java.time.Instant
 import org.akoshterek.backgammon.agent.AbsAgent
@@ -134,7 +135,7 @@ class RawTd40(override val path: Path,
   override def endGame(): Unit = {
     super.endGame()
 
-    if (isLearnMode && !isCopy && playedGames % 1000 == 0) {
+    if (isLearnMode && !isCopy && playedGames % 10000 == 0) {
       // calculate metrics
       val snapshot = tdNN.weightsCopy
       val averageTdError = tdNN.getAverageTDError(reset = true)
@@ -261,5 +262,25 @@ class RawTd40(override val path: Path,
     }
 
     math.sqrt(sumSq).toFloat
+  }
+
+  def saveBenchmarkResult(opponentName: String, ppg: Float, gamesWon: Int, 
+                         gamesLost: Int, totalPoints: Int): Unit = {
+    if (!isCopy && experimentTag.nonEmpty) {
+      val benchmarkFile = new File(path.toFile, 
+        s"${experimentTag}_${fullName}_benchmarks.csv")
+      
+      // Create header if file doesn't exist
+      if (!benchmarkFile.exists()) {
+        Using(new java.io.PrintWriter(benchmarkFile)) { writer =>
+          writer.println("gamesPlayed,opponent,ppg,gamesWon,gamesLost,totalPoints")
+        }
+      }
+      
+      // Append result
+      Using(new java.io.PrintWriter(new FileOutputStream(benchmarkFile, true))) { writer =>
+        writer.println(s"$playedGames,$opponentName,$ppg,$gamesWon,$gamesLost,$totalPoints")
+      }
+    }
   }
 }
