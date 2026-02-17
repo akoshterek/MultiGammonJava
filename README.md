@@ -20,7 +20,7 @@ python3 run_experiments.py --list
 
 - **[PROJECT_OVERVIEW.md](PROJECT_OVERVIEW.md)** - Complete project guide (start here!)
 - **[experiments/RECOMMENDATIONS.md](experiments/RECOMMENDATIONS.md)** - Detailed experimental analysis
-- **[experiments/EXPERIMENT_005_RESULTS.md](experiments/EXPERIMENT_005_RESULTS.md)** - Latest experiment findings
+- **[experiments/005_sigmoid_test/EXPERIMENT_005_RESULTS.md](experiments/005_sigmoid_test/EXPERIMENT_005_RESULTS.md)** - Latest experiment findings
 
 ## Key Features
 

@@ -1,28 +1,44 @@
 package org.akoshterek.backgammon.agent.raw
 
 import java.nio.file.{Files, Path}
+import java.time.Instant
 import org.akoshterek.backgammon.agent.AbsAgent
 import org.akoshterek.backgammon.agent.inputrepresentation.Tesauro92Codec
 import org.akoshterek.backgammon.board.{Board, PositionClass}
-import org.akoshterek.backgammon.eval.Reward
+import org.akoshterek.backgammon.eval.{Evaluator, Reward}
 import org.akoshterek.backgammon.move.Move
-import org.akoshterek.backgammon.nn.{EligibilityTrace2D, TdNeuralNetwork, Weights2D}
+import org.akoshterek.backgammon.nn._
+import org.akoshterek.backgammon.dice.PseudoRandomDiceRoller
 
 import scala.util.Using
 
 
 class RawTd40(override val path: Path,
-              val alpha: Float = 0.01f,
+              var alpha: Float = 0.01f,
               val lambda: Float = 0.7f,
               val gamma: Float = 1.0f,
               val experimentTag: String = "",
-              val isCopy: Boolean = false
+              val isCopy: Boolean = false,
+              val originalSeed: Long = 16000000L,
+              val alphaAnnealingEnabled: Boolean = true,  // Enable alpha annealing by default
+              val alphaAnnealingTarget: Float = 0.0002f,  // Decay to this value
+              val alphaAnnealingGames: Int = 1500000,     // Over this many games
+              val biasAlphaRatio: Float = 1.0f,           // Bias learning ratio (will decay adaptively)
+              val gradientClipThreshold: Float = 5.0f,    // Clip extreme TD errors
+              val useOutputBias: Boolean = true           // Enable output bias with adaptive learning to prevent drift
              ) extends AbsAgent("RawTd40", path) {
   private val representation = new RawRepresentation(Tesauro92Codec)
+  private val initialAlpha = alpha  // Store initial alpha for annealing
   // shared NN
-  private var tdNN = new TdNeuralNetwork(representation.contactInputsCount, 40, 1)
+  private var tdNN = new TdNeuralNetwork(representation.contactInputsCount, 40, 1, alpha, lambda, gamma,
+                                         LeakyReLU, Sigmoid, biasAlphaRatio, gradientClipThreshold, useOutputBias)
   private var eligibilityTrace: EligibilityTrace2D = _
   private var weights: Weights2D = _
+
+  // Try to load checkpoint on startup (only for non-copy instances)
+  if (!isCopy && experimentTag.nonEmpty) {
+    tryLoadCheckpoint()
+  }
 
   private val filePath: Path = path.resolve(s"${if (experimentTag.nonEmpty) experimentTag + "_" else ""}${fullName}_td_metrics.csv")
   Files.createDirectories(filePath.getParent) // ensures path exists
@@ -34,9 +50,59 @@ class RawTd40(override val path: Path,
     writer.close()
   }
 
+  private def tryLoadCheckpoint(): Unit = {
+    CheckpointManager.findLatest(path, experimentTag) match {
+      case Some(checkpointPath) =>
+        try {
+          val checkpoint = CheckpointManager.load(checkpointPath)
+
+          // Create current configuration for validation
+          val currentArch = NetworkArchitecture(
+            inputSize = representation.contactInputsCount,
+            hiddenSize = 40,
+            outputSize = 1,
+            hiddenActivation = "LeakyReLU",  // Should match TdNeuralNetwork.scala:10
+            outputActivation = "Sigmoid"
+          )
+
+          val currentHyperparams = Hyperparameters(alpha, lambda, gamma)
+
+          // Validate checkpoint
+          CheckpointManager.validate(checkpoint, currentArch, currentHyperparams)
+
+          // Load weights
+          tdNN.loadWeights(checkpoint.weights)
+
+          // Restore game counter
+          setPlayedGames(checkpoint.metadata.gamesPlayed)
+
+          // Update random seed (deterministic offset)
+          val newSeed = checkpoint.metadata.randomSeed + checkpoint.metadata.gamesPlayed
+          Evaluator.diceRoller = PseudoRandomDiceRoller(newSeed)
+
+          // Alpha might have been overridden - use command line value
+          alpha = currentHyperparams.alpha
+
+          println(s"✅ Resumed from checkpoint: ${checkpoint.metadata.gamesPlayed} games")
+          println(s"   Dice seed updated: $newSeed")
+        } catch {
+          case e: Exception =>
+            System.err.println(s"❌ Failed to load checkpoint: ${e.getMessage}")
+            throw e
+        }
+
+      case None =>
+        println(s"No checkpoint found for tag '$experimentTag', starting fresh training")
+    }
+  }
+
   override def copyAgent(): RawTd40 = {
-        val other: RawTd40 = new RawTd40(path, alpha, lambda, gamma, experimentTag, isCopy = true)
+        val other: RawTd40 = new RawTd40(path, alpha, lambda, gamma, experimentTag, isCopy = true,
+                                          originalSeed, alphaAnnealingEnabled, alphaAnnealingTarget,
+                                          alphaAnnealingGames, biasAlphaRatio, gradientClipThreshold,
+                                          useOutputBias)
         other.tdNN = tdNN
+        other.setPlayedGames(this.playedGames)
         other
   }
 
@@ -87,10 +153,49 @@ class RawTd40(override val path: Path,
         println(s"\n[$playedGames games] ${weightStats.prettyPrint}")
         weightStats.healthWarnings.foreach(println)
         println()
+
+        // Save checkpoint every 50K games
+        if (experimentTag.nonEmpty) {
+          saveCheckpoint(playedGames)
+        }
       }
     }
 
     playedGames
+  }
+
+  private def saveCheckpoint(gamesPlayed: Int): Unit = {
+    try {
+      val checkpointPath = CheckpointManager.getCheckpointPath(path, experimentTag, gamesPlayed)
+
+      val metadata = CheckpointMetadata(
+        formatVersion = "1.0",
+        timestamp = Instant.now().toString,
+        gamesPlayed = gamesPlayed,
+        experimentTag = experimentTag,
+        hyperparameters = Hyperparameters(alpha, lambda, gamma),
+        networkArchitecture = NetworkArchitecture(
+          inputSize = representation.contactInputsCount,
+          hiddenSize = 40,
+          outputSize = 1,
+          hiddenActivation = "LeakyReLU",
+          outputActivation = "Sigmoid"
+        ),
+        randomSeed = originalSeed,
+        performance = None  // Could add benchmark results here if available
+      )
+
+      val checkpoint = Checkpoint(
+        metadata = metadata,
+        weights = tdNN.saveWeights()
+      )
+
+      CheckpointManager.save(checkpoint, checkpointPath)
+    } catch {
+      case e: Exception =>
+        System.err.println(s"Warning: Failed to save checkpoint: ${e.getMessage}")
+        // Don't crash training on checkpoint save failure
+    }
   }
 
   override def doMove(move: Move): Unit = {
@@ -106,12 +211,40 @@ class RawTd40(override val path: Path,
     val afterMoveOutput = evaluatePosition(boardAfterMove, move.pc).data
     val boardBeforeMove = currentBoard
 
+    // Update alpha and bias ratio with annealing before training
+    if (alphaAnnealingEnabled && !isCopy) {
+      val effectiveAlpha = alpha //calculateAnnealedAlpha()
+      val effectiveBiasRatio = calculateAdaptiveBiasRatio()
+      tdNN.alpha = effectiveAlpha
+      tdNN.biasAlphaRatio = effectiveBiasRatio
+    }
+
     // to call forward()
     val input = representation.calculateContactInputs(boardBeforeMove)
     val currentOutput = Reward.rewardArray[Float]
     tdNN.forward(input, currentOutput)
 
     tdNN.train(afterMoveOutput, eligibilityTrace)
+  }
+
+  /**
+   * Calculate annealed learning rate using linear decay
+   * alpha(t) = initialAlpha + (targetAlpha - initialAlpha) * (t / maxGames)
+   */
+  private def calculateAnnealedAlpha(): Float = {
+    val progress = math.min(1.0f, playedGames.toFloat / alphaAnnealingGames)
+    val annealedAlpha = initialAlpha + (alphaAnnealingTarget - initialAlpha) * progress
+    math.max(alphaAnnealingTarget, annealedAlpha)  // Don't go below target
+  }
+
+  /**
+   * Calculate adaptive bias learning ratio
+   * Starts at 1.0 (full speed) for early learning, decays to 0.2 to prevent late drift
+   */
+  private def calculateAdaptiveBiasRatio(): Float = {
+    val progress = math.min(1.0f, playedGames.toFloat / alphaAnnealingGames)
+    val targetRatio = 0.2f  // End at 20% of weight learning rate
+    1.0f + (targetRatio - 1.0f) * progress  // Linear decay from 1.0 to 0.2
   }
 
   def calculateWeightDelta(w1: Weights2D, w2: Weights2D): Float = {
