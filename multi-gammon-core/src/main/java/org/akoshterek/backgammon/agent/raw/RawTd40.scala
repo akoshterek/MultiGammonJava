@@ -19,11 +19,19 @@ class RawTd40(override val path: Path,
               val gamma: Float = 1.0f,
               val experimentTag: String = "",
               val isCopy: Boolean = false,
-              val originalSeed: Long = 16000000L
+              val originalSeed: Long = 16000000L,
+              val alphaAnnealingEnabled: Boolean = true,  // Enable alpha annealing by default
+              val alphaAnnealingTarget: Float = 0.0002f,  // Decay to this value
+              val alphaAnnealingGames: Int = 1500000,     // Over this many games
+              val biasAlphaRatio: Float = 1.0f,           // Bias learning ratio (will decay adaptively)
+              val gradientClipThreshold: Float = 5.0f,    // Clip extreme TD errors
+              val useOutputBias: Boolean = true           // Enable output bias with adaptive learning to prevent drift
              ) extends AbsAgent("RawTd40", path) {
   private val representation = new RawRepresentation(Tesauro92Codec)
+  private val initialAlpha = alpha  // Store initial alpha for annealing
   // shared NN
-  private var tdNN = new TdNeuralNetwork(representation.contactInputsCount, 40, 1, alpha, lambda, gamma)
+  private var tdNN = new TdNeuralNetwork(representation.contactInputsCount, 40, 1, alpha, lambda, gamma,
+                                         LeakyReLU, Sigmoid, biasAlphaRatio, gradientClipThreshold, useOutputBias)
   private var eligibilityTrace: EligibilityTrace2D = _
   private var weights: Weights2D = _
 
@@ -89,7 +97,10 @@ class RawTd40(override val path: Path,
   }
 
   override def copyAgent(): RawTd40 = {
-        val other: RawTd40 = new RawTd40(path, alpha, lambda, gamma, experimentTag, isCopy = true, originalSeed)
+        val other: RawTd40 = new RawTd40(path, alpha, lambda, gamma, experimentTag, isCopy = true,
+                                          originalSeed, alphaAnnealingEnabled, alphaAnnealingTarget,
+                                          alphaAnnealingGames, biasAlphaRatio, gradientClipThreshold,
+                                          useOutputBias)
         other.tdNN = tdNN
         other.setPlayedGames(this.playedGames)
         other
@@ -200,12 +211,40 @@ class RawTd40(override val path: Path,
     val afterMoveOutput = evaluatePosition(boardAfterMove, move.pc).data
     val boardBeforeMove = currentBoard
 
+    // Update alpha and bias ratio with annealing before training
+    if (alphaAnnealingEnabled && !isCopy) {
+      val effectiveAlpha = alpha //calculateAnnealedAlpha()
+      val effectiveBiasRatio = calculateAdaptiveBiasRatio()
+      tdNN.alpha = effectiveAlpha
+      tdNN.biasAlphaRatio = effectiveBiasRatio
+    }
+
     // to call forward()
     val input = representation.calculateContactInputs(boardBeforeMove)
     val currentOutput = Reward.rewardArray[Float]
     tdNN.forward(input, currentOutput)
 
     tdNN.train(afterMoveOutput, eligibilityTrace)
+  }
+
+  /**
+   * Calculate annealed learning rate using linear decay
+   * alpha(t) = initialAlpha + (targetAlpha - initialAlpha) * (t / maxGames)
+   */
+  private def calculateAnnealedAlpha(): Float = {
+    val progress = math.min(1.0f, playedGames.toFloat / alphaAnnealingGames)
+    val annealedAlpha = initialAlpha + (alphaAnnealingTarget - initialAlpha) * progress
+    math.max(alphaAnnealingTarget, annealedAlpha)  // Don't go below target
+  }
+
+  /**
+   * Calculate adaptive bias learning ratio
+   * Starts at 1.0 (full speed) for early learning, decays to 0.2 to prevent late drift
+   */
+  private def calculateAdaptiveBiasRatio(): Float = {
+    val progress = math.min(1.0f, playedGames.toFloat / alphaAnnealingGames)
+    val targetRatio = 0.2f  // End at 20% of weight learning rate
+    1.0f + (targetRatio - 1.0f) * progress  // Linear decay from 1.0 to 0.2
   }
 
   def calculateWeightDelta(w1: Weights2D, w2: Weights2D): Float = {

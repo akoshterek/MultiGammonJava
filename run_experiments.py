@@ -101,16 +101,16 @@ def main():
     # Fixed command line parameters
     fixed_args = [
         "-A", "RawTd40",
-        "-B", "Heuristic",
+        "-B", "SimpleHeuristic",
         "-G", "1000",
         "-T", "1500000",
         "-P", "50000",
-        "--experiment-path", "experiments/006_long_training_leaky_relu",
+        "--experiment-path", "experiments/006_long_training_leaky_relu_noannealing",
     ]
 
     # Variable parameters table - Long training run with optimal LeakyReLU config
     experiments = {
-        "LONG": {"alpha": 0.003, "lambda": 0.8, "gamma": 0.99},  # Best config from experiments
+        "LONG": {"alpha": 0.001, "lambda": 0.8, "gamma": 0.99},  # Best config from experiments
     }
 
     # Handle --list option
@@ -144,10 +144,10 @@ def main():
     print(f"\nScript directory: {script_dir}")
     print("\nExperiment Summary:")
     print("=" * 80)
-    print("| Run | alpha | lambda | gamma |")
-    print("|-----|-------|--------|-------|")
+    print("|  Run  |  alpha  | lambda | gamma |")
+    print("|-------|---------|--------|-------|")
     for run_id, params in experiments_to_run.items():
-        print(f"| {run_id:3} | {params['alpha']:5.3f} | {params['lambda']:6.1f} | {params['gamma']:5.2f} |")
+        print(f"| {run_id:5} | {params['alpha']:7.3f} | {params['lambda']:6.1f} | {params['gamma']:5.2f} |")
     print("=" * 80)
     print()
 

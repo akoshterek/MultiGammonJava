@@ -254,11 +254,12 @@ weightNearZero, weightLarge
 ```
 
 **Plot progress:**
+
 ```python
 import pandas as pd
 import matplotlib.pyplot as plt
 
-df = pd.read_csv('experiments/006_long_training_leaky_relu/run_LONG_RawTd40_td_metrics.csv')
+df = pd.read_csv('experiments/006_long_training_leaky_relu_a_0.002/run_LONG_RawTd40_td_metrics.csv')
 df.plot(x='gamesPlayed', y=['averageTDError', 'weightMaxAbs'])
 plt.show()
 ```

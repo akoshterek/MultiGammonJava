@@ -4,11 +4,14 @@ package org.akoshterek.backgammon.nn
 class TdNeuralNetwork(inputSize: Int,
                       hiddenSize: Int,
                       outputSize: Int,
-                      val alpha: Float = 0.01f,
+                      var alpha: Float = 0.01f,  // Changed to var to allow annealing
                       val lambda: Float = 0.7f,
                       val gamma: Float = 1.0f,
                       val hiddenActivation: Activation = LeakyReLU,
-                      val outputActivation: Activation = Sigmoid
+                      val outputActivation: Activation = Sigmoid,
+                      var biasAlphaRatio: Float = 0.5f,  // Made var for adaptive learning
+                      val gradientClipThreshold: Float = 5.0f,  // Clip extreme TD errors
+                      val useOutputBias: Boolean = true  // Set to false to disable output bias (prevent drift)
                      ) {
   // Weight matrices
   val wInputHidden: Array[Array[Float]] = Array.fill(hiddenSize, inputSize)(NNUtils.heInit(inputSize))
@@ -146,7 +149,8 @@ class TdNeuralNetwork(inputSize: Int,
     var o = 0
     while (o < outputSize) {
       val sum = DotProductUtils.dotProduct(wHiddenOutput(o), hiddenActivated, useSIMD = true)
-      output(o) = outputActivation.f(sum + bOutput(o))
+      val biasedSum = if (useOutputBias) sum + bOutput(o) else sum
+      output(o) = outputActivation.f(biasedSum)
       o += 1
     }
   }
@@ -177,6 +181,7 @@ class TdNeuralNetwork(inputSize: Int,
   private def computeError(target: Array[Float]): Unit = {
     var tdErrorSum = 0f
     for (o <- 0 until outputSize) {
+      // No clipping - let TD learning proceed naturally
       error(o) = target(o) - clippedOutput(o)
       tdErrorSum += error(o).abs
     }
@@ -234,9 +239,14 @@ class TdNeuralNetwork(inputSize: Int,
         wHiddenOutput(o)(h) += alpha * error(o) * eligibilityTrace.eHiddenOutput(o)(h)
         h += 1
       }
-      // Bias update for output layer with L2 decay to prevent drift
-      val biasDecay = 0.000001f  // Very small decay - just prevents runaway growth
-      bOutput(o) += alpha * error(o) * gradOut(o) - biasDecay * bOutput(o)
+
+      // Bias update for output layer with slower learning rate
+      // Only update if output bias is enabled
+      if (useOutputBias) {
+        val biasAlpha = alpha * biasAlphaRatio
+        bOutput(o) += biasAlpha * error(o) * gradOut(o)
+      }
+
       o += 1
     }
   }

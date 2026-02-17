@@ -13,7 +13,6 @@ dependencies {
     implementation "org.apache.commons:commons-lang3:${commonsLangVersion}"
     implementation "org.apache.commons:commons-math3:${commonsMathVersion}"
     implementation "com.google.guava:guava:${guavaVersion}"
-    implementation "org.encog:encog-core:${encogVersion}"
 
     // JSON serialization for checkpoints
     implementation "org.json4s:json4s-native_2.13:${json4sVersion}"
