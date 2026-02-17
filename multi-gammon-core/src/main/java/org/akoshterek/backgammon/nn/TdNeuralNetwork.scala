@@ -140,7 +140,7 @@ class TdNeuralNetwork(inputSize: Int,
   private def computeHiddenLayer(input: Array[Float]): Unit = {
     var h = 0
     while (h < hiddenSize) {
-      var sum = DotProductUtils.dotProduct(wInputHidden(h), input, useSIMD = true)
+      val sum = DotProductUtils.dotProduct(wInputHidden(h), input, useSIMD = true)
       hiddenRaw(h) = sum + bHidden(h)
       hiddenActivated(h) = hiddenActivation.f(hiddenRaw(h))
       h += 1
