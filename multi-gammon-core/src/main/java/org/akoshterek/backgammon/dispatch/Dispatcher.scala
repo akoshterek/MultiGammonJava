@@ -2,7 +2,8 @@ package org.akoshterek.backgammon.dispatch
 
 import java.nio.file.{Files, Path, Paths}
 import org.akoshterek.backgammon.License
-import org.akoshterek.backgammon.agent.{Agent, AgentFactory, CopyableAgent}
+import org.akoshterek.backgammon.agent.{Agent, AgentFactory, CopyableAgent, OpponentConfig, OpponentSelector}
+import org.akoshterek.backgammon.agent.raw.RawTd40
 import org.akoshterek.backgammon.dice.PseudoRandomDiceRoller
 import org.akoshterek.backgammon.eval.Evaluator
 import org.akoshterek.backgammon.util.{OptionsBean, OptionsBuilder}
@@ -71,21 +72,38 @@ class Dispatcher {
 
     assert(agent1 != null && benchAgent != null)
 
-    val agent2: Agent = agent1 match {
-      case copyableAgent: CopyableAgent[_] =>
-        copyableAgent.copyAgent()
-      case _ =>
-        AgentFactory.createAgent(agentName, options)
+    // Parse opponent configuration
+    val opponentConfig = OpponentConfig.parse(
+      options.trainingOpponents,
+      options.benchmarkOpponents
+    )
+
+    // Create OpponentSelector for diverse training if agent is copyable
+    val opponentSelector = agent1 match {
+      case copyableAgent: CopyableAgent[Agent] =>
+        Some(new OpponentSelector(copyableAgent, opponentConfig, Evaluator.basePath, 16000001L))
+      case _ => None
     }
 
-    runIteration(agent1, benchAgent, agent2, trainingGames, benchmarkGames, benchmarkPeriod)
+    val agent2: Agent = if (opponentSelector.isEmpty) {
+      agent1 match {
+        case copyableAgent: CopyableAgent[_] =>
+          copyableAgent.copyAgent()
+        case _ =>
+          AgentFactory.createAgent(agentName, options)
+      }
+    } else {
+      null  // Will use OpponentSelector instead
+    }
+
+    runIteration(agent1, benchAgent, agent2, opponentSelector, trainingGames, benchmarkGames, benchmarkPeriod)
   }
 
-  private def runIteration(agent1: Agent, benchAgent: Agent, agent2: Agent, trainGames: Int, benchmarkGames: Int, benchmarkPeriod: Int): Unit = {
-    val gameDispatcher: GameDispatcher = new GameDispatcher(agent1, agent2)
+  private def runIteration(agent1: Agent, benchAgent: Agent, agent2: Agent, 
+                          opponentSelector: Option[OpponentSelector],
+                          trainGames: Int, benchmarkGames: Int, benchmarkPeriod: Int): Unit = {
+    val gameDispatcher: GameDispatcher = new GameDispatcher(agent1, agent2, opponentSelector)
     gameDispatcher.showLog = options.isVerbose
-    val randomAgent = AgentFactory.createAgent("random", options);
-    //val pubEvalAgent = AgentFactory.createAgent("pubeval", options);
 
     val dir = Paths.get(gameDispatcher.agent1.path.toString)
     Files.createDirectories(dir)
@@ -96,9 +114,16 @@ class Dispatcher {
         gameDispatcher.playGames(Math.min(benchmarkPeriod, trainGames), learn = true)
         agent1.save()
 
-        benchmark(agent1, randomAgent, benchmarkGames)
-        benchmark(agent1, benchAgent, benchmarkGames)
-        //benchmark(agent1, pubEvalAgent, benchmarkGames)
+        // Run benchmarks against all configured opponents
+        opponentSelector match {
+          case Some(selector) =>
+            selector.getBenchmarkOpponents().foreach { benchOpponent =>
+              benchmark(agent1, benchOpponent, benchmarkGames)
+            }
+          case None =>
+            // Fallback to old behavior
+            benchmark(agent1, benchAgent, benchmarkGames)
+        }
       }
     }
     else {
@@ -111,6 +136,20 @@ class Dispatcher {
     benchDispatcher.showLog = options.isVerbose
     benchDispatcher.playGames(benchmarkGames, learn = false)
     benchDispatcher.printStatistics(Evaluator.basePath, options.experimentRunTag)
+    
+    // Save to benchmarks CSV if agent supports it
+    agent1 match {
+      case rawAgent: RawTd40 =>
+        val totalGames = benchDispatcher.getAgent1WonGames + benchDispatcher.getAgent2WonGames
+        val ppg = if (totalGames > 0) {
+          benchDispatcher.getAgent1WonPoints.toFloat / totalGames.toFloat
+        } else 0f
+        val wins = benchDispatcher.getAgent1WonGames
+        val losses = benchDispatcher.getAgent2WonGames
+        val points = benchDispatcher.getAgent1WonPoints
+        rawAgent.saveBenchmarkResult(benchAgent.fullName, ppg, wins, losses, points)
+      case _ => // Other agents don't have benchmark tracking
+    }
   }
 
   private def formatTime(millis: Long): String = {

@@ -1,6 +1,6 @@
 package org.akoshterek.backgammon.dispatch
 
-import org.akoshterek.backgammon.agent.Agent
+import org.akoshterek.backgammon.agent.{Agent, OpponentSelector}
 import org.akoshterek.backgammon.board.{Board, PositionClass}
 import org.akoshterek.backgammon.matchstate.{GameResult, GameState, MatchMove, MatchState}
 import org.akoshterek.backgammon.move._
@@ -9,10 +9,14 @@ import java.nio.file.Path
 import scala.collection.mutable.ArrayBuffer
 import scala.util.control.Breaks._
 
-class GameDispatcher(val agent1: Agent, val agent2: Agent) {
+class GameDispatcher(val agent1: Agent, val agent2: Agent, val opponentSelector: Option[OpponentSelector] = None) {
+  // For backward compatibility: if agent2 is provided, use it; otherwise use selector
+  require(agent2 != null || opponentSelector.isDefined, "Must provide either agent2 or opponentSelector")
+  
+  private var currentOpponent: Agent = agent2
   private val agents: Array[AgentEntry] = Array[AgentEntry](
     new AgentEntry(agent1),
-    new AgentEntry(agent2)
+    new AgentEntry(if (agent2 != null) agent2 else opponentSelector.get.selectTrainingOpponent())
   )
 
   private val amMoves: Array[Move] = new Array[Move](MoveList.MAX_INCOMPLETE_MOVES)
@@ -31,7 +35,7 @@ class GameDispatcher(val agent1: Agent, val agent2: Agent) {
 
   // Initialize numGames from agent's current progress (for checkpoint resume in training)
   // Only if both agents have same playedGames (self-play training), not during evaluation
-  if (agent1.playedGames == agent2.playedGames && agent1.playedGames > 0) {
+  if (agent2 != null && agent1.playedGames == agent2.playedGames && agent1.playedGames > 0) {
     numGames = agent1.playedGames
   }
 
@@ -55,6 +59,13 @@ class GameDispatcher(val agent1: Agent, val agent2: Agent) {
   }
 
   def playGame(): Unit = {
+    // Select new opponent for this game if using OpponentSelector
+    if (opponentSelector.isDefined && agent2 == null) {
+      val newOpponent = opponentSelector.get.selectTrainingOpponent()
+      agents(1) = new AgentEntry(newOpponent)
+      currentOpponent = newOpponent
+    }
+    
     agents.foreach(a => a.agent.startGame())
     startGame()
 
@@ -75,6 +86,11 @@ class GameDispatcher(val agent1: Agent, val agent2: Agent) {
   def printStatistics(path: Path, experimentTag: String): Unit = {
     GameInfoPrinter.printStatistics(agents, numGames, path, experimentTag)
   }
+
+  def getAgent1WonGames: Int = agents(0).wonGames
+  def getAgent2WonGames: Int = agents(1).wonGames
+  def getAgent1WonPoints: Int = agents(0).wonPoints
+  def getAgent2WonPoints: Int = agents(1).wonPoints
 
   private def startGame(): Unit = {
     currentMatch = new MatchState

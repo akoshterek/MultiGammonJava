@@ -15,6 +15,9 @@ class OptionsBean {
   var gamma: Float = 1.0f
   var experimentPath: String = ""
   var experimentRunTag: String = ""
+  var trainingOpponents: String = "self:100"
+  var benchmarkOpponents: String = "SimpleHeuristic"
+  var useOutputBias: Boolean = true
 
   def agentNames: Vector[String] = _agentNames
   def agentNames_= (agents: Array[String]): Unit = {
