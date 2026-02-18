@@ -246,7 +246,7 @@ class GeneticTrainer(val basePath: Path,
       )
 
       // Use String.format with US locale to ensure period decimal separator
-      val filename = String.format(java.util.Locale.US, "ga_checkpoint_gen04%d_fitness_%.4f.json",
+      val filename = String.format(java.util.Locale.US, "ga_checkpoint_gen%04d_fitness_%.4f.json",
         gen.asInstanceOf[Object],
         bestFitness.asInstanceOf[Object])
       val checkpointPath = basePath.resolve(filename)
