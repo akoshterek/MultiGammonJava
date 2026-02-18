@@ -19,6 +19,13 @@ class OptionsBean {
   var benchmarkOpponents: String = "SimpleHeuristic"
   var useOutputBias: Boolean = true
 
+  var gaTraining: Boolean = false
+  var gaPopulationSize: Int = 20
+  var gaGenerations: Int = 10
+  var gaEliteCount: Int = 4
+  var gaMutationRate: Float = 0.05f
+  var gaMutationStrength: Float = 0.1f
+
   def agentNames: Vector[String] = _agentNames
   def agentNames_= (agents: Array[String]): Unit = {
     agents match {

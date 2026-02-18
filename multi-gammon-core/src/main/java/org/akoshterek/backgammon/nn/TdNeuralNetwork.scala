@@ -54,20 +54,7 @@ class TdNeuralNetwork(inputSize: Int,
   def analyzeWeights(): WeightStatistics = {
     val allWeights = wInputHidden.flatten ++ wHiddenOutput.flatten
     val allBiases = bHidden ++ bOutput
-
-    if (allWeights.isEmpty) {
-      return WeightStatistics(0f, 0f, 0f, 0, 0, allWeights.length)
-    }
-
-    val mean = allWeights.sum / allWeights.length
-    val variance = allWeights.map(w => (w - mean) * (w - mean)).sum / allWeights.length
-    val stdDev = math.sqrt(variance).toFloat
-    val maxAbs = allWeights.map(_.abs).max
-
-    val nearZero = allWeights.count(w => math.abs(w) < 0.01f)
-    val large = allWeights.count(w => math.abs(w) > 5.0f)
-
-    WeightStatistics(mean, stdDev, maxAbs, nearZero, large, allWeights.length)
+    NNUtils.analyzeWeights(allWeights ++ allBiases)
   }
 
   def saveWeights(): NetworkWeights = {
@@ -282,32 +269,5 @@ class TdNeuralNetwork(inputSize: Int,
 
       h += 1
     }
-  }
-}
-
-case class WeightStatistics(
-  mean: Float,
-  stdDev: Float,
-  maxAbs: Float,
-  nearZeroCount: Int,
-  largeCount: Int,
-  totalCount: Int
-) {
-  def prettyPrint: String = {
-    val nearZeroPct = nearZeroCount.toFloat / totalCount * 100
-    val largePct = largeCount.toFloat / totalCount * 100
-
-    f"""Weight Statistics:
-       |  Mean: $mean%.4f, StdDev: $stdDev%.4f, MaxAbs: $maxAbs%.4f
-       |  Near-zero (<0.01): $nearZeroCount ($nearZeroPct%.1f%%)
-       |  Large (>5.0): $largeCount ($largePct%.1f%%)""".stripMargin
-  }
-
-  def healthWarnings: List[String] = {
-    var warnings = List.empty[String]
-    if (maxAbs > 10.0f) warnings = warnings :+ "⚠️ WEIGHTS GROWING LARGE - possible instability"
-    if (maxAbs < 0.5f) warnings = warnings :+ "⚠️ WEIGHTS TOO SMALL - possibly stuck in minima"
-    if (nearZeroCount.toFloat / totalCount > 0.5f) warnings = warnings :+ "⚠️ >50% weights near-zero - network may be dying"
-    warnings
   }
 }
