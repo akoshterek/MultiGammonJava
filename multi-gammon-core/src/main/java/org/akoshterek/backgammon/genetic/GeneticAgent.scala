@@ -42,15 +42,6 @@ class GeneticAgent(val path: Path,
     rewardArray(OUTPUT_WIN) = output
     new Reward(rewardArray)
   }
-  
-  override def evalOver(board: Board): Reward = {
-    // Game is over, return 1.0 for win, 0.0 for loss
-    // Check if current player has won by counting remaining pieces
-    val opponentPieces = board.anBoard(Board.OPPONENT).sum
-    val rewardArray = Reward.rewardArray[Float]
-    rewardArray(OUTPUT_WIN) = if (opponentPieces == 0) 1.0f else 0.0f
-    new Reward(rewardArray)
-  }
 }
 
 /**
