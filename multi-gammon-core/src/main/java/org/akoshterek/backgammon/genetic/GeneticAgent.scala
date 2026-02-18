@@ -1,11 +1,11 @@
 package org.akoshterek.backgammon.genetic
 
-import java.nio.file.Path
+import java.nio.file.{Path, Paths}
 import org.akoshterek.backgammon.agent.{Agent, CopyableAgent}
 import org.akoshterek.backgammon.agent.inputrepresentation.Tesauro92Codec
 import org.akoshterek.backgammon.agent.raw.RawRepresentation
 import org.akoshterek.backgammon.board.{Board, PositionClass}
-import org.akoshterek.backgammon.eval.Reward
+import org.akoshterek.backgammon.eval.{Evaluator, Reward}
 import org.akoshterek.backgammon.Constants._
 
 /**
@@ -65,5 +65,18 @@ object GeneticAgent {
     val network = new SimpleNeuralNetwork(representation.contactInputsCount, 40, 1)
     network.loadWeights(weights)
     new GeneticAgent(path, network, agentId)
+  }
+
+  /**
+   * Create agent from existing weights (finds in the path)
+   */
+  def fromPath(path: Path, agentId: Int = 0): GeneticAgent = {
+    val tracker = new BestCheckpointTracker(path)
+    val checkpoint = tracker.loadBestCheckpoint()
+    if (checkpoint.isDefined) {
+      GeneticAgent.fromWeights(path, checkpoint.get.weights, agentId)
+    } else {
+      throw new IllegalArgumentException("Can't load weights from path " + path.toString)
+    }
   }
 }

@@ -87,7 +87,6 @@ class GeneticTrainer(val basePath: Path,
         val dispatcher = new GameDispatcher(agent, opponent, None)
         dispatcher.playGames(gamesPerEvaluation, learn = false)
         
-        val wonGames = dispatcher.getAgent1WonGames
         val wonPoints = dispatcher.getAgent1WonPoints
         val ppg = if (gamesPerEvaluation > 0) wonPoints.toDouble / gamesPerEvaluation else 0.0
         

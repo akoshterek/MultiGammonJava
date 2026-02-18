@@ -113,8 +113,23 @@ object GACheckpoint {
   }
   
   private def extractMatrix(json: String, key: String, rows: Int, cols: Int): Array[Array[Float]] = {
-    val pattern = s""""$key":\\s*\\[(.*?)\\]\\s*[,}]""".r
-    val content = pattern.findFirstMatchIn(json).get.group(1)
+    val startPattern = s""""$key":\\s*\\[""".r
+    val startMatch = startPattern.findFirstMatchIn(json).get
+    val startIdx = startMatch.end
+    
+    // Find matching closing bracket using bracket counting
+    var bracketCount = 1
+    var idx = startIdx
+    while (bracketCount > 0 && idx < json.length) {
+      json(idx) match {
+        case '[' => bracketCount += 1
+        case ']' => bracketCount -= 1
+        case _ =>
+      }
+      idx += 1
+    }
+    
+    val content = json.substring(startIdx, idx - 1)
     
     val rowPattern = "\\[([^\\]]+)\\]".r
     val rowMatches = rowPattern.findAllMatchIn(content).toArray
