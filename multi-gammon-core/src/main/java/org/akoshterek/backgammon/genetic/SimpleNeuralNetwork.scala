@@ -1,7 +1,6 @@
 package org.akoshterek.backgammon.genetic
 
 import org.akoshterek.backgammon.nn._
-import scala.util.Random
 
 /**
  * Simplified neural network for genetic algorithm training.
@@ -32,7 +31,7 @@ class SimpleNeuralNetwork(val inputSize: Int,
     // Compute hidden layer
     var h = 0
     while (h < hiddenSize) {
-      var sum = DotProductUtils.dotProduct(wInputHidden(h), input, useSIMD = true)
+      val sum = DotProductUtils.dotProduct(wInputHidden(h), input, useSIMD = true)
       hiddenRaw(h) = sum + bHidden(h)
       hiddenActivated(h) = hiddenActivation.f(hiddenRaw(h))
       h += 1
@@ -117,19 +116,7 @@ class SimpleNeuralNetwork(val inputSize: Int,
    */
   def analyzeWeights(): WeightStatistics = {
     val allWeights = wInputHidden.flatten ++ wHiddenOutput.flatten
-    
-    if (allWeights.isEmpty) {
-      return WeightStatistics(0f, 0f, 0f, 0, 0, allWeights.length)
-    }
-    
-    val mean = allWeights.sum / allWeights.length
-    val variance = allWeights.map(w => (w - mean) * (w - mean)).sum / allWeights.length
-    val stdDev = math.sqrt(variance).toFloat
-    val maxAbs = allWeights.map(_.abs).max
-    
-    val nearZero = allWeights.count(w => math.abs(w) < 0.01f)
-    val large = allWeights.count(w => math.abs(w) > 5.0f)
-    
-    WeightStatistics(mean, stdDev, maxAbs, nearZero, large, allWeights.length)
+    val allBiases = bHidden ++ bOutput
+    NNUtils.analyzeWeights(allWeights ++ allBiases)
   }
 }
