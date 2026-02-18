@@ -23,6 +23,12 @@ object OptionsBuilder {
   private val BENCHMARK_OPPONENTS_OPTION: String = "benchmark-opponents"
   private val USE_OUTPUT_BIAS_OPTION: String = "use-output-bias"
 
+  private val GA_TRAINING_OPTION: String = "ga-train"
+  private val GA_POPULATION_OPTION: String = "ga-population"
+  private val GA_GENERATIONS_OPTION: String = "ga-generations"
+  private val GA_ELITE_OPTION: String = "ga-elite"
+  private val GA_MUTATION_RATE_OPTION: String = "ga-mutation-rate"
+  private val GA_MUTATION_STRENGTH_OPTION: String = "ga-mutation-strength"
   private val options: Options = new Options
   private var commandLine: CommandLine = _
 
@@ -45,6 +51,13 @@ object OptionsBuilder {
     options.addOption(Option.builder().longOpt(TRAINING_OPPONENTS_OPTION).argName("training opponents").desc("training opponent mix (e.g. 'self:50,SimpleHeuristic:25,Random:25')").hasArg.build)
     options.addOption(Option.builder().longOpt(BENCHMARK_OPPONENTS_OPTION).argName("benchmark opponents").desc("comma-separated benchmark opponents (e.g. 'Random,SimpleHeuristic,Heuristic')").hasArg.build)
     options.addOption(Option.builder().longOpt(USE_OUTPUT_BIAS_OPTION).argName("use output bias").desc("enable output bias (default true, set to false for diverse opponents)").hasArg.build)
+
+    options.addOption(Option.builder().longOpt(GA_TRAINING_OPTION).desc("use genetic algorithm training instead of TD learning").build)
+    options.addOption(Option.builder().longOpt(GA_POPULATION_OPTION).argName("population size").desc("GA population size (default 20)").hasArg.`type`(classOf[Number]).build)
+    options.addOption(Option.builder().longOpt(GA_GENERATIONS_OPTION).argName("generations").desc("GA number of generations (default 10)").hasArg.`type`(classOf[Number]).build)
+    options.addOption(Option.builder().longOpt(GA_ELITE_OPTION).argName("elite count").desc("GA elite count (default 4)").hasArg.`type`(classOf[Number]).build)
+    options.addOption(Option.builder().longOpt(GA_MUTATION_RATE_OPTION).argName("mutation rate").desc("GA mutation rate 0.0-1.0 (default 0.05)").hasArg.`type`(classOf[Number]).build)
+    options.addOption(Option.builder().longOpt(GA_MUTATION_STRENGTH_OPTION).argName("mutation strength").desc("GA mutation strength (default 0.1)").hasArg.`type`(classOf[Number]).build)
   }
 
   def parse(args: Array[String]): OptionsBean = {
@@ -70,6 +83,13 @@ object OptionsBuilder {
       bean.trainingOpponents = commandLine.getOptionValue(TRAINING_OPPONENTS_OPTION, "self:100")
       bean.benchmarkOpponents = commandLine.getOptionValue(BENCHMARK_OPPONENTS_OPTION, "SimpleHeuristic")
       bean.useOutputBias = commandLine.getOptionValue(USE_OUTPUT_BIAS_OPTION, "true").toBoolean
+
+      bean.gaTraining = commandLine.hasOption(GA_TRAINING_OPTION)
+      bean.gaPopulationSize = getIntOption(GA_POPULATION_OPTION, 20)
+      bean.gaGenerations = getIntOption(GA_GENERATIONS_OPTION, 10)
+      bean.gaEliteCount = getIntOption(GA_ELITE_OPTION, 4)
+      bean.gaMutationRate = getFloatOption(GA_MUTATION_RATE_OPTION, 0.05f)
+      bean.gaMutationStrength = getFloatOption(GA_MUTATION_STRENGTH_OPTION, 0.1f)
     }
     catch {
       case e: ParseException =>

@@ -7,6 +7,7 @@ import org.akoshterek.backgammon.agent.raw.RawTd40
 import org.akoshterek.backgammon.dice.PseudoRandomDiceRoller
 import org.akoshterek.backgammon.eval.Evaluator
 import org.akoshterek.backgammon.util.{OptionsBean, OptionsBuilder}
+import org.akoshterek.backgammon.genetic.GeneticTrainer
 import org.apache.commons.lang3.time.DurationFormatUtils
 
 class Dispatcher {
@@ -42,16 +43,20 @@ class Dispatcher {
 
   def run(): Unit = {
     val elapsedTime: Long = time {
-      val agentNames: Vector[String] = options.agentNames
-      val benchAgenName: String = options.benchmarkAgentName
+      if (options.gaTraining) {
+        runGeneticTraining()
+      } else {
+        val agentNames: Vector[String] = options.agentNames
+        val benchAgenName: String = options.benchmarkAgentName
 
-      agentNames.foreach { agentName =>
-        runAgentIteration(agentName,
-          benchAgenName,
-          options.trainingGames,
-          options.benchmarkGames,
-          options.benchmarkPeriod
-        )
+        agentNames.foreach { agentName =>
+          runAgentIteration(agentName,
+            benchAgenName,
+            options.trainingGames,
+            options.benchmarkGames,
+            options.benchmarkPeriod
+          )
+        }
       }
     }
 
@@ -150,6 +155,46 @@ class Dispatcher {
         rawAgent.saveBenchmarkResult(benchAgent.fullName, ppg, wins, losses, points)
       case _ => // Other agents don't have benchmark tracking
     }
+  }
+
+  private def runGeneticTraining(): Unit = {
+    println("\n" + "="*60)
+    println("Genetic Algorithm Training")
+    println("="*60 + "\n")
+    
+    // Create opponents based on benchmark configuration
+    val opponentNames = options.benchmarkOpponents.split(",").map(_.trim)
+    val opponents = opponentNames.map(name => AgentFactory.createAgent(name, options))
+    
+    println(s"Population size: ${options.gaPopulationSize}")
+    println(s"Generations: ${options.gaGenerations}")
+    println(s"Elite count: ${options.gaEliteCount}")
+    println(s"Mutation rate: ${options.gaMutationRate}")
+    println(s"Mutation strength: ${options.gaMutationStrength}")
+    println(s"Opponents: ${opponentNames.mkString(", ")}")
+    println()
+    
+    // Create trainer
+    val trainer = new GeneticTrainer(
+      basePath = Evaluator.basePath,
+      populationSize = options.gaPopulationSize,
+      eliteCount = options.gaEliteCount,
+      mutationRate = options.gaMutationRate,
+      mutationStrength = options.gaMutationStrength,
+      crossoverMethod = "uniform",
+      gamesPerEvaluation = options.benchmarkGames
+    )
+    
+    // Initialize population
+    trainer.initializePopulation()
+    
+    // Train
+    trainer.train(options.gaGenerations, opponents)
+    
+    // Save best agent
+    trainer.saveBestAgent("best_genetic_agent.json")
+    
+    println("\nGenetic training complete!")
   }
 
   private def formatTime(millis: Long): String = {
