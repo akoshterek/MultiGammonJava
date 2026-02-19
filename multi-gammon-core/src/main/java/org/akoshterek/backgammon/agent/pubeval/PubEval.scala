@@ -1,6 +1,7 @@
 package org.akoshterek.backgammon.agent.pubeval
 
 import java.util
+import org.akoshterek.backgammon.nn.DotProductUtils
 
 class PubEval {
   private val _contactWeights: Array[Float] = new Array[Float](122)
@@ -81,13 +82,7 @@ class PubEval {
     } else {
       setx(pos)
       val weights = if (race != 0) _raceWeights else _contactWeights
-      var score = 0.0f
-      var i = 0
-      while (i < weights.length) {
-        score += x(i) * weights(i)
-        i += 1
-      }
-      score
+      DotProductUtils.dotProduct(x, weights, useSIMD = true)
     }
   }
 
