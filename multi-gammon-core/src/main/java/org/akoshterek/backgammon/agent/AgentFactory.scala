@@ -4,10 +4,8 @@ import org.akoshterek.backgammon.agent.gnubg.GnubgAgent
 import org.akoshterek.backgammon.agent.pubeval.PubEvalAgent
 import org.akoshterek.backgammon.agent.raw.RawTd40
 import org.akoshterek.backgammon.eval.Evaluator
-import org.akoshterek.backgammon.genetic.{BestCheckpointTracker, GeneticAgent}
+import org.akoshterek.backgammon.genetic.GeneticAgent
 import org.akoshterek.backgammon.util.OptionsBean
-
-import java.nio.file.Paths
 
 object AgentFactory {
   def createAgent(fullName: String, options: OptionsBean): Agent = {
@@ -31,6 +29,7 @@ object AgentFactory {
 
       case "geneticagent" =>
         GeneticAgent.fromPath(Evaluator.basePath, 2);
+
 //
 //      case "geneticagent2" =>
 //        val path = Paths.get("experiments_ga/002_simple_pubeval")

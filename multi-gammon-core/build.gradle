@@ -20,7 +20,7 @@ dependencies {
 
     // Add Scala logging dependencies
     implementation "com.typesafe.scala-logging:scala-logging_2.13:3.9.5"
-    implementation 'ch.qos.logback:logback-classic:1.5.13'
+    implementation 'ch.qos.logback:logback-classic:1.5.32'
 }
 
 test {
@@ -71,6 +71,8 @@ task runMultiGammon(type: JavaExec) {
             '-Xmx4g',
             '-Xms2g',
             '-XX:+UseG1GC',
+            '-Duser.language=en',
+            '-Duser.country=US',
             '--add-modules',
             'jdk.incubator.vector',
             '--enable-preview'

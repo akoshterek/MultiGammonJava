@@ -4,10 +4,15 @@ import org.apache.commons.math3.distribution.UniformIntegerDistribution
 import org.apache.commons.math3.random.Well19937c
 
 class PseudoRandomDiceRoller(val seed: Long) extends DiceRoller {
-  private val rng = new Well19937c(seed)
-  private val distribution = new UniformIntegerDistribution(rng, 1, 6)
+  private val threadLocalRng = ThreadLocal.withInitial(() => {
+    new Well19937c(seed)
+  })
 
-  private def nextDice: Int = distribution.sample
+  private val threadLocalDist = ThreadLocal.withInitial(() =>
+    new UniformIntegerDistribution(threadLocalRng.get(), 1, 6)
+  )
+
+  private def nextDice: Int = threadLocalDist.get().sample
 
   override def roll(): (Int, Int) = (nextDice, nextDice)
 }

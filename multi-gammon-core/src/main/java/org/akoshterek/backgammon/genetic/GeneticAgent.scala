@@ -15,6 +15,8 @@ import org.akoshterek.backgammon.Constants._
 class GeneticAgent(val path: Path, 
                    val network: SimpleNeuralNetwork,
                    val agentId: Int = 0) extends Agent with CopyableAgent[GeneticAgent] {
+
+  override val supportsBearoff = true
   
   private val representation = new RawRepresentation(Tesauro92Codec)
   
@@ -26,13 +28,6 @@ class GeneticAgent(val path: Path,
     val copy = new GeneticAgent(path, clonedNetwork, agentId)
     copy.setPlayedGames(this.playedGames)
     copy
-  }
-  
-  override def evaluatePosition(board: Board, pc: PositionClass): Reward = {
-    pc match {
-      case PositionClass.CLASS_OVER => evalOver(board)
-      case _ => evalContact(board)
-    }
   }
   
   override def evalContact(board: Board): Reward = {

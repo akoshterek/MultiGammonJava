@@ -25,13 +25,13 @@ object GameInfoPrinter {
         agents(i).wonPoints.asInstanceOf[Float] / (agents(0).wonPoints + agents(1).wonPoints) * 100))
     }
 
-    val ppg: Float = agents(0).wonPoints.toFloat / numGames
-    System.out.println("%c:%s: won %+5.3f ppg\n".format(signs(0), agents(0).agent.fullName, ppg))
+    val ppgDifferential: Float = (agents(0).wonPoints - agents(1).wonPoints).toFloat / numGames
+    System.out.println("%c:%s: differential %+5.3f ppg\n".format(signs(0), agents(0).agent.fullName, ppgDifferential))
 
     val fileName = if (experimentTag.nonEmpty) s"${experimentTag}_${getLogFileName(agents)}" else getLogFileName(agents)
     val logPath: Path = path.resolve(fileName)
     Using(new PrintWriter(Files.newBufferedWriter(logPath, StandardOpenOption.APPEND, StandardOpenOption.CREATE)))(writer => {
-      writer.println(s"${agents(0).agent.playedGames}, $ppg")
+      writer.println(s"${agents(0).agent.playedGames}, $ppgDifferential")
     })
   }
 
@@ -45,8 +45,6 @@ object GameInfoPrinter {
     val an: Board = if (matchState.fMove == 0) matchState.board.clone().swapSides else matchState.board.clone()
     apch(0) = "O: " + agents(0).agent.fullName
     apch(6) = "X: " + agents(1).agent.fullName
-    //apch[1] = String.format("%d point(s)", match.anScore[0]);
-    //apch[5] = String.format("%d point(s)", match.anScore[1]);
     apch(if (matchState.fMove != 0) 4 else 2) = ""
 
     if (matchState.anDice._1 != 0) {

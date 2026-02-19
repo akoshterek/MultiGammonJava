@@ -78,8 +78,6 @@ final class Reward(input: Array[Float]) {
 
   def toArray: Array[Float] = data
 
-  def toDoubleArray: Array[Double] = data.map(_.toDouble)
-
   override def equals(that: Any): Boolean = {
     that match {
       case that: Reward => this.data.sameElements(that.data)
