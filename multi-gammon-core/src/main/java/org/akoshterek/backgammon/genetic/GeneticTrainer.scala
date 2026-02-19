@@ -263,9 +263,8 @@ class GeneticTrainer(val basePath: Path,
       val stats = bestAgent.network.analyzeWeights()
       println(s"\nBest agent statistics:")
       println(s"  Fitness: $bestFitness PPG")
-      println(s"  Weight mean: ${stats.mean}")
-      println(s"  Weight stdDev: ${stats.stdDev}")
-      println(s"  Weight maxAbs: ${stats.maxAbs}")
+      println(stats.prettyPrint)
+      stats.healthWarnings.foreach(println)
       
       val bestPath = checkpointTracker.getBestCheckpointPath()
       bestPath match {
