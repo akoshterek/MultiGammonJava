@@ -26,6 +26,7 @@ class OptionsBean {
   var gaEliteCount: Int = 4
   var gaMutationRate: Float = 0.05f
   var gaMutationStrength: Float = 0.1f
+  var gaParallelism: Int = 4
 
   def agentNames: Vector[String] = _agentNames
   def agentNames_= (agents: Array[String]): Unit = {

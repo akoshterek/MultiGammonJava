@@ -30,6 +30,7 @@ object OptionsBuilder {
   private val GA_ELITE_OPTION: String = "ga-elite"
   private val GA_MUTATION_RATE_OPTION: String = "ga-mutation-rate"
   private val GA_MUTATION_STRENGTH_OPTION: String = "ga-mutation-strength"
+  private val GA_PARALLELISM_OPTION: String = "ga-parallelism"
   private val options: Options = new Options
   private var commandLine: CommandLine = _
 
@@ -60,6 +61,7 @@ object OptionsBuilder {
     options.addOption(Option.builder().longOpt(GA_ELITE_OPTION).argName("elite count").desc("GA elite count (default 4)").hasArg.`type`(classOf[Number]).build)
     options.addOption(Option.builder().longOpt(GA_MUTATION_RATE_OPTION).argName("mutation rate").desc("GA mutation rate 0.0-1.0 (default 0.05)").hasArg.`type`(classOf[Number]).build)
     options.addOption(Option.builder().longOpt(GA_MUTATION_STRENGTH_OPTION).argName("mutation strength").desc("GA mutation strength (default 0.1)").hasArg.`type`(classOf[Number]).build)
+    options.addOption(Option.builder().longOpt(GA_PARALLELISM_OPTION).argName("threads").desc("GA evaluation parallelism (default 4)").hasArg.`type`(classOf[Number]).build)
   }
 
   def parse(args: Array[String]): OptionsBean = {
@@ -93,6 +95,7 @@ object OptionsBuilder {
       bean.gaEliteCount = getIntOption(GA_ELITE_OPTION, 4)
       bean.gaMutationRate = getFloatOption(GA_MUTATION_RATE_OPTION, 0.05f)
       bean.gaMutationStrength = getFloatOption(GA_MUTATION_STRENGTH_OPTION, 0.1f)
+      bean.gaParallelism = getIntOption(GA_PARALLELISM_OPTION, 4)
     }
     catch {
       case e: ParseException =>
