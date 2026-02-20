@@ -2,6 +2,7 @@
 
 ./gradlew :multi-gammon-core:runMultiGammon --args="\
   --ga-train \
+  --ga-parallelism 4 \
   --ga-population 100 \
   --ga-generations 100 \
   --ga-elite 10 \
@@ -9,4 +10,4 @@
   --ga-mutation-strength 0.05 \
   -G 100 \
   --benchmark-opponents 'PubEval' \
-  --experiment-path experiments_ga/004_pubeval_bearoff"
+  --experiment-path experiments_ga/006_pubeval_5out"

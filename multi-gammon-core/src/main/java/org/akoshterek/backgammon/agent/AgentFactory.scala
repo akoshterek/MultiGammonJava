@@ -7,6 +7,8 @@ import org.akoshterek.backgammon.eval.Evaluator
 import org.akoshterek.backgammon.genetic.GeneticAgent
 import org.akoshterek.backgammon.util.OptionsBean
 
+import java.nio.file.Paths
+
 object AgentFactory {
   def createAgent(fullName: String, options: OptionsBean): Agent = {
     val fullNameLower: String = fullName.toLowerCase
@@ -28,12 +30,15 @@ object AgentFactory {
                    useOutputBias = options.useOutputBias)
 
       case "geneticagent" =>
-        GeneticAgent.fromPath(Evaluator.basePath, 2);
+        GeneticAgent.fromPath(Evaluator.basePath, 6);
 
-//
-//      case "geneticagent2" =>
-//        val path = Paths.get("experiments_ga/002_simple_pubeval")
-//        GeneticAgent.fromPath(path, 2);
+
+      case "geneticagent5" =>
+        val path = Paths.get("experiments_ga/005_pubeval_5out")
+        GeneticAgent.fromPath(path, 5);
+      case "geneticagent6" =>
+        val path = Paths.get("experiments_ga/006_pubeval_5out")
+        GeneticAgent.fromPath(path, 6);
 
       case _ =>
         throw new IllegalArgumentException("Unknown agent name " + fullName)

@@ -16,6 +16,7 @@ class GeneticTrainer(val basePath: Path,
                     val mutationStrength: Float = 0.1f,
                     val crossoverMethod: String = "uniform",
                     val gamesPerEvaluation: Int = 100,
+                    val parallelism: Int = 4,
                     val seed: Long = System.currentTimeMillis()) {
   
   require(eliteCount < populationSize, "Elite count must be less than population size")
@@ -73,31 +74,65 @@ class GeneticTrainer(val basePath: Path,
   }
   
   /**
+   * Evaluate single agent fitness against opponents
+   * Uses generation and agent-specific seed for deterministic parallel evaluation
+   * Seed formula: baseSeed + generation * populationSize + agentIndex
+   * This ensures different dice sequences across generations for more exploration
+   */
+  private def evaluateAgentFitness(agentIndex: Int, agent: GeneticAgent, opponents: Array[Agent]): Double = {
+    var totalPPG = 0.0
+    
+    // Create agent-specific dice roller with generation-dependent seed
+    val agentSeed = seed + generation * populationSize + agentIndex
+    val agentDiceRoller = new org.akoshterek.backgammon.dice.PseudoRandomDiceRoller(agentSeed)
+    
+    for (opponent <- opponents) {
+      val dispatcher = new GameDispatcher(agent, opponent, None, agentDiceRoller)
+      dispatcher.playGames(gamesPerEvaluation, learn = false)
+      val wonPoints = dispatcher.getAgent1WonPoints
+      val ppg = if (gamesPerEvaluation > 0) wonPoints.toDouble / gamesPerEvaluation else 0.0
+      totalPPG += ppg
+    }
+    
+    totalPPG / opponents.length
+  }
+  
+  /**
    * Evaluate fitness of entire population against opponents
    */
   def evaluatePopulation(opponents: Array[Agent]): Unit = {
     println(s"\n=== Generation $generation: Evaluating Population ===")
+    println(s"  Evaluating $populationSize agents using $parallelism threads...")
     
-    for (i <- population.indices) {
-      val agent = population(i)
-      var totalPPG = 0.0
-      
-      // Evaluate against each opponent
-      for (opponent <- opponents) {
-        val dispatcher = new GameDispatcher(agent, opponent, None)
-        dispatcher.playGames(gamesPerEvaluation, learn = false)
-        
-        val wonPoints = dispatcher.getAgent1WonPoints
-        val ppg = if (gamesPerEvaluation > 0) wonPoints.toDouble / gamesPerEvaluation else 0.0
-        
-        totalPPG += ppg
+    // Sequential evaluation for parallelism = 1
+    if (parallelism == 1) {
+      for (i <- population.indices) {
+        fitness(i) = evaluateAgentFitness(i, population(i), opponents)
       }
+    } else {
+      // Parallel evaluation using ExecutorService
+      import java.util.concurrent.{Executors, Callable}
+      import scala.jdk.CollectionConverters._
       
-      // Fitness is average PPG across all opponents
-      fitness(i) = totalPPG / opponents.length
+      val executor = Executors.newFixedThreadPool(parallelism)
       
-      if ((i + 1) % 5 == 0) {
-        println(s"  Evaluated ${i + 1}/$populationSize agents...")
+      try {
+        val tasks = population.indices.map { i =>
+          new Callable[(Int, Double)] {
+            def call(): (Int, Double) = {
+              (i, evaluateAgentFitness(i, population(i), opponents))
+            }
+          }
+        }.asJava
+        
+        val results = executor.invokeAll(tasks).asScala.map(_.get())
+        
+        // Update fitness array
+        results.foreach { case (i, fit) =>
+          fitness(i) = fit
+        }
+      } finally {
+        executor.shutdown()
       }
     }
     
@@ -204,6 +239,7 @@ class GeneticTrainer(val basePath: Path,
     println(s"Mutation strength: $mutationStrength")
     println(s"Crossover method: $crossoverMethod")
     println(s"Games per evaluation: $gamesPerEvaluation")
+    println(s"Parallelism: $parallelism threads")
     println(s"========================================\n")
     
     for (gen <- 0 until numGenerations) {

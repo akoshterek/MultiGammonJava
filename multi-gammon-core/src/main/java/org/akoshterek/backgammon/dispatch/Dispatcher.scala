@@ -184,7 +184,8 @@ class Dispatcher {
       mutationRate = options.gaMutationRate,
       mutationStrength = options.gaMutationStrength,
       crossoverMethod = "uniform",
-      gamesPerEvaluation = options.benchmarkGames
+      gamesPerEvaluation = options.benchmarkGames,
+      parallelism = options.gaParallelism
     )
     
     // Initialize population
