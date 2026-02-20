@@ -2,10 +2,10 @@ package org.akoshterek.backgammon.nn
 
 import org.json4s._
 import org.json4s.native.Serialization
-import org.json4s.native.Serialization.{read, writePretty}
+import org.json4s.native.Serialization.read
+import org.akoshterek.backgammon.util.JsonUtils
 
-import java.io.FileWriter
-import java.nio.file.{Files, Path, Paths, StandardCopyOption}
+import java.nio.file.{Files, Path}
 import scala.io.Source
 import scala.util.Using
 
@@ -58,24 +58,8 @@ object CheckpointManager {
    * Save checkpoint to file atomically
    */
   def save(checkpoint: Checkpoint, path: Path): Unit = {
-    val tempFile = Paths.get(path.toString + ".tmp")
-
-    try {
-      // Write to temp file with pretty formatting
-      val json = writePretty(checkpoint)
-      Using(new FileWriter(tempFile.toFile)) { writer =>
-        writer.write(json)
-      }.get
-
-      // Atomic rename
-      Files.move(tempFile, path, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING)
-      println(s"Checkpoint saved: $path")
-    } catch {
-      case e: Exception =>
-        // Clean up temp file on error
-        Files.deleteIfExists(tempFile)
-        throw new RuntimeException(s"Failed to save checkpoint to $path", e)
-    }
+    JsonUtils.saveJsonPretty(checkpoint, path)
+    println(s"Checkpoint saved: $path")
   }
 
   /**
