@@ -15,8 +15,10 @@ class Dispatcher {
   private var options: OptionsBean = _
 
   def init(args: Array[String]): Boolean = {
-    License.printBanner()
     options = OptionsBuilder.parse(args)
+    if (!options.noBanner) {
+      License.printBanner()
+    }
     if (options.isHelp) {
       OptionsBuilder.printHelp("multigammon")
       false
@@ -85,8 +87,8 @@ class Dispatcher {
 
     // Create OpponentSelector for diverse training if agent is copyable
     val opponentSelector = agent1 match {
-      case copyableAgent: CopyableAgent[Agent] =>
-        Some(new OpponentSelector(copyableAgent, opponentConfig, Evaluator.basePath, 16000001L))
+      case copyableAgent: CopyableAgent[_] =>
+        Some(new OpponentSelector(copyableAgent.asInstanceOf[CopyableAgent[Agent]], opponentConfig, Evaluator.basePath, 16000001L))
       case _ => None
     }
 

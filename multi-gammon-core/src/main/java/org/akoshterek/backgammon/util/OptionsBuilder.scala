@@ -6,6 +6,7 @@ object OptionsBuilder {
   private val HELP_OPTION: String = "help"
   private val WARRANTY_OPTION: String = "warranty"
   private val LICENSE_OPTION: String = "copying"
+  private val NO_BANNER_OPTION: String = "no-banner"
   private val VERBOSE_OPTION: String = "verbose"
   private val AGENT_OPTION: String = "agent"
   private val BENCH_AGENT_OPTION: String = "bench-agent"
@@ -36,6 +37,7 @@ object OptionsBuilder {
     options.addOption("h", HELP_OPTION, false, "produce help message")
     options.addOption("c", LICENSE_OPTION, false, "show license")
     options.addOption("w", WARRANTY_OPTION, false, "show warranty")
+    options.addOption(null, NO_BANNER_OPTION, false, "suppress banner output")
     options.addOption("v", VERBOSE_OPTION, false, "show game log")
     options.addOption(Option.builder("A").longOpt(AGENT_OPTION).argName("agent").desc("agent(s) to train").hasArg.build)
     options.addOption(Option.builder("B").longOpt(BENCH_AGENT_OPTION).argName("benchmark agent").desc("benchmark agent").hasArg.build)
@@ -68,6 +70,7 @@ object OptionsBuilder {
       bean.isHelp = commandLine.hasOption(HELP_OPTION)
       bean.isWarranty = commandLine.hasOption(WARRANTY_OPTION)
       bean.isLicense = commandLine.hasOption(LICENSE_OPTION)
+      bean.noBanner = commandLine.hasOption(NO_BANNER_OPTION)
       bean.isVerbose  = commandLine.hasOption(VERBOSE_OPTION)
       bean.agentNames = commandLine.getOptionValues(AGENT_OPTION)
       bean.benchmarkAgentName = commandLine.getOptionValue(BENCH_AGENT_OPTION, DEFAULT_BENCH_AGENT)

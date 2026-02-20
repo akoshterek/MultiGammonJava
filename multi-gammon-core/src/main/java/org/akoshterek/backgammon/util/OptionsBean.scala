@@ -4,6 +4,7 @@ class OptionsBean {
   var isHelp: Boolean = false
   var isWarranty: Boolean = false
   var isLicense: Boolean = false
+  var noBanner: Boolean = false
   private var _agentNames: Vector[String] = Vector()
   var benchmarkAgentName: String = ""
   var trainingGames: Int = 0
