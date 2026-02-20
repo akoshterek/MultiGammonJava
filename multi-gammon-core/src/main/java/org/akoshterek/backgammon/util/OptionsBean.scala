@@ -4,6 +4,7 @@ class OptionsBean {
   var isHelp: Boolean = false
   var isWarranty: Boolean = false
   var isLicense: Boolean = false
+  var noBanner: Boolean = false
   private var _agentNames: Vector[String] = Vector()
   var benchmarkAgentName: String = ""
   var trainingGames: Int = 0
@@ -25,6 +26,7 @@ class OptionsBean {
   var gaEliteCount: Int = 4
   var gaMutationRate: Float = 0.05f
   var gaMutationStrength: Float = 0.1f
+  var gaParallelism: Int = 4
 
   def agentNames: Vector[String] = _agentNames
   def agentNames_= (agents: Array[String]): Unit = {

@@ -32,10 +32,9 @@ class GeneticAgent(val path: Path,
   
   override def evalContact(board: Board): Reward = {
     val input = representation.calculateContactInputs(board)
-    val output = network.evaluate(input)
-    val rewardArray = Reward.rewardArray[Float]
-    rewardArray(OUTPUT_WIN) = output
-    new Reward(rewardArray)
+    val output = Array.ofDim[Float](5)
+    network.forward(input, output)
+    new Reward(output)
   }
 }
 
@@ -48,7 +47,7 @@ object GeneticAgent {
    */
   def createRandom(path: Path, agentId: Int = 0): GeneticAgent = {
     val representation = new RawRepresentation(Tesauro92Codec)
-    val network = new SimpleNeuralNetwork(representation.contactInputsCount, 40, 1)
+    val network = new SimpleNeuralNetwork(representation.contactInputsCount, 40, 5)
     new GeneticAgent(path, network, agentId)
   }
   
@@ -57,7 +56,7 @@ object GeneticAgent {
    */
   def fromWeights(path: Path, weights: org.akoshterek.backgammon.nn.NetworkWeights, agentId: Int = 0): GeneticAgent = {
     val representation = new RawRepresentation(Tesauro92Codec)
-    val network = new SimpleNeuralNetwork(representation.contactInputsCount, 40, 1)
+    val network = new SimpleNeuralNetwork(representation.contactInputsCount, 40, 5)
     network.loadWeights(weights)
     new GeneticAgent(path, network, agentId)
   }

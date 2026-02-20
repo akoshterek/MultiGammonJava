@@ -6,6 +6,7 @@ object OptionsBuilder {
   private val HELP_OPTION: String = "help"
   private val WARRANTY_OPTION: String = "warranty"
   private val LICENSE_OPTION: String = "copying"
+  private val NO_BANNER_OPTION: String = "no-banner"
   private val VERBOSE_OPTION: String = "verbose"
   private val AGENT_OPTION: String = "agent"
   private val BENCH_AGENT_OPTION: String = "bench-agent"
@@ -29,6 +30,7 @@ object OptionsBuilder {
   private val GA_ELITE_OPTION: String = "ga-elite"
   private val GA_MUTATION_RATE_OPTION: String = "ga-mutation-rate"
   private val GA_MUTATION_STRENGTH_OPTION: String = "ga-mutation-strength"
+  private val GA_PARALLELISM_OPTION: String = "ga-parallelism"
   private val options: Options = new Options
   private var commandLine: CommandLine = _
 
@@ -36,6 +38,7 @@ object OptionsBuilder {
     options.addOption("h", HELP_OPTION, false, "produce help message")
     options.addOption("c", LICENSE_OPTION, false, "show license")
     options.addOption("w", WARRANTY_OPTION, false, "show warranty")
+    options.addOption(null, NO_BANNER_OPTION, false, "suppress banner output")
     options.addOption("v", VERBOSE_OPTION, false, "show game log")
     options.addOption(Option.builder("A").longOpt(AGENT_OPTION).argName("agent").desc("agent(s) to train").hasArg.build)
     options.addOption(Option.builder("B").longOpt(BENCH_AGENT_OPTION).argName("benchmark agent").desc("benchmark agent").hasArg.build)
@@ -58,6 +61,7 @@ object OptionsBuilder {
     options.addOption(Option.builder().longOpt(GA_ELITE_OPTION).argName("elite count").desc("GA elite count (default 4)").hasArg.`type`(classOf[Number]).build)
     options.addOption(Option.builder().longOpt(GA_MUTATION_RATE_OPTION).argName("mutation rate").desc("GA mutation rate 0.0-1.0 (default 0.05)").hasArg.`type`(classOf[Number]).build)
     options.addOption(Option.builder().longOpt(GA_MUTATION_STRENGTH_OPTION).argName("mutation strength").desc("GA mutation strength (default 0.1)").hasArg.`type`(classOf[Number]).build)
+    options.addOption(Option.builder().longOpt(GA_PARALLELISM_OPTION).argName("threads").desc("GA evaluation parallelism (default 4)").hasArg.`type`(classOf[Number]).build)
   }
 
   def parse(args: Array[String]): OptionsBean = {
@@ -68,6 +72,7 @@ object OptionsBuilder {
       bean.isHelp = commandLine.hasOption(HELP_OPTION)
       bean.isWarranty = commandLine.hasOption(WARRANTY_OPTION)
       bean.isLicense = commandLine.hasOption(LICENSE_OPTION)
+      bean.noBanner = commandLine.hasOption(NO_BANNER_OPTION)
       bean.isVerbose  = commandLine.hasOption(VERBOSE_OPTION)
       bean.agentNames = commandLine.getOptionValues(AGENT_OPTION)
       bean.benchmarkAgentName = commandLine.getOptionValue(BENCH_AGENT_OPTION, DEFAULT_BENCH_AGENT)
@@ -90,6 +95,7 @@ object OptionsBuilder {
       bean.gaEliteCount = getIntOption(GA_ELITE_OPTION, 4)
       bean.gaMutationRate = getFloatOption(GA_MUTATION_RATE_OPTION, 0.05f)
       bean.gaMutationStrength = getFloatOption(GA_MUTATION_STRENGTH_OPTION, 0.1f)
+      bean.gaParallelism = getIntOption(GA_PARALLELISM_OPTION, 4)
     }
     catch {
       case e: ParseException =>

@@ -9,7 +9,10 @@ import java.nio.file.Path
 import scala.collection.mutable.ArrayBuffer
 import scala.util.control.Breaks._
 
-class GameDispatcher(val agent1: Agent, val agent2: Agent, val opponentSelector: Option[OpponentSelector] = None) {
+class GameDispatcher(val agent1: Agent, 
+                     val agent2: Agent, 
+                     val opponentSelector: Option[OpponentSelector] = None,
+                     val diceRoller: org.akoshterek.backgammon.dice.DiceRoller = null) {
   // For backward compatibility: if agent2 is provided, use it; otherwise use selector
   require(agent2 != null || opponentSelector.isDefined, "Must provide either agent2 or opponentSelector")
   
@@ -32,6 +35,9 @@ class GameDispatcher(val agent1: Agent, val agent2: Agent, val opponentSelector:
   private var currentMatch: MatchState = _
   private val lMatch: ArrayBuffer[MatchMove] = ArrayBuffer()
   private var pmrHint: MoveRecord = _
+  
+  // Store original dice roller for restoration
+  private var savedDiceRoller: org.akoshterek.backgammon.dice.DiceRoller = _
 
   // Initialize numGames from agent's current progress (for checkpoint resume in training)
   // For OpponentSelector case, use agent1's playedGames directly
@@ -43,17 +49,30 @@ class GameDispatcher(val agent1: Agent, val agent2: Agent, val opponentSelector:
   }
 
   def playGames(games: Int, learn: Boolean): Unit = {
-    agents(0).agent.isLearnMode = learn
-    agents(1).agent.isLearnMode = learn
-    for (i <- numGames + 1 until numGames + games + 1) {
-      playGame()
-      if (i % 100 == 0) {
-        System.out.print("%d ".format(i))
-      }
+    // Override dice roller if custom one provided (for deterministic parallel evaluation)
+    if (diceRoller != null) {
+      savedDiceRoller = org.akoshterek.backgammon.eval.Evaluator.diceRoller
+      org.akoshterek.backgammon.eval.Evaluator.diceRoller = diceRoller
     }
-    numGames += games
-    if (learn) {
-      agents(0).agent.save()
+    
+    try {
+      agents(0).agent.isLearnMode = learn
+      agents(1).agent.isLearnMode = learn
+      for (i <- numGames + 1 until numGames + games + 1) {
+        playGame()
+        if (i % 100 == 0) {
+          System.out.print("%d ".format(i))
+        }
+      }
+      numGames += games
+      if (learn) {
+        agents(0).agent.save()
+      }
+    } finally {
+      // Restore original dice roller
+      if (diceRoller != null && savedDiceRoller != null) {
+        org.akoshterek.backgammon.eval.Evaluator.diceRoller = savedDiceRoller
+      }
     }
   }
 
