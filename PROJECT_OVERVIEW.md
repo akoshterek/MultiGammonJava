@@ -2,6 +2,8 @@
 
 **Quick Summary:** A Scala/Java implementation of TD-Gammon using temporal-difference reinforcement learning with eligibility traces. Successfully replicated core TD-Gammon results with modern optimizations (SIMD, LeakyReLU).
 
+**Build/runtime requirement:** JDK **25** (LTS). SIMD uses the incubating Java Vector API (`jdk.incubator.vector`); tests and `runMultiGammon` enable it via `--add-modules` / `--enable-preview`.
+
 ---
 
 ## What This Project Does
@@ -308,7 +310,7 @@ Plus additional features:
 
 ### SIMD Optimization
 
-Uses Java Vector API for fast dot products:
+Uses Java Vector API (`jdk.incubator.vector`, JDK 25) for fast dot products:
 ```scala
 // Before SIMD: 100% scalar
 sum = 0

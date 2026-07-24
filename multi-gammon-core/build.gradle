@@ -33,8 +33,9 @@ task fatJar(type: Jar) {
         attributes 'Main-Class': 'backgammon.MultiGammon'
     }
 
-    archiveBaseName = 'multi-gammon'
-    archiveClassifier = 'all'
+    archiveBaseName.set('multi-gammon')
+    archiveVersion.set('')
+    archiveClassifier.set('all')
 
     // Include all runtime dependencies
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
