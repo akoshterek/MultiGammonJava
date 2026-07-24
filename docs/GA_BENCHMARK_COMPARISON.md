@@ -197,9 +197,9 @@ The better agent's advantage **increases** against better opponents - exactly wh
    - Benchmark frequently during training
 
 **Training practices:**
-3. **Benchmark early and often** - Run 6's 1.07 fitness was misleading
-4. **Focus on strong opponent performance** - gaps widen vs better players
-5. ✅ **Generation-dependent seeds already implemented** - `seed + generation * populationSize + agentIndex`
+1. **Benchmark early and often** - Run 6's 1.07 fitness was misleading
+2. **Focus on strong opponent performance** - gaps widen vs better players
+3. ✅ **Generation-dependent seeds already implemented** - `seed + generation * populationSize + agentIndex`
 
 ### Open Questions
 - Would larger network (80+ hidden) make 5-output competitive?

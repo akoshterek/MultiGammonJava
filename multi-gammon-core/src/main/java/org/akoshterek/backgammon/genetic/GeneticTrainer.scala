@@ -76,14 +76,15 @@ class GeneticTrainer(val basePath: Path,
   /**
    * Evaluate single agent fitness against opponents
    * Uses generation and agent-specific seed for deterministic parallel evaluation
-   * Seed formula: baseSeed + generation * populationSize + agentIndex
+   * Seed formula: baseSeed + generation
    * This ensures different dice sequences across generations for more exploration
    */
   private def evaluateAgentFitness(agentIndex: Int, agent: GeneticAgent, opponents: Array[Agent]): Double = {
     var totalPPG = 0.0
     
     // Create agent-specific dice roller with generation-dependent seed
-    val agentSeed = seed + generation * populationSize + agentIndex
+    val agentSeed = seed + generation
+    //TODO gameSeed = hash(baseSeed, generation, gameIndex)
     val agentDiceRoller = new org.akoshterek.backgammon.dice.PseudoRandomDiceRoller(agentSeed)
     
     for (opponent <- opponents) {
