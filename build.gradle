@@ -4,7 +4,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'org.scala-lang:scala-library:2.13.12'
+        classpath 'org.scala-lang:scala-library:2.13.18'
     }
 }
 
@@ -16,7 +16,7 @@ plugins {
 allprojects {
     // Define dependency versions BEFORE they're used
     ext {
-        scalaVersion = '2.13.12'
+        scalaVersion = '2.13.18'
         scalaArmVersion = '2.1'
         commonsCliVersion = '1.6.0'
         commonsMathVersion = '3.6.1'
@@ -53,24 +53,31 @@ subprojects {
     apply plugin: 'scala'
     apply plugin: 'maven-publish'
 
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
-
     java {
         toolchain {
-            languageVersion = JavaLanguageVersion.of(17)
+            languageVersion = JavaLanguageVersion.of(25)
         }
+        sourceCompatibility = JavaVersion.VERSION_25
+        targetCompatibility = JavaVersion.VERSION_25
     }
 
     tasks.withType(ScalaCompile) {
         scalaCompileOptions.forkOptions.with {
             memoryMaximumSize = '2g'
+            jvmArgs += ['--add-modules', 'jdk.incubator.vector', '--enable-preview']
         }
+        scalaCompileOptions.additionalParameters = [
+                '-release:25'
+        ]
     }
 
     tasks.withType(JavaCompile) {
         options.encoding = 'UTF-8'
-        options.compilerArgs += ['-parameters']
+        options.compilerArgs += [
+                '-parameters',
+                '--add-modules', 'jdk.incubator.vector',
+                '--enable-preview'
+        ]
     }
 
     sourceSets {
@@ -103,13 +110,13 @@ subprojects {
 
         testLogging {
             events "passed", "skipped", "failed"
-            exceptionFormat "full"
+            exceptionFormat = "full"
         }
     }
 
     dependencies {
         // Use direct version references to avoid property resolution issues
-        implementation "org.scala-lang:scala-library:2.13.12"
+        implementation "org.scala-lang:scala-library:2.13.18"
         testImplementation "junit:junit:4.13.2"
     }
 
@@ -140,7 +147,7 @@ subprojects {
 
 // Configuration for the wrapper task
 wrapper {
-    gradleVersion = '8.4'
+    gradleVersion = '9.6.1'
     distributionType = Wrapper.DistributionType.BIN
 }
 

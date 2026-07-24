@@ -1,2 +1,2 @@
 #!/bin/bash
-gradle wrapper --gradle-version 8.4
+gradle wrapper --gradle-version 9.6.1
